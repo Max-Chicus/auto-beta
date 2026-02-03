@@ -1,23 +1,101 @@
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 function Header() {
-  const { cartItems } = useSelector(state => state.cart);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isAdminLoggedIn = () => {
+    return localStorage.getItem('adminLoggedIn') === 'true';
+  };
 
   return (
-    <header className="bg-red-600 text-white p-4 flex justify-between items-center">
-      <h1 className="text-xl font-bold">
-        <Link to="/">AutoShop</Link>
-      </h1>
-      <nav className="space-x-4 flex">
-        <Link to="/catalog" className="hover:underline">Catalog</Link>
-        <Link to="/cart" className="hover:underline header__cart">
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-cart4" viewBox="0 0 16 16">
-            <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l.5 2H5V5zM6 5v2h2V5zm3 0v2h2V5zm3 0v2h1.36l.5-2zm1.11 3H12v2h.61zM11 8H9v2h2zM8 8H6v2h2zM5 8H3.89l.5 2H5zm0 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0" />
-          </svg>
-        ({cartItems.length})
-        </Link>
-        <Link to="/checkout" className="hover:underline">Checkout</Link>
+    <header className="bg-white shadow">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <span className="text-2xl font-bold text-red-600">DERS</span>
+              <span className="text-2xl font-bold text-gray-900">TRONIK</span>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-gray-700 hover:text-red-600 font-medium">
+              Acasă
+            </Link>
+            <Link to="/services" className="text-gray-700 hover:text-red-600 font-medium">
+              Servicii
+            </Link>
+            <Link to="/request-service" className="text-gray-700 hover:text-red-600 font-medium">
+              Solicită serviciu
+            </Link>
+            
+            {/* Admin Link (dacă e logat) */}
+            {isAdminLoggedIn() && (
+              <Link 
+                to="/admin" 
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium"
+              >
+                Admin Panel
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-gray-700 hover:text-red-600"
+            >
+              {mobileMenuOpen ? (
+                <span className="text-2xl">✕</span>
+              ) : (
+                <span className="text-2xl">☰</span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-4 border-t">
+            <div className="flex flex-col space-y-4">
+              <Link 
+                to="/" 
+                className="text-gray-700 hover:text-red-600 font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Acasă
+              </Link>
+              <Link 
+                to="/services" 
+                className="text-gray-700 hover:text-red-600 font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Servicii
+              </Link>
+              <Link 
+                to="/request-service" 
+                className="text-gray-700 hover:text-red-600 font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Solicită serviciu
+              </Link>
+              
+              {isAdminLoggedIn() && (
+                <Link 
+                  to="/admin" 
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium text-center"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin Panel
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
