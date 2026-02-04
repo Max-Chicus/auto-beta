@@ -7,17 +7,28 @@ require('dotenv').config();
 const app = express();
 connectDB();
 
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? ['https://domeniultau.ro', 'https://www.domeniultau.ro']
-    : 'http://localhost:5173',
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+// Înlocuiește tot cors-ul cu asta:
+const allowedOrigins = [
+  'https://backend-api-lemon-seven.vercel.app',  // backend-ul tău
+  'https://auto-service-frontend.vercel.app',     // frontend-ul tău NOU
+  'http://localhost:5173',                        // dev local
+  'http://localhost:3000'                         // alt dev local
+];
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permite requests fără origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
 
-app.use(cors());
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'CORS policy: Origin not allowed';
+      console.log('Blocked origin:', origin);
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({
