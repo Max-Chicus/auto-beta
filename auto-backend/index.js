@@ -9,6 +9,43 @@ connectDB();
 
 app.use(cors());
 
+// După app.use(cors()); și înainte de debug middleware
+
+// RUTA DE BAZĂ - pentru a evita "Not Found"
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Auto Beta Backend API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: [
+      '/api/services',
+      '/api/service-requests',
+      '/api/service-quote',
+      '/api/filters',
+      '/api/admin',
+      '/api/public',
+      '/uploads'
+    ]
+  });
+});
+
+// RUTA API DE BAZĂ
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'Auto Beta API v1.0',
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    mongo: 'connected'
+  });
+});
+
+// După aceea păstrează restul codului tău...
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+  next();
+});
+// ... restul codului tău rămâne la fel
+
 // Debug middleware - arată toate requesturile
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
