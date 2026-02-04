@@ -85,12 +85,12 @@ export const processImagesForForm = async (files) => {
 
 // ========== FUNCȚII PENTRU TIPURI SERVICII ==========
 export const createServiceTypeInline = async (typeData) => {
-  return API.post('/admin/service-types', typeData);
+  return API.post('/api/admin/service-types', typeData);
 };
 
 // ========== FUNCȚII PRINCIPALE ==========
 export const getFilters = async () => {
-  return API.get('/filters');
+  return API.get('/api/filters');
 };
 
 export const getServices = async (filters = {}) => {
@@ -100,27 +100,27 @@ export const getServices = async (filters = {}) => {
       params.append(key, value);
     }
   });
-  return API.get(`/services?${params.toString()}`);
+  return API.get(`/api/services?${params.toString()}`);
 };
 
 export const getServiceById = async (id) => {
-  return API.get(`/services/${id}`);
+  return API.get(`/api/services/${id}`);
 };
 
 export const createService = async (serviceData) => {
-  return API.post('/admin/services', serviceData);
+  return API.post('/api/admin/services', serviceData);
 };
 
 export const updateService = async (id, serviceData) => {
-  return API.put(`/admin/services/${id}`, serviceData);
+  return API.put(`/api/admin/services/${id}`, serviceData);
 };
 
 export const deleteService = async (id) => {
-  return API.delete(`/admin/services/${id}`);
+  return API.delete(`/api/admin/services/${id}`);
 };
 
 export const submitServiceRequest = async (requestData) => {
-  return API.post('/service-requests', requestData);
+  return API.post('/api/service-requests', requestData);
 };
 
 export const getServiceRequests = async (filters = {}) => {
@@ -128,11 +128,11 @@ export const getServiceRequests = async (filters = {}) => {
   Object.entries(filters).forEach(([key, value]) => {
     if (value) params.append(key, value);
   });
-  return API.get(`/admin/service-requests?${params.toString()}`);
+  return API.get(`/api/admin/service-requests?${params.toString()}`);
 };
 
 export const updateRequestStatus = async (id, statusData) => {
-  return API.patch(`/admin/service-requests/${id}/status`, statusData);
+  return API.patch(`/api/admin/service-requests/${id}/status`, statusData);
 };
 
 export const adminLogin = async (credentials) => {
@@ -158,27 +158,27 @@ export const adminLogin = async (credentials) => {
 };
 
 export const getAdminStats = async () => {
-  return API.get('/admin/stats');
+  return API.get('/api/admin/stats');
 };
 
 export const getBrands = async () => {
-  return API.get('/admin/brands');
+  return API.get('/api/admin/brands');
 };
 
 export const createBrand = async (brandData) => {
-  return API.post('/admin/brands', brandData);
+  return API.post('/api/admin/brands', brandData);
 };
 
 export const getServiceTypes = async () => {
-  return API.get('/admin/service-types');
+  return API.get('/api/admin/service-types');
 };
 
 export const getPublicStats = async () => {
-  return API.get('/public/stats');
+  return API.get('/api/public/stats');
 };
 
 export const findServicesForVehicle = async (vehicleData) => {
-  return API.get('/services/for-vehicle', { params: vehicleData });
+  return API.get('/api/services/for-vehicle', { params: vehicleData });
 };
 
 // Export principal
