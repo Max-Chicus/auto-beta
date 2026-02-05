@@ -83,6 +83,7 @@ app.use('/service-requests', require('./routes/service-requests'));
 app.use('/service-quote', require('./routes/service-quote'));
 app.use('/filters', require('./routes/filters'));
 app.use('/admin', require('./routes/admin'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/public', require('./routes/public'));
 
 const PORT = process.env.PORT || 5000;
