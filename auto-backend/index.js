@@ -47,12 +47,12 @@ app.get('/', (req, res) => {
     status: 'running',
     version: '1.0.0',
     endpoints: [
-      '/api/services',
-      '/api/service-requests',
-      '/api/service-quote',
-      '/api/filters',
-      '/api/admin',
-      '/api/public',
+      '/services',
+      '/service-requests',
+      '/service-quote',
+      '/filters',
+      '/admin',
+      '/public',
       '/uploads'
     ]
   });
@@ -69,7 +69,7 @@ app.get('/api', (req, res) => {
 });
 
 // RUTA DE TEST pentru CORS
-app.get('/api/test-cors', (req, res) => {
+app.get('/test-cors', (req, res) => {
   res.json({
     message: 'CORS is working!',
     frontend: req.headers.origin || 'No origin header',
@@ -78,12 +78,12 @@ app.get('/api/test-cors', (req, res) => {
 });
 
 // Routes
-app.use('/api/services', require('./routes/services'));
-app.use('/api/service-requests', require('./routes/service-requests'));
-app.use('/api/service-quote', require('./routes/service-quote'));
-app.use('/api/filters', require('./routes/filters'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/public', require('./routes/public'));
+app.use('/services', require('./routes/services'));
+app.use('/service-requests', require('./routes/service-requests'));
+app.use('/service-quote', require('./routes/service-quote'));
+app.use('/filters', require('./routes/filters'));
+app.use('/admin', require('./routes/admin'));
+app.use('/public', require('./routes/public'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
