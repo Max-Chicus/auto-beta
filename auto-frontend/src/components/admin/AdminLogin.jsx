@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../../api/api';
 
 function AdminLogin({ onLogin }) {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -8,30 +7,40 @@ function AdminLogin({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Auto-redirect dacă e deja logat
+  useEffect(() => {
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      navigate('/admin');
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // Pentru simplitate, folosim o autentificare simplă
-      // În producție, folosește un endpoint de login
-      if (formData.username === 'admin' && formData.password === 'admin123') {
-        // Salvează token-ul în localStorage
-        localStorage.setItem('adminToken', 'admin123');
+      // Direct către backend
+      const response = await fetch('https://auto-beta.onrender.com/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminLoggedIn', 'true');
-        
-        // Setează headerul default pentru API
-        API.defaults.headers.common['Authorization'] = 'Bearer admin123';
         
         if (onLogin) onLogin();
         navigate('/admin');
       } else {
-        setError('Nume de utilizator sau parolă incorectă');
+        setError(data.message || 'Credențiale incorecte');
       }
     } catch (err) {
-      setError('Eroare la autentificare');
-      console.error(err);
+      console.error('Login error:', err);
+      setError('Eroare de conexiune la server');
     } finally {
       setLoading(false);
     }
@@ -45,7 +54,7 @@ function AdminLogin({ onLogin }) {
             Panou Admin Login
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Folosește credențialele de administrator
+            Introdu credențialele de administrator
           </p>
         </div>
         
@@ -82,14 +91,6 @@ function AdminLogin({ onLogin }) {
                 value={formData.password}
                 onChange={e => setFormData({...formData, password: e.target.value})}
               />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <span className="font-medium text-gray-600">
-                Utilizator: admin | Parolă: admin123
-              </span>
             </div>
           </div>
 

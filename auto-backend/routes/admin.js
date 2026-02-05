@@ -10,6 +10,31 @@ const mongoose = require('mongoose');
 
 console.log('✅ Admin routes loaded');
 
+// ========== LOGIN ADMIN ==========
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  console.log('🔐 Admin login attempt:', username);
+
+  // Pentru demo, acceptă admin/admin123
+  if (username === 'admin' && password === 'admin123') {
+    res.json({
+      success: true,
+      token: 'admin-jwt-token-' + Date.now(),
+      user: {
+        username: 'admin',
+        role: 'admin',
+        id: 'admin-001'
+      }
+    });
+  } else {
+    res.status(401).json({
+      success: false,
+      message: 'Credențiale incorecte'
+    });
+  }
+});
+
 // Middleware pentru logging
 router.use((req, res, next) => {
   console.log(`[ADMIN] ${req.method} ${req.path}`);

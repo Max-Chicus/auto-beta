@@ -18,11 +18,11 @@ API.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  
+
   if (config.data instanceof FormData) {
     config.headers['Content-Type'] = 'multipart/form-data';
   }
-  
+
   return config;
 });
 
@@ -32,20 +32,20 @@ API.interceptors.response.use(
   (error) => {
     if (!error.response) {
       console.error('❌ Eroare de rețea');
-      return Promise.reject({ 
+      return Promise.reject({
         message: 'Serverul nu răspunde',
-        isNetworkError: true 
+        isNetworkError: true
       });
     }
-    
+
     const { status } = error.response;
-    
+
     if (status === 401 && window.location.pathname.includes('/admin')) {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminLoggedIn');
       window.location.href = '/admin/login';
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -57,12 +57,12 @@ export const convertFileToBase64 = (file) => {
       reject(new Error('Fișierul nu este o imagine'));
       return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
       reject(new Error('Imaginea este prea mare (max 5MB)'));
       return;
     }
-    
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
@@ -72,7 +72,7 @@ export const convertFileToBase64 = (file) => {
 
 export const processImagesForForm = async (files) => {
   const base64Images = [];
-  
+
   for (const file of files) {
     try {
       const base64 = await convertFileToBase64(file);
@@ -81,7 +81,7 @@ export const processImagesForForm = async (files) => {
       console.warn(`⚠️ Imagine ignorată: ${error.message}`);
     }
   }
-  
+
   return base64Images;
 };
 
@@ -138,25 +138,14 @@ export const updateRequestStatus = async (id, statusData) => {
 };
 
 export const adminLogin = async (credentials) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (credentials.username === 'admin' && credentials.password === 'admin123') {
-        resolve({
-          data: {
-            success: true,
-            token: 'admin123',
-            user: { username: 'admin' }
-          }
-        });
-      } else {
-        reject({
-          response: {
-            data: { error: 'Credențiale incorecte' }
-          }
-        });
-      }
-    }, 500);
-  });
+  const response = await API.post('/admin/login', credentials);
+  
+  if (response.data && response.data.token) {
+    localStorage.setItem('adminToken', response.data.token);
+    localStorage.setItem('adminLoggedIn', 'true');
+  }
+  
+  return response;
 };
 
 export const getAdminStats = async () => {
