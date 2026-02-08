@@ -72,26 +72,64 @@ router.get('/stats', async (req, res) => {
 });
 
 // ========== CRUD PENTRU BRAND-URI ==========
-router.get('/brands', async (req, res) => {
-  try {
-    const brands = await Brand.find().sort({ name: 1 });
-    res.json(brands);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 router.post('/brands', async (req, res) => {
   try {
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ error: 'Numele este obligatoriu' });
+    const { name, logo } = req.body;
 
-    const existingBrand = await Brand.findOne({ name });
-    if (existingBrand) return res.status(400).json({ error: 'Brandul există deja' });
+    if (!name) {
+      return res.status(400).json({ error: 'Numele este obligatoriu' });
+    }
 
-    const brand = await Brand.create({ name });
-    res.status(201).json({ message: 'Brand creat cu succes', brand });
+    // Verifică dacă brandul există deja
+    const existingBrand = await Brand.findOne({
+      name: { $regex: new RegExp(`^${name}$`, 'i') }
+    });
+
+    if (existingBrand) {
+      return res.status(400).json({ error: 'Brandul există deja' });
+    }
+
+    const brandData = { name };
+
+    // Procesează logo-ul dacă există
+    if (logo && logo.startsWith('data:image')) {
+      const uploadDir = path.join(__dirname, '../uploads/brands');
+
+      // Creează directorul dacă nu există
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      // Extrage datele din base64
+      const matches = logo.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (matches) {
+        const mimeType = matches[1];
+        const base64Data = matches[2];
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        // Generează nume unic pentru fișier
+        const extension = mimeType.split('/')[1] || 'png';
+        const fileName = `brand-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${extension}`;
+        const filePath = path.join(uploadDir, fileName);
+
+        // Salvează fișierul
+        fs.writeFileSync(filePath, buffer);
+
+        // Adaugă calea logo-ului la datele brandului
+        brandData.logo = `/uploads/brands/${fileName}`;
+      }
+    }
+
+    // Creează brandul
+    const brand = await Brand.create(brandData);
+
+    res.status(201).json({
+      message: 'Brand creat cu succes',
+      brand
+    });
+
   } catch (err) {
+    console.error('Eroare la crearea brandului:', err);
     res.status(400).json({ error: err.message });
   }
 });
@@ -144,7 +182,7 @@ router.get('/services', async (req, res) => {
 
     const [services, total] = await Promise.all([
       Service.find(query)
-        .populate('brand', 'name')
+        .populate('brand', 'name logo')
         .populate('serviceType', 'name icon')
         .skip(skip)
         .limit(parseInt(limit))
@@ -510,29 +548,20 @@ router.delete('/services/:id', async (req, res) => {
 });
 
 // ========== SERVICE REQUESTS ==========
-router.get('/service-requests', async (req, res) => {
+router.post('/service-requests', async (req, res) => {
   try {
-    const { status, limit = 50 } = req.query;
-    let query = {};
-
-    if (status) query.status = status;
-
-    const requests = await ServiceRequest.find(query)
-      .populate('service.serviceId', 'name code')
-      .populate('vehicle.brand', 'name')
-      .sort({ createdAt: -1 })
-      .limit(parseInt(limit));
-
-    const stats = {
-      total: await ServiceRequest.countDocuments(),
-      new: await ServiceRequest.countDocuments({ status: 'new' }),
-      contacted: await ServiceRequest.countDocuments({ status: 'contacted' }),
-      in_progress: await ServiceRequest.countDocuments({ status: 'in_progress' })
-    };
-
-    res.json({ requests, stats });
+    // Salvează în DB
+    const serviceRequest = await ServiceRequest.create(req.body);
+    
+    // Returnează răspuns
+    res.status(201).json({
+      success: true,
+      requestNumber: serviceRequest._id,
+      message: 'Cerere salvată'
+    });
+    
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 });
 

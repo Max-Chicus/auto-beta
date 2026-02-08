@@ -7,12 +7,16 @@ function AdminLogin({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Auto-redirect dacă e deja logat
+  // VERIFICARE SINGURĂ LA ÎNCĂRCARE - CORECTAT
   useEffect(() => {
-    if (localStorage.getItem('adminLoggedIn') === 'true') {
-      navigate('/admin');
+    const token = localStorage.getItem('adminToken');
+    const isLoggedIn = localStorage.getItem('adminLoggedIn');
+    
+    if (token && isLoggedIn === 'true') {
+      // Folosește window.location în loc de navigate pentru a preveni loop-ul
+      window.location.href = '/admin';
     }
-  }, [navigate]);
+  }, []); // FĂRĂ [navigate] în dependencies!
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,27 +24,53 @@ function AdminLogin({ onLogin }) {
     setLoading(true);
 
     try {
-      // Direct către backend
+      // Direct către backend - CORECTAT
       const response = await fetch('https://auto-beta.onrender.com/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      if (data.success) {
+      const data = await response.json();
+      console.log('Login response:', data);
+
+      // Verifică dacă răspunsul conține token - CORECTAT
+      if (data.token) {
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminLoggedIn', 'true');
         
+        if (data.user) {
+          localStorage.setItem('adminUser', JSON.stringify(data.user));
+        }
+        
         if (onLogin) onLogin();
-        navigate('/admin');
-      } else {
-        setError(data.message || 'Credențiale incorecte');
+        
+        // Folosește window.location pentru a preveni loop-ul
+        window.location.href = '/admin';
+        return;
       }
+      
+      // Verifică pentru structura alternativă
+      if (data.success && data.user) {
+        localStorage.setItem('adminToken', data.token || 'admin-token');
+        localStorage.setItem('adminLoggedIn', 'true');
+        localStorage.setItem('adminUser', JSON.stringify(data.user));
+        
+        if (onLogin) onLogin();
+        window.location.href = '/admin';
+        return;
+      }
+      
+      // Dacă nu are token/success
+      setError(data.message || 'Credențiale incorecte');
+      
     } catch (err) {
       console.error('Login error:', err);
-      setError('Eroare de conexiune la server');
+      setError('Eroare de conexiune la server. Verifică consola pentru detalii.');
     } finally {
       setLoading(false);
     }
@@ -107,7 +137,7 @@ function AdminLogin({ onLogin }) {
           <div className="text-center">
             <button
               type="button"
-              onClick={() => navigate('/')}
+              onClick={() => window.location.href = '/'}
               className="text-sm text-gray-600 hover:text-gray-900"
             >
               ← Înapoi la site

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import API from '../api/api';
-import { getFirstImageUrl, getAllImageUrls } from '../utils/imageUtils'; // Importă utilitarul
+import { getFirstImageUrl, getAllImageUrls, getFullImageUrl } from '../utils/imageUtils'; // Importă getFullImageUrl
 
 function ServiceDetail() {
   const { id } = useParams();
@@ -87,6 +87,12 @@ function ServiceDetail() {
   // Obține toate URL-urile imaginilor
   const imageUrls = getAllImageUrls(service.images);
   const firstImageUrl = getFirstImageUrl(service.images);
+  
+  // Extrage datele brandului
+  const brandName = service.brand?.name || 'Necunoscut';
+  const brandLogo = service.brand?.logo;
+  const serviceTypeName = service.serviceType?.name || 'Serviciu';
+  const serviceTypeIcon = service.serviceType?.icon || '⚙️';
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
@@ -107,7 +113,7 @@ function ServiceDetail() {
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{service.serviceType?.icon}</span>
+                  <span className="text-2xl">{serviceTypeIcon}</span>
                   <h1 className="text-3xl font-bold text-gray-900">{service.name}</h1>
                   {service.featured && (
                     <span className="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full">
@@ -116,14 +122,37 @@ function ServiceDetail() {
                   )}
                 </div>
                 
+                {/* BRAND INFO CU LOGO */}
                 <div className="flex items-center gap-4 text-gray-600 mb-4">
-                  <span className="flex items-center gap-2">
-                    <span className="text-lg">🏢</span>
-                    {service.brand?.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {/* LOGO BRAND */}
+                    {brandLogo ? (
+                      <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={getFullImageUrl(brandLogo)}
+                          alt={brandName}
+                          className="w-6 h-6 object-contain"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                            e.target.parentElement.innerHTML = 
+                              `<span class="text-xs font-bold text-gray-600">${brandName.charAt(0)}</span>`;
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-xs font-bold text-gray-600">
+                          {brandName.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                    <span>{brandName}</span>
+                  </div>
+                  
                   <span className="flex items-center gap-2">
                     <span className="text-lg">⚙️</span>
-                    {service.serviceType?.name}
+                    {serviceTypeName}
                   </span>
                   <span className="flex items-center gap-2">
                     <span className="text-lg">⏱️</span>
@@ -165,7 +194,7 @@ function ServiceDetail() {
               </div>
             </div>
 
-            {/* SECȚIUNE IMAGINI - NOUĂ */}
+            {/* SECȚIUNE IMAGINI */}
             {imageUrls.length > 0 && (
               <div className="mt-8 pt-6 border-t">
                 <h3 className="text-xl font-bold mb-4">Imagini serviciu</h3>
@@ -324,42 +353,74 @@ function ServiceDetail() {
             <div className="bg-white rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4">Servicii similare</h3>
               <div className="space-y-4">
-                {relatedServices.map(related => (
-                  <Link
-                    key={related._id}
-                    to={`/service/${related._id}`}
-                    className="block border rounded-lg p-4 hover:border-red-300 hover:bg-red-50 transition"
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Imagine mică pentru serviciu related */}
-                      <div className="w-16 h-16 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                        {related.images && related.images.length > 0 ? (
-                          <img
-                            src={getFirstImageUrl(related.images)}
-                            alt={related.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(related.name)}&background=random&size=64`;
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-lg">{related.serviceType?.icon || '⚙️'}</span>
+                {relatedServices.map(related => {
+                  const relatedBrandName = related.brand?.name || 'Necunoscut';
+                  const relatedBrandLogo = related.brand?.logo;
+                  
+                  return (
+                    <Link
+                      key={related._id}
+                      to={`/service/${related._id}`}
+                      className="block border rounded-lg p-4 hover:border-red-300 hover:bg-red-50 transition"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Imagine mică pentru serviciu related */}
+                        <div className="w-16 h-16 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
+                          {related.images && related.images.length > 0 ? (
+                            <img
+                              src={getFirstImageUrl(related.images)}
+                              alt={related.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(related.name)}&background=random&size=64`;
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <span className="text-lg">{related.serviceType?.icon || '⚙️'}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 line-clamp-2">{related.name}</h4>
+                          
+                          {/* BRAND INFO CU LOGO ÎN RELATED SERVICES */}
+                          <div className="flex items-center gap-2 mt-1">
+                            {relatedBrandLogo ? (
+                              <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={getFullImageUrl(relatedBrandLogo)}
+                                  alt={relatedBrandName}
+                                  className="w-4 h-4 object-contain"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                                <span className="text-xs font-bold text-gray-600">
+                                  {relatedBrandName.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                            <span className="text-sm text-gray-600">{relatedBrandName}</span>
                           </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 line-clamp-2">{related.name}</h4>
-                        <div className="flex justify-between items-center mt-1">
-                          <p className="text-sm text-gray-600">{related.brand?.name}</p>
-                          <span className="text-red-600 font-bold">{related.repairPrice} {related.currency}</span>
+                          
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                              {related.serviceType?.name}
+                            </span>
+                            <span className="text-red-600 font-bold">{related.repairPrice} {related.currency}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}

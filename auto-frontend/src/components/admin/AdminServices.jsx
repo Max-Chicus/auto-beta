@@ -4,7 +4,7 @@ import API from '../../api/api';
 import ImageUpload from './ImageUpload';
 import ServiceTypeInline from './ServiceTypeInline';
 import BrandInline from './BrandInline';
-import { getFirstImageUrl } from '../../utils/imageUtils';
+import { getFullImageUrl, getFirstImageUrl } from '../../utils/imageUtils';
 
 function AdminServices() {
   const [services, setServices] = useState([]);
@@ -21,7 +21,6 @@ function AdminServices() {
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    code: '',
     brand: '',
     serviceType: '',
     compatibleModels: [{
@@ -165,7 +164,6 @@ function AdminServices() {
       // Pregătește datele
       const serviceData = {
         name: formData.name,
-        code: formData.code || '',
         brand: formData.brand,
         serviceType: formData.serviceType,
         repairPrice: Number(formData.repairPrice),
@@ -244,7 +242,6 @@ function AdminServices() {
     setEditingService(service);
     setFormData({
       name: service.name || '',
-      code: service.code || '',
       brand: service.brand?._id || service.brand || '',
       serviceType: service.serviceType?._id || service.serviceType || '',
       compatibleModels: service.compatibleModels?.length > 0
@@ -388,21 +385,6 @@ function AdminServices() {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                     placeholder="Ex: BOSCH 5.3 Reparație ABS"
                     required
-                  />
-                </div>
-
-                {/* Cod serviciu */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Cod serviciu (opțional)
-                  </label>
-                  <input
-                    type="text"
-                    name="code"
-                    value={formData.code}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Ex: BOSCH-53-ABS"
                   />
                 </div>
 
@@ -819,10 +801,36 @@ function AdminServices() {
                     </td>
 
                     <td className="p-4">
-                      <p className="font-medium">{service.brand?.name || '-'}</p>
-                      <p className="text-sm text-gray-500">
-                        {service.serviceType?.name || '-'}
-                      </p>
+                      <div className="flex items-center">
+                        {service.brand?.logo ? (
+                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-2 overflow-hidden">
+                            <img
+                              src={getFullImageUrl(service.brand.logo)}
+                              alt={service.brand.name}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                console.error('❌ Eroare logo brand:', service.brand.logo);
+                                e.target.onerror = null;
+                                e.target.style.display = 'none';
+                                e.target.parentElement.innerHTML =
+                                  `<span class="text-lg">${service.brand.name.charAt(0)}</span>`;
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                            <span className="text-xs font-bold text-gray-600">
+                              {service.brand?.name?.charAt(0) || '-'}
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium">{service.brand?.name || '-'}</p>
+                          <p className="text-sm text-gray-500">
+                            {service.serviceType?.name || '-'}
+                          </p>
+                        </div>
+                      </div>
                     </td>
 
                     <td className="p-4">

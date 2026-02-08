@@ -62,12 +62,6 @@ const ServiceSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  code: {
-    type: String,
-    unique: true,
-    trim: true,
-    sparse: true
-  },
 
   // Categorizare
   brand: {

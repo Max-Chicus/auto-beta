@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
     }
 
     let services = await Service.find(query)
-      .populate('brand', 'name')
+      .populate('brand', 'name logo')
       .populate('serviceType', 'name icon')
       .limit(parseInt(limit))
       .sort({ featured: -1, popularity: -1, name: 1 });
@@ -77,6 +77,24 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET newest services
+router.get('/newest', async (req, res) => {
+  try {
+    const { limit = 6 } = req.query;
+
+    const services = await Service.find({ isActive: true })
+      .populate('brand', 'name logo')
+      .populate('serviceType', 'name icon')
+      .sort({ createdAt: -1 }) // Sortează după data creării (cele mai noi)
+      .limit(parseInt(limit));
+
+    res.json(services);
+  } catch (err) {
+    console.error('Eroare la preluarea serviciilor noi:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET services for specific vehicle
 router.get('/for-vehicle', async (req, res) => {
   try {
@@ -92,7 +110,7 @@ router.get('/for-vehicle', async (req, res) => {
       brand: brandId,
       isActive: true
     })
-      .populate('brand', 'name')
+      .populate('brand', 'name logo')
       .populate('serviceType', 'name icon')
       .sort({ serviceType: 1, name: 1 });
 
@@ -117,7 +135,7 @@ router.get('/for-vehicle', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const service = await Service.findById(req.params.id)
-      .populate('brand', 'name')
+      .populate('brand', 'name logo')
       .populate('serviceType', 'name icon');
 
     if (!service) {

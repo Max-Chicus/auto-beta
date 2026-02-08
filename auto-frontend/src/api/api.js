@@ -50,6 +50,7 @@ API.interceptors.response.use(
   }
 );
 
+
 // ========== FUNCȚII PENTRU IMAGINI ==========
 export const convertFileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
@@ -139,12 +140,12 @@ export const updateRequestStatus = async (id, statusData) => {
 
 export const adminLogin = async (credentials) => {
   const response = await API.post('/admin/login', credentials);
-  
+
   if (response.data && response.data.token) {
     localStorage.setItem('adminToken', response.data.token);
     localStorage.setItem('adminLoggedIn', 'true');
   }
-  
+
   return response;
 };
 
@@ -156,8 +157,20 @@ export const getBrands = async () => {
   return API.get('/admin/brands');
 };
 
+// În api.js, modifică funcția createBrand:
 export const createBrand = async (brandData) => {
-  return API.post('/admin/brands', brandData);
+  // Dacă brandData are logo (base64), procesează-l
+  if (brandData.logo && brandData.logo.startsWith('data:image')) {
+    // Convert base64 logo la format backend-friendly
+    const processedBrandData = {
+      name: brandData.name,
+      logo: brandData.logo // trimite ca base64, backend-ul va procesa
+    };
+    return API.post('/admin/brands', processedBrandData);
+  }
+
+  // Dacă nu are logo, trimite doar numele
+  return API.post('/admin/brands', { name: brandData.name });
 };
 
 export const getServiceTypes = async () => {

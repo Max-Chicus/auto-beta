@@ -1,0 +1,14 @@
+<svg width="180" height="180" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundal alb pentru vizibilitate -->
+  <rect width="32" height="32" fill="white"/>
+  
+  <!-- Logo mare și clar -->
+  <rect x="4" y="4" width="24" height="24" rx="3" stroke="#dc2626" stroke-width="3"/>
+  
+  <!-- Pini mai groși -->
+  <path d="M4 10H1M4 16H1M4 22H1M31 10H28M31 16H28M31 22H28M10 4V1M16 4V1M22 4V1M10 28V31M16 28V31M22 28V31" 
+        stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Lightning mai mare -->
+  <path d="M16 8L11 18H16L14 24L22 14H18L24 8L16 8Z" fill="#dc2626"/>
+</svg>

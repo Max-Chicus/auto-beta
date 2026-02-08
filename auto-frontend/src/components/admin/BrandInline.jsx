@@ -1,10 +1,58 @@
 import { useState } from 'react';
 import { createBrand } from '../../api/api';
+import { convertFileToBase64 } from '../../api/api';
 
 function BrandInline({ onBrandAdded, existingBrands = [] }) {
   const [showForm, setShowForm] = useState(false);
-  const [newBrand, setNewBrand] = useState({ name: '' });
+  const [newBrand, setNewBrand] = useState({ 
+    name: '', 
+    logo: null, 
+    logoPreview: null 
+  });
   const [loading, setLoading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // Handle logo upload
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Verifică tipul fișierului
+    if (!file.type.startsWith('image/')) {
+      alert('Vă rugăm să încărcați doar imagini!');
+      return;
+    }
+
+    // Verifică dimensiunea
+    if (file.size > 2 * 1024 * 1024) { // 2MB max
+      alert('Imaginea este prea mare! Dimensiunea maximă este 2MB.');
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const base64 = await convertFileToBase64(file);
+      setNewBrand(prev => ({
+        ...prev,
+        logo: base64,
+        logoPreview: base64
+      }));
+    } catch (err) {
+      console.error('Eroare la conversia imaginii:', err);
+      alert('Eroare la încărcarea imaginii. Vă rugăm să încercați din nou.');
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  // Remove logo
+  const removeLogo = () => {
+    setNewBrand(prev => ({
+      ...prev,
+      logo: null,
+      logoPreview: null
+    }));
+  };
 
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -26,14 +74,20 @@ function BrandInline({ onBrandAdded, existingBrands = [] }) {
 
     setLoading(true);
     try {
-      const res = await createBrand(newBrand);
+      // Pregătește datele pentru trimitere
+      const brandData = {
+        name: newBrand.name.trim(),
+        logo: newBrand.logo // trimite logo ca base64
+      };
+
+      const res = await createBrand(brandData);
       
       if (onBrandAdded) {
         onBrandAdded(res.data.brand);
       }
       
-      setNewBrand({ name: '' });
-      setShowForm(false); // Închide formularul după salvare
+      setNewBrand({ name: '', logo: null, logoPreview: null });
+      setShowForm(false);
       alert('✅ Brand adăugat cu succes! Acum poți selecta din lista de mai sus.');
       
     } catch (err) {
@@ -64,7 +118,7 @@ function BrandInline({ onBrandAdded, existingBrands = [] }) {
           type="button"
           onClick={() => {
             setShowForm(false);
-            setNewBrand({ name: '' });
+            setNewBrand({ name: '', logo: null, logoPreview: null });
           }}
           className="text-gray-500 hover:text-gray-700"
         >
@@ -72,52 +126,120 @@ function BrandInline({ onBrandAdded, existingBrands = [] }) {
         </button>
       </div>
 
-      {/* Înlocuiește <form> cu <div> și buton cu type="button" */}
       <div className="space-y-3">
+        {/* Nume brand */}
         <div>
           <label className="block text-xs text-gray-600 mb-1">Nume brand *</label>
           <input
             type="text"
             value={newBrand.name}
-            onChange={(e) => setNewBrand({ name: e.target.value })}
+            onChange={(e) => setNewBrand(prev => ({ ...prev, name: e.target.value }))}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
                 handleSubmit();
               }
             }}
-            className="w-full border border-gray-300 rounded px-2 py-2 text-sm"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
             placeholder="Ex: ALFA ROMEO, AUDI, BMW"
             required
             autoFocus
           />
         </div>
 
-        <div className="flex justify-between items-center">
+        {/* Logo upload */}
+        <div>
+          <label className="block text-xs text-gray-600 mb-1">
+            Logo brand (opțional, recomandat)
+          </label>
+          
+          {newBrand.logoPreview ? (
+            <div className="relative">
+              <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-white">
+                <img 
+                  src={newBrand.logoPreview} 
+                  alt="Preview logo" 
+                  className="w-16 h-16 object-contain border border-gray-200 rounded"
+                />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-700">Logo încărcat</p>
+                  <button
+                    type="button"
+                    onClick={removeLogo}
+                    className="mt-1 text-xs text-red-600 hover:text-red-800"
+                  >
+                    Șterge logo
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-red-400 transition-colors cursor-pointer">
+              <input
+                type="file"
+                id="brandLogoUpload"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+                disabled={uploadingLogo}
+              />
+              <label 
+                htmlFor="brandLogoUpload" 
+                className="cursor-pointer flex flex-col items-center"
+              >
+                {uploadingLogo ? (
+                  <>
+                    <div className="w-10 h-10 border-t-2 border-b-2 border-red-600 rounded-full animate-spin mb-2"></div>
+                    <span className="text-sm text-gray-600">Se încarcă...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                      <span className="text-2xl">📷</span>
+                    </div>
+                    <span className="text-sm text-gray-700">Click pentru a încărca logo</span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      PNG, JPG, max 2MB
+                    </span>
+                  </>
+                )}
+              </label>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-between items-center pt-3">
           <div className="flex space-x-2">
             <button
-              type="button" // Schimbă din type="submit" în type="button"
+              type="button"
               onClick={handleSubmit}
-              disabled={loading}
-              className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+              disabled={loading || uploadingLogo}
+              className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center"
             >
-              {loading ? 'Se salvează...' : 'Salvează brand'}
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                  Se salvează...
+                </>
+              ) : (
+                'Salvează brand'
+              )}
             </button>
             <button
               type="button"
               onClick={() => {
                 setShowForm(false);
-                setNewBrand({ name: '' });
+                setNewBrand({ name: '', logo: null, logoPreview: null });
               }}
-              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+              className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              Închide
+              Anulează
             </button>
           </div>
         </div>
         
         <div className="text-xs text-gray-500 mt-2">
-          💡 După salvare, brandul va apărea în lista de mai sus. Poți selecta-l și continua completarea serviciului.
+          💡 Logo-ul va apărea în catalogul de servicii și pe site. Recomandat pentru branding profesionist.
         </div>
       </div>
     </div>
