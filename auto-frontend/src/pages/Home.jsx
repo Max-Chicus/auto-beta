@@ -279,7 +279,7 @@ function Home() {
       </div>
 
       {/* SERVICII RECOMANDATE */}
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+      {/* <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Servicii recomandate</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -318,7 +318,7 @@ function Home() {
             Vezi toate serviciile →
           </Link>
         </div>
-      </div>
+      </div> */}
 
       {/* SERVICII NOI ADAUGATE */}
       <div className="bg-gray-50 py-16">
@@ -429,7 +429,7 @@ function Home() {
             Solicită serviciu
           </Link>
           <p className="mt-4 text-red-200">
-            sau sună la <a href="tel:+37312345678" className="font-bold underline">+373 123 456 78</a>
+            sau sună la <a href="tel:+37369857294" className="font-bold underline">+373 69 857 294</a>
           </p>
         </div>
       </div>

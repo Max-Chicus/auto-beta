@@ -12,7 +12,7 @@ function About() {
       <div className="relative bg-gradient-to-r from-gray-900 to-red-900 text-white overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1563720223480-d9b6d9f9b5c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+            src="src/assets/about-hero.webp"
             alt="Despre noi - DersTronik"
             className="w-full h-full object-cover opacity-30"
           />
@@ -66,7 +66,7 @@ function About() {
 
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1593941707882-a5bba53398f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              src="src/assets/about-equipment.webp"
               alt="Echipamente de testare electronică auto"
               className="rounded-2xl shadow-2xl"
             />
@@ -133,7 +133,7 @@ function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <img
-              src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              src="src/assets/about-equipment-2.webp"
               alt="Platformă de testare electronică"
               className="rounded-2xl shadow-xl"
             />
@@ -197,7 +197,7 @@ function About() {
 
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1599658880437-2d38f6a521f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                src="src/assets/about-BGA.webp"
                 alt="Procesoare BGA"
                 className="rounded-2xl shadow-xl"
               />
@@ -373,10 +373,10 @@ function About() {
               Solicită expertiză
             </Link>
             <a
-              href="tel:+37312345678"
+              href="tel:+37369857294"
               className="bg-transparent border-2 border-white hover:bg-white hover:text-red-600 text-white px-8 py-3 rounded-lg text-lg font-semibold transition duration-300"
             >
-              Sună acum: +373 123 456 78
+              Sună acum: +373 69 857 294
             </a>
           </div>
           <p className="mt-8 text-red-200">
