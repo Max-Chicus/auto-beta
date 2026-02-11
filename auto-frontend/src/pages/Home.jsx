@@ -52,7 +52,7 @@ function Home() {
       id: 1,
       title: "Reparație profesională de unități auto electronice",
       description: "Specializați în reparația unităților de control (ECU), ABS, ESP, airbag, panouri de bord și alte sisteme electronice.",
-      image: "./public/hero-1.webp"
+      image: "/hero-1.webp"
     },
     {
       id: 2,
