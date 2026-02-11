@@ -52,19 +52,19 @@ function Home() {
       id: 1,
       title: "Reparație profesională de unități auto electronice",
       description: "Specializați în reparația unităților de control (ECU), ABS, ESP, airbag, panouri de bord și alte sisteme electronice.",
-      image: "src/assets/hero-1.webp"
+      image: "/assets/hero-1.webp"
     },
     {
       id: 2,
       title: "Garanție 100% pentru toate reparațiile",
       description: "Oferim garanție până la 24 luni pentru toate serviciile noastre. Calitatea și fiabilitatea sunt garantate!",
-      image: "src/assets/hero-2.webp"
+      image: "/assets/hero-2.webp"
     },
     {
       id: 3,
       title: "Diagnosticare precisă cu echipamente de ultimă generație",
       description: "Utilizăm sisteme de diagnosticare Bosch și Autel pentru identificarea precisă a problemelor electronice auto.",
-      image: "src/assets/hero-3.webp"
+      image: "/assets/hero-3.webp"
     }
   ];
 
@@ -75,7 +75,7 @@ function Home() {
       title: "Panouri de bord",
       description: "Reparăm și reprogramăm toate tipurile de panouri de bord pentru afișare corectă a informațiilor vehiculului.",
       icon: "📊",
-      image: "src/assets/gama-1.webp",
+      image: "/assets/gama-1.webp",
       features: ["Afișare kilometraj", "Indicatori lumină", "Resetare erori", "Calibrare senzori"]
     },
     {
@@ -83,7 +83,7 @@ function Home() {
       title: "Unități de control (ECU)",
       description: "Reparație specializată pentru toate tipurile de unități de control: motor, ABS/ESP, airbag, transmisie, pompe.",
       icon: "⚙️",
-      image: "src/assets/gama-2.webp",
+      image: "/assets/gama-2.webp",
       features: ["Reprogramare", "Diagnosticare erori", "Reparație componente", "Testare completă"]
     },
     {
@@ -91,7 +91,7 @@ function Home() {
       title: "Sisteme de navigație",
       description: "Reparăm și actualizăm sisteme de navigație pentru toate mărcile și modelele de autovehicule.",
       icon: "📍",
-      image: "src/assets/gama-3.webp",
+      image: "/assets/gama-3.webp",
       features: ["Actualizare hărți", "Reparare ecran", "Conectivitate", "Compatibilitate"]
     },
     {
@@ -99,7 +99,7 @@ function Home() {
       title: "Calculatoare de bord",
       description: "Servicii complete pentru calculatoare de bord: afișare, calcul, stocare date vehicul.",
       icon: "🧮",
-      image: "src/assets/gama-4.webp",
+      image: "/assets/gama-4.webp",
       features: ["Calcul consum", "Diagnosticare", "Reprogramare", "Testare"]
     },
     {
@@ -107,7 +107,7 @@ function Home() {
       title: "Instrumente de afișare",
       description: "Reparăm toate instrumentele de afișare: tahometre, vitezometre, indicatoare nivel.",
       icon: "📈",
-      image: "src/assets/gama-5.webp",
+      image: "/assets/gama-5.webp",
       features: ["Calibrare", "Iluminare LED", "Afșare digitală", "Compatibilitate"]
     },
     {
@@ -115,7 +115,7 @@ function Home() {
       title: "Sisteme de climatizare",
       description: "Reparație unități de control climatizare, afișaje temperatură și sisteme automate.",
       icon: "❄️",
-      image: "src/assets/gama-6.webp",
+      image: "/assets/gama-6.webp",
       features: ["Control temperatură", "Reprogramare", "Testare senzori", "Calibrare"]
     }
   ];
