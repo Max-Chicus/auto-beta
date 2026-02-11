@@ -66,7 +66,7 @@ function About() {
 
           <div className="relative">
             <img
-              src="public/about-equipment.webp"
+              src="/about-equipment.webp"
               alt="Echipamente de testare electronică auto"
               className="rounded-2xl shadow-2xl"
             />
@@ -133,7 +133,7 @@ function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <img
-              src="public/about-equipment-2.webp"
+              src="/about-equipment-2.webp"
               alt="Platformă de testare electronică"
               className="rounded-2xl shadow-xl"
             />
@@ -197,7 +197,7 @@ function About() {
 
             <div className="relative">
               <img
-                src="public/about-BGA.webp"
+                src="/about-BGA.webp"
                 alt="Procesoare BGA"
                 className="rounded-2xl shadow-xl"
               />
