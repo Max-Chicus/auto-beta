@@ -187,14 +187,14 @@ function ServiceRequest() {
       // 🚨 ATENȚIE: ÎNLOCUIEȘTE URMĂTOAREA CHEIE CU ACCESS KEY-UL TĂU REAL DE LA WEB3FORMS.COM
       // Obține cheia de la: https://web3forms.com > Dashboard > Access Keys
       // ============================================
-      const WEB3FORMS_ACCESS_KEY = '40376622-05e1-41ab-9d30-24f5bb8ff2c7'; // <-- ÎNLOCUIEȚTE ACEASTĂ CHEIE!
+      const WEB3FORMS_ACCESS_KEY = 'ecbd0ae9-c840-4c34-a062-9be43ec689f5'; // <-- ÎNLOCUIEȚTE ACEASTĂ CHEIE!
       // Exemplu: '12345678-1234-1234-1234-123456789012'
       // ============================================
 
       const emailData = {
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🔔 CERERE SERVICIU NOUĂ: ${cleanData.customer.name} - ${brandName} ${cleanData.vehicle.model}`,
-        from_name: 'Atelier Auto Website',
+        from_name: 'Derstronik Electronic',
         botcheck: '', // Lăsat gol pentru protecție anti-spam
         
         // Conținut HTML pentru email

@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 // Configurează transporter-ul
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  host: process.env.SMTP_HOST || 'derstronik.info@gmail.com',
   port: process.env.SMTP_PORT || 587,
   secure: false,
   auth: {
@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async ({ to, subject, html, text }) => {
   try {
     // Setări default
-    const from = process.env.EMAIL_FROM || 'service@atelierauto.ro';
+    const from = process.env.EMAIL_FROM || 'derstronik.online';
     
     const mailOptions = {
       from: `"Service Auto" <${from}>`,

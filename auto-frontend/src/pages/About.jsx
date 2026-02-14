@@ -12,7 +12,7 @@ function About() {
       <div className="relative bg-gradient-to-r from-gray-900 to-red-900 text-white overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="public/about-hero.webp"
+            src="/about-hero.webp"
             alt="Despre noi - DersTronik"
             className="w-full h-full object-cover opacity-30"
           />
@@ -20,7 +20,7 @@ function About() {
 
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold mb-5">
               D E R S T R O N I K
             </h1>
             <p className="text-2xl md:text-3xl mb-8 text-gray-200 font-light">
