@@ -17,7 +17,7 @@ router.post('/login', (req, res) => {
   console.log('🔐 Admin login attempt:', username);
 
   // Pentru demo, acceptă admin/admin123
-  if (username === 'admin' && password === 'admin123') {
+  if (username === 'vasile' && password === 'Busuioc2026!') {
     res.json({
       success: true,
       token: 'admin-jwt-token-' + Date.now(),
