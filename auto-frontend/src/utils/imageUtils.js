@@ -8,26 +8,37 @@ console.log('📡 API Base URL:', API_BASE_URL); // Pentru debugging
 /**
  * Returnează URL complet pentru o imagine
  */
-// src/utils/imageUtils.js
 export const getFullImageUrl = (imageUrl) => {
   if (!imageUrl) return '';
-
-  // Dacă e base64 (începe cu data:image)
-  if (imageUrl.startsWith('data:image')) {
-    return imageUrl;  // Returnează direct base64-ul
-  }
-
-  // Dacă deja are protocol
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+  
+  // Dacă deja are protocol (http/https) sau e data URL
+  if (imageUrl.startsWith('http://') || 
+      imageUrl.startsWith('https://') || 
+      imageUrl.startsWith('data:')) {
     return imageUrl;
   }
-
-  // Dacă e URL relativ
+  
+  // Dacă e URL relativ (începe cu /)
   if (imageUrl.startsWith('/')) {
     return `${API_BASE_URL}${imageUrl}`;
   }
-
+  
+  // Altfel presupunem că e doar nume de fișier
   return `${API_BASE_URL}/uploads/${imageUrl}`;
+};
+
+/**
+ * Returnează URL pentru prima imagine dintr-un array
+ */
+export const getFirstImageUrl = (images) => {
+  if (!images || !Array.isArray(images) || images.length === 0) {
+    return null;
+  }
+  
+  const firstImage = images[0];
+  const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage.url;
+  
+  return getFullImageUrl(imageUrl);
 };
 
 /**
@@ -37,7 +48,7 @@ export const getAllImageUrls = (images) => {
   if (!images || !Array.isArray(images)) {
     return [];
   }
-
+  
   return images.map(img => {
     const imageUrl = typeof img === 'string' ? img : img.url;
     return getFullImageUrl(imageUrl);
