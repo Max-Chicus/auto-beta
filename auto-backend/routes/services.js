@@ -5,7 +5,6 @@ const router = express.Router();
 const Service = require('../models/Service');
 const Brand = require('../models/Brand');
 
-// GET all services (for catalog)
 router.get('/', async (req, res) => {
   try {
     const {
@@ -18,9 +17,12 @@ router.get('/', async (req, res) => {
       limit = 50
     } = req.query;
 
+    console.log('🔍 PRIMIT PARAMETRII:', { brand, model, year, serviceType, search, featured });
+
+    // Construim query-ul de bază
     let query = { isActive: true };
 
-    // Filtrare după brand (nume sau ID)
+    // Filtrare după brand
     if (brand) {
       if (mongoose.Types.ObjectId.isValid(brand)) {
         query.brand = brand;
@@ -37,13 +39,9 @@ router.get('/', async (req, res) => {
       query.serviceType = serviceType;
     }
 
-    // Căutare text
+    // Căutare text în nume
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { 'compatibleModels.modelName': { $regex: search, $options: 'i' } },
-        { 'compatibleModels.modelCode': { $regex: search, $options: 'i' } }
-      ];
+      query.name = { $regex: search, $options: 'i' };
     }
 
     // Servicii recomandate
@@ -51,70 +49,84 @@ router.get('/', async (req, res) => {
       query.featured = true;
     }
 
+    console.log('📦 Query MongoDB:', JSON.stringify(query));
+
+    // Execută query-ul
     let services = await Service.find(query)
       .populate('brand', 'name logo')
       .populate('serviceType', 'name icon')
       .limit(parseInt(limit))
       .sort({ featured: -1, popularity: -1, name: 1 });
 
-    // FILTRARE DUPĂ MODEL (fără an) - ACEASTA ESTE CHEIA
-    if (model && model.trim() !== '') {
-      console.log('🎯 Filtrare după model:', model);
+    console.log('📊 Total servicii din DB:', services.length);
 
+    // FILTRU MANUAL pentru model - ASTA E PARTEA IMPORTANTĂ
+    if (model && model.trim() !== '') {
+      console.log('🎯 FILTREZ DUPA MODEL:', model);
+
+      const modelSearch = model.toLowerCase().trim();
+
+      // Filtrează serviciile care au modelul compatibil
       services = services.filter(service => {
-        // Verifică dacă serviciul are modele compatibile
+        // Verifică dacă are modele compatibile
         if (!service.compatibleModels || service.compatibleModels.length === 0) {
           return false;
         }
 
         // Caută modelul în lista de modele compatibile
-        const hasCompatibleModel = service.compatibleModels.some(cm => {
+        const hasMatch = service.compatibleModels.some(cm => {
           if (!cm.modelName) return false;
 
-          // Comparație case-insensitive
           const dbModel = cm.modelName.toLowerCase().trim();
-          const searchModel = model.toLowerCase().trim();
 
-          // Verifică dacă:
-          // 1. Numele exact (ex: "145 930" === "145 930")
-          // 2. Sau modelul din DB conține modelul căutat
-          // 3. Sau modelul căutat conține modelul din DB
-          const isMatch = dbModel === searchModel ||
-            dbModel.includes(searchModel) ||
-            searchModel.includes(dbModel);
+          // Verifică dacă se potrivește
+          const isMatch = dbModel === modelSearch ||
+            dbModel.includes(modelSearch) ||
+            modelSearch.includes(dbModel);
 
           if (isMatch) {
-            console.log(`✅ Match: ${service.name} -> ${cm.modelName}`);
+            console.log(`✅ ${service.name} -> ${cm.modelName} (match cu ${model})`);
           }
 
           return isMatch;
         });
 
-        return hasCompatibleModel;
+        return hasMatch;
       });
 
       console.log('📊 Servicii după filtrare model:', services.length);
     }
 
-    // FILTRARE DUPĂ MODEL + AN (doar dacă există și an)
+    // FILTRU pentru model + an (opțional)
     if (model && year) {
-      console.log('🎯 Filtrare după model + an:', model, year);
+      console.log('🎯 FILTREZ DUPA MODEL + AN:', model, year);
 
-      services = services.filter(service =>
-        service.compatibleModels.some(cm => {
-          const matchesModel = cm.modelName.toLowerCase().includes(model.toLowerCase()) ||
-            (cm.modelCode && cm.modelCode.toLowerCase().includes(model.toLowerCase()));
-          const matchesYear = parseInt(year) >= cm.yearFrom && parseInt(year) <= cm.yearTo;
+      const modelSearch = model.toLowerCase().trim();
+      const yearNum = parseInt(year);
+
+      services = services.filter(service => {
+        if (!service.compatibleModels) return false;
+
+        return service.compatibleModels.some(cm => {
+          if (!cm.modelName) return false;
+
+          const dbModel = cm.modelName.toLowerCase().trim();
+          const matchesModel = dbModel === modelSearch ||
+            dbModel.includes(modelSearch) ||
+            modelSearch.includes(dbModel);
+
+          const matchesYear = yearNum >= cm.yearFrom && yearNum <= cm.yearTo;
+
           return matchesModel && matchesYear;
-        })
-      );
+        });
+      });
 
       console.log('📊 Servicii după filtrare model+an:', services.length);
     }
 
     res.json(services);
   } catch (err) {
-    console.error('Eroare la preluarea serviciilor:', err);
+    console.error('❌ EROARE:', err);
     res.status(500).json({ error: err.message });
   }
 });

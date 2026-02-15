@@ -6,17 +6,17 @@ function ServiceFinder({ onSearch }) {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  
+
   // Date pentru filtre
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState([]);
-  
+
   // Date selectate de utilizator
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedBrandName, setSelectedBrandName] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [modelSearch, setModelSearch] = useState('');
-  
+
   // Rezultate servicii
   const [services, setServices] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -45,10 +45,10 @@ function ServiceFinder({ onSearch }) {
   const fetchModelsForBrand = async () => {
     try {
       setLoading(true);
-      
+
       // Folosește noul endpoint pentru modele
       const res = await API.get(`/filters/models?brand=${selectedBrand}`);
-      
+
       if (res.data.success) {
         setModels(res.data.models || []);
         // Salvează numele brandului selectat
@@ -85,28 +85,28 @@ function ServiceFinder({ onSearch }) {
   const findServices = async (modelName = selectedModel) => {
     try {
       setLoading(true);
-      
-      // Folosește endpoint-ul existent pentru servicii
+
+      console.log('🔍 Trimit request cu:', {
+        brand: selectedBrand,
+        brandName: selectedBrandName,
+        model: modelName
+      });
+
       const params = new URLSearchParams();
       if (selectedBrand) params.append('brand', selectedBrand);
       if (modelName) params.append('model', modelName);
-      
+
       const res = await API.get(`/services?${params.toString()}`);
-      
+
+      console.log('📦 Primit:', res.data.length, 'servicii');
+      console.log('📦 Lista servicii:', res.data.map(s => s.name));
+
       setServices(res.data || []);
       setShowResults(true);
-      setStep(3); // Modificat la 3 pentru că am eliminat pasul cu anul
-      
-      // Trigger pentru parent component (dacă e necesar)
-      if (onSearch) {
-        onSearch({
-          brandId: selectedBrand,
-          model: modelName
-          // Anul eliminat
-        });
-      }
+      setStep(3);
+
     } catch (err) {
-      console.error('Eroare servicii:', err);
+      console.error('❌ Eroare:', err);
       setServices([]);
     } finally {
       setLoading(false);
@@ -280,8 +280,8 @@ function ServiceFinder({ onSearch }) {
           ) : services.length > 0 ? (
             <div className="space-y-4">
               {services.map(service => (
-                <div 
-                  key={service._id} 
+                <div
+                  key={service._id}
                   className="border border-gray-300 rounded-lg p-4 hover:border-red-300 hover:shadow-md transition cursor-pointer"
                   onClick={() => navigate(`/service/${service._id}`)}
                 >
@@ -308,7 +308,7 @@ function ServiceFinder({ onSearch }) {
                   </div>
                 </div>
               ))}
-              
+
               <div className="pt-4 border-t">
                 <button
                   onClick={() => navigate('/services')}
@@ -349,13 +349,13 @@ function ServiceFinder({ onSearch }) {
               ← Înapoi
             </button>
           )}
-          
+
           {step === 1 && (
             <div className="text-sm text-gray-500">
               Selectează o marcă pentru a continua
             </div>
           )}
-          
+
           {step === 2 && selectedModel && (
             <button
               onClick={() => findServices()}
