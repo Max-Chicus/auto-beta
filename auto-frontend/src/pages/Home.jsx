@@ -187,7 +187,7 @@ function Home() {
         <ServiceFinder onSearch={(data) => {
           const params = new URLSearchParams();
           if (data.brandId) params.append('brand', data.brandId);
-          if (data.model) params.append('search', data.model);
+          if (data.model) params.append('model', data.model);
           window.location.href = `/services?${params.toString()}`;
         }} />
       </div>

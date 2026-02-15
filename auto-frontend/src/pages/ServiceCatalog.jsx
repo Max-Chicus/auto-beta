@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import API from '../api/api';
 import ServiceCard from '../components/ServiceCard';
-import ServiceFinder from '../components/ServiceFinder';
-import { getFirstImageUrl } from '../utils/imageUtils';
 
 function ServiceCatalog() {
+  const [searchParams] = useSearchParams(); // ← Folosește useSearchParams
   const [services, setServices] = useState([]);
   const [brands, setBrands] = useState([]);
   const [serviceTypes, setServiceTypes] = useState([]);
@@ -13,11 +12,29 @@ function ServiceCatalog() {
   const [filters, setFilters] = useState({
     brand: '',
     serviceType: '',
-    search: ''
+    search: '',
+    model: '' // ← Adaugă model în filters
   });
+
+  // Citește parametrii din URL la încărcare
+  useEffect(() => {
+    const brand = searchParams.get('brand') || '';
+    const model = searchParams.get('model') || '';
+    const search = searchParams.get('search') || '';
+    
+    setFilters({
+      brand,
+      model,
+      search,
+      serviceType: ''
+    });
+  }, [searchParams]);
 
   useEffect(() => {
     fetchFilters();
+  }, []);
+
+  useEffect(() => {
     fetchServices();
   }, [filters]);
 
@@ -38,6 +55,9 @@ function ServiceCatalog() {
       if (filters.brand) params.append('brand', filters.brand);
       if (filters.serviceType) params.append('serviceType', filters.serviceType);
       if (filters.search) params.append('search', filters.search);
+      if (filters.model) params.append('model', filters.model); // ← Adaugă model în request
+
+      console.log('🔍 Fetch services with params:', params.toString()); // Debug
 
       const res = await API.get(`/services?${params.toString()}`);
       setServices(res.data);
@@ -52,25 +72,37 @@ function ServiceCatalog() {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
+  // Găsește numele brandului selectat
+  const selectedBrand = brands.find(b => b._id === filters.brand);
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Servicii de reparație auto</h1>
+        
+        {/* Afișează mesajul de căutare dacă există model selectat */}
+        {filters.model && selectedBrand && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-800">
+              🔍 Căutare pentru: <span className="font-bold">{selectedBrand.name} {filters.model}</span>
+              <button 
+                onClick={() => {
+                  setFilters({ brand: '', model: '', search: '', serviceType: '' });
+                  window.location.href = '/services';
+                }}
+                className="ml-4 text-sm text-blue-600 hover:text-blue-800 underline"
+              >
+                Șterge filtrele
+              </button>
+            </p>
+          </div>
+        )}
+        
         <p className="text-gray-600 mt-2">
           Servicii profesionale pentru toate mărcile și modelele
         </p>
       </div>
-
-      {/* SERVICE FINDER COMPONENT */}
-      {/* <div className="mb-10">
-        <ServiceFinder onSearch={(data) => {
-          setFilters({
-            brand: data.brandId,
-            search: data.model
-          });
-        }} />
-      </div> */}
 
       {/* FILTRE RAPIDE */}
       <div className="flex flex-col md:flex-row gap-4 mb-8 p-6 bg-gray-50 rounded-xl">
@@ -116,7 +148,7 @@ function ServiceCatalog() {
             type="text"
             value={filters.search}
             onChange={(e) => handleFilterChange('search', e.target.value)}
-            placeholder="Nume serviciu sau model..."
+            placeholder="Nume serviciu..."
             className="w-full border border-gray-300 rounded-lg px-4 py-2"
           />
         </div>
@@ -131,7 +163,11 @@ function ServiceCatalog() {
       ) : services.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border">
           <h3 className="text-xl font-semibold text-gray-700">Nu s-au găsit servicii</h3>
-          <p className="text-gray-600 mt-2 mb-6">Încearcă alte filtre sau caută după alt model</p>
+          <p className="text-gray-600 mt-2 mb-6">
+            {filters.model 
+              ? `Nu există servicii pentru ${selectedBrand?.name || ''} ${filters.model}`
+              : 'Încearcă alte filtre sau caută după alt model'}
+          </p>
           <Link
             to="/request-service"
             className="inline-block bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700"
@@ -144,10 +180,14 @@ function ServiceCatalog() {
           <div className="mb-6 flex justify-between items-center">
             <p className="text-gray-600">
               {services.length} servicii găsite
+              {filters.model && ` pentru ${selectedBrand?.name || ''} ${filters.model}`}
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => setFilters({ brand: '', serviceType: '', search: '' })}
+                onClick={() => {
+                  setFilters({ brand: '', serviceType: '', search: '', model: '' });
+                  window.location.href = '/services';
+                }}
                 className="text-sm text-red-600 hover:text-red-800"
               >
                 Resetează filtrele
