@@ -57,19 +57,49 @@ router.get('/', async (req, res) => {
       .limit(parseInt(limit))
       .sort({ featured: -1, popularity: -1, name: 1 });
 
-    // FILTRARE DUPĂ MODEL (fără an)
-    if (model) {
-      services = services.filter(service =>
-        service.compatibleModels &&
-        service.compatibleModels.some(cm =>
-          cm.modelName.toLowerCase().includes(model.toLowerCase()) ||
-          (cm.modelCode && cm.modelCode.toLowerCase().includes(model.toLowerCase()))
-        )
-      );
+    // FILTRARE DUPĂ MODEL (fără an) - ACEASTA ESTE CHEIA
+    if (model && model.trim() !== '') {
+      console.log('🎯 Filtrare după model:', model);
+
+      services = services.filter(service => {
+        // Verifică dacă serviciul are modele compatibile
+        if (!service.compatibleModels || service.compatibleModels.length === 0) {
+          return false;
+        }
+
+        // Caută modelul în lista de modele compatibile
+        const hasCompatibleModel = service.compatibleModels.some(cm => {
+          if (!cm.modelName) return false;
+
+          // Comparație case-insensitive
+          const dbModel = cm.modelName.toLowerCase().trim();
+          const searchModel = model.toLowerCase().trim();
+
+          // Verifică dacă:
+          // 1. Numele exact (ex: "145 930" === "145 930")
+          // 2. Sau modelul din DB conține modelul căutat
+          // 3. Sau modelul căutat conține modelul din DB
+          const isMatch = dbModel === searchModel ||
+            dbModel.includes(searchModel) ||
+            searchModel.includes(dbModel);
+
+          if (isMatch) {
+            console.log(`✅ Match: ${service.name} -> ${cm.modelName}`);
+          }
+
+          return isMatch;
+        });
+
+        return hasCompatibleModel;
+      });
+
+      console.log('📊 Servicii după filtrare model:', services.length);
     }
 
-    // FILTRARE DUPĂ MODEL + AN (dacă există și an)
+    // FILTRARE DUPĂ MODEL + AN (doar dacă există și an)
     if (model && year) {
+      console.log('🎯 Filtrare după model + an:', model, year);
+
       services = services.filter(service =>
         service.compatibleModels.some(cm => {
           const matchesModel = cm.modelName.toLowerCase().includes(model.toLowerCase()) ||
@@ -78,6 +108,8 @@ router.get('/', async (req, res) => {
           return matchesModel && matchesYear;
         })
       );
+
+      console.log('📊 Servicii după filtrare model+an:', services.length);
     }
 
     res.json(services);
