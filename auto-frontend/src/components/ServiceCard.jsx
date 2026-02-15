@@ -22,6 +22,7 @@ function ServiceCard({ service }) {
           <img
             src={imageUrl}
             alt={service.name}
+            crossOrigin="anonymous"
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             onError={(e) => {
               e.target.onerror = null;
