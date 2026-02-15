@@ -25,7 +25,6 @@ router.get('/', async (req, res) => {
       if (mongoose.Types.ObjectId.isValid(brand)) {
         query.brand = brand;
       } else {
-        // Caută brand după nume
         const brandDoc = await Brand.findOne({ name: new RegExp(brand, 'i') });
         if (brandDoc) {
           query.brand = brandDoc._id;
@@ -58,7 +57,18 @@ router.get('/', async (req, res) => {
       .limit(parseInt(limit))
       .sort({ featured: -1, popularity: -1, name: 1 });
 
-    // FILTRARE AVANSATĂ: model + an (dacă sunt specificate)
+    // FILTRARE DUPĂ MODEL (fără an)
+    if (model) {
+      services = services.filter(service =>
+        service.compatibleModels &&
+        service.compatibleModels.some(cm =>
+          cm.modelName.toLowerCase().includes(model.toLowerCase()) ||
+          (cm.modelCode && cm.modelCode.toLowerCase().includes(model.toLowerCase()))
+        )
+      );
+    }
+
+    // FILTRARE DUPĂ MODEL + AN (dacă există și an)
     if (model && year) {
       services = services.filter(service =>
         service.compatibleModels.some(cm => {
