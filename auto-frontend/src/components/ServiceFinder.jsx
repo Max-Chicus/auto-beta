@@ -89,7 +89,7 @@ function ServiceFinder({ onSearch }) {
       // Folosește endpoint-ul existent pentru servicii
       const params = new URLSearchParams();
       if (selectedBrand) params.append('brand', selectedBrand);
-      if (modelName) params.append('search', modelName);
+      if (modelName) params.append('model', modelName);
       
       const res = await API.get(`/services?${params.toString()}`);
       
