@@ -273,12 +273,9 @@ function Home() {
                       </div>
                     </div>
 
-                    {/* Buton detalii - VERSIUNEA CORECTĂ */}
+                    {/* Buton detalii - trimite după nume */}
                     <Link
-                      to={`/services?serviceType=${dbServiceTypes.find(
-                        st => st.name.toLowerCase().trim() === service.title.toLowerCase().trim()
-                      )?._id || service.id
-                        }`}
+                      to={`/services?serviceTypeName=${encodeURIComponent(service.title)}`}
                       className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white py-3 rounded-lg font-medium transition-colors duration-300"
                     >
                       Vezi servicii specifice →

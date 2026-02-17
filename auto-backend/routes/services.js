@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const Service = require('../models/Service');
 const Brand = require('../models/Brand');
+const ServiceType = require('../models/ServiceType'); // ← IMPORTANT: Adaugă asta
 
 router.get('/', async (req, res) => {
   try {
@@ -12,12 +13,13 @@ router.get('/', async (req, res) => {
       model,
       year,
       serviceType,
+      serviceTypeName, // ← NOU: adaugă asta
       search,
       featured,
       limit = 50
     } = req.query;
 
-    console.log('🔍 PRIMIT PARAMETRII:', { brand, model, year, serviceType, search, featured });
+    console.log('🔍 PRIMIT PARAMETRII:', { brand, model, year, serviceType, serviceTypeName, search, featured });
 
     // Construim query-ul de bază
     let query = { isActive: true };
@@ -34,9 +36,34 @@ router.get('/', async (req, res) => {
       }
     }
 
-    // Filtrare după tip serviciu
+    // Filtrare după tip serviciu - după ID
     if (serviceType) {
-      query.serviceType = serviceType;
+      if (mongoose.Types.ObjectId.isValid(serviceType)) {
+        query.serviceType = serviceType;
+      } else {
+        // Dacă nu e ID valid, caută după nume
+        const typeDoc = await ServiceType.findOne({ name: new RegExp(serviceType, 'i') });
+        if (typeDoc) {
+          query.serviceType = typeDoc._id;
+        }
+      }
+    }
+
+    // ← NOU: Filtrare după numele tipului de serviciu
+    if (serviceTypeName && serviceTypeName.trim() !== '') {
+      console.log('🎯 CAUT DUPA SERVICE TYPE NAME:', serviceTypeName);
+      
+      // Caută tipul de serviciu după nume (case insensitive)
+      const typeDoc = await ServiceType.findOne({ 
+        name: { $regex: serviceTypeName, $options: 'i' } 
+      });
+      
+      if (typeDoc) {
+        console.log('✅ GĂSIT TIP SERVICIU:', typeDoc.name, 'cu ID:', typeDoc._id);
+        query.serviceType = typeDoc._id;
+      } else {
+        console.log('❌ NU S-A GĂSIT tipul de serviciu:', serviceTypeName);
+      }
     }
 
     // Căutare text în nume
@@ -58,7 +85,7 @@ router.get('/', async (req, res) => {
       .limit(parseInt(limit))
       .sort({ featured: -1, popularity: -1, name: 1 });
 
-    console.log('📊 Total servicii din DB:', services.length);
+    console.log('📊 Total servicii din DB înainte de filtrarea model:', services.length);
 
     // FILTRU MANUAL pentru model - ASTA E PARTEA IMPORTANTĂ
     if (model && model.trim() !== '') {

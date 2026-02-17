@@ -12,6 +12,7 @@ function ServiceCatalog() {
   const [filters, setFilters] = useState({
     brand: '',
     serviceType: '',
+    serviceTypeName: '',
     search: '',
     model: ''
   });
@@ -22,6 +23,7 @@ function ServiceCatalog() {
     const model = searchParams.get('model') || '';
     const search = searchParams.get('search') || '';
     const serviceType = searchParams.get('serviceType') || '';
+    const serviceTypeName = searchParams.get('serviceTypeName') || '';
     
     console.log('📥 Parametri URL primiți:', { brand, model, search, serviceType });
     
@@ -29,7 +31,8 @@ function ServiceCatalog() {
       brand,
       model,
       search,
-      serviceType
+      serviceType,
+      serviceTypeName
     });
   }, [searchParams]);
 
@@ -62,6 +65,7 @@ function ServiceCatalog() {
       const params = new URLSearchParams();
       if (filters.brand) params.append('brand', filters.brand);
       if (filters.serviceType) params.append('serviceType', filters.serviceType);
+      if (filters.serviceTypeName) params.append('serviceTypeName', filters.serviceTypeName);
       if (filters.search) params.append('search', filters.search);
       if (filters.model) params.append('model', filters.model);
 
