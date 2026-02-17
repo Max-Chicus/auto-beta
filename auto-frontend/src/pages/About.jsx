@@ -42,8 +42,8 @@ function About() {
             </h2>
             <div className="space-y-4 text-gray-700 text-lg leading-relaxed">
               <p>
-                Compania noastră este un atelier specializat în electronică auto. Oferim 
-                servicii de diagnosticare, întreținere, reparații și montaj pentru echipamente 
+                Compania noastră este un atelier specializat în electronică auto. Oferim
+                servicii de diagnosticare, întreținere, reparații și montaj pentru echipamente
                 electronice auto.
               </p>
               <p>
@@ -57,8 +57,8 @@ function About() {
                 <li>Diverse alte instrumente de afișare pentru autovehicule</li>
               </ul>
               <p className="pt-4">
-                Punem un mare accent pe precizia și calitatea superioară a muncii noastre, 
-                precum și pe o atenție individualizată pentru clienți, oferind prețuri corecte 
+                Punem un mare accent pe precizia și calitatea superioară a muncii noastre,
+                precum și pe o atenție individualizată pentru clienți, oferind prețuri corecte
                 și transparente.
               </p>
             </div>
@@ -88,12 +88,12 @@ function About() {
                   Tehnologia modernă și expertiza specializată
                 </h3>
                 <p className="text-gray-700 mb-4">
-                  Tehnologia vehiculelor moderne este în continuă dezvoltare pentru a vă oferi 
-                  un confort de condus de primă clasă. Electronica și software-ul de la bordul 
+                  Tehnologia vehiculelor moderne este în continuă dezvoltare pentru a vă oferi
+                  un confort de condus de primă clasă. Electronica și software-ul de la bordul
                   vehiculului dumneavoastră sunt din ce în ce mai complexe.
                 </p>
                 <p className="text-gray-700">
-                  Pentru a identifica o defecțiune, este necesară utilizarea de echipamente de 
+                  Pentru a identifica o defecțiune, este necesară utilizarea de echipamente de
                   testare profesionale și expertiză specializată.
                 </p>
               </div>
@@ -105,14 +105,14 @@ function About() {
                   Raport de expertiză pentru electronică auto
                 </h3>
                 <p className="text-gray-700">
-                  Evaluăm daunele componentelor electronice ale autovehiculelor. Datorită 
-                  experienței noastre îndelungate și expertizei necesare în domeniul electronicii 
-                  auto și diagnosticării moderne, suntem capabili să elaborăm un raport de 
+                  Evaluăm daunele componentelor electronice ale autovehiculelor. Datorită
+                  experienței noastre îndelungate și expertizei necesare în domeniul electronicii
+                  auto și diagnosticării moderne, suntem capabili să elaborăm un raport de
                   expertiză calificat.
                 </p>
                 <p className="text-gray-700 mt-2">
-                  Analizăm componentele electronice, cum ar fi unitățile de control și panourile 
-                  de bord, pentru a detecta manipulările kilometrajului, datele accidentelor, 
+                  Analizăm componentele electronice, cum ar fi unitățile de control și panourile
+                  de bord, pentru a detecta manipulările kilometrajului, datele accidentelor,
                   modificările numărului de șasiu și creșterile de putere.
                 </p>
               </div>
@@ -141,23 +141,23 @@ function About() {
 
           <div className="space-y-4">
             <p className="text-gray-700 text-lg">
-              Un element esențial al unei reparații de calitate superioară este diagnosticarea 
-              precisă a erorilor. Băncile noastre de testare sunt proiectate pentru a evalua 
-              structuri complexe, incluzând interacțiunile dintre unitățile de control al motorului, 
+              Un element esențial al unei reparații de calitate superioară este diagnosticarea
+              precisă a erorilor. Băncile noastre de testare sunt proiectate pentru a evalua
+              structuri complexe, incluzând interacțiunile dintre unitățile de control al motorului,
               panourile de bord și sistemele de imobilizare.
             </p>
             <p className="text-gray-700 text-lg">
-              Cu ajutorul acestei tehnologii avansate, putem identifica rapid defecțiunile și 
-              interveni eficient pentru corectarea erorilor de software, restabilind funcționalitatea 
+              Cu ajutorul acestei tehnologii avansate, putem identifica rapid defecțiunile și
+              interveni eficient pentru corectarea erorilor de software, restabilind funcționalitatea
               optimă a sistemelor electronice.
             </p>
             <p className="text-gray-700 text-lg">
-              Acest proces riguros nu doar asigură o diagnosticare corectă, ci previne și eventualele 
-              probleme recurente, contribuind la prelungirea duratei de viață a componentelor și la 
+              Acest proces riguros nu doar asigură o diagnosticare corectă, ci previne și eventualele
+              probleme recurente, contribuind la prelungirea duratei de viață a componentelor și la
               menținerea performanțelor vehiculului la cele mai înalte standarde.
             </p>
             <p className="text-gray-700 text-lg font-semibold">
-              Investim continuu în echipamente de testare de ultimă generație și în formarea echipei 
+              Investim continuu în echipamente de testare de ultimă generație și în formarea echipei
               noastre de experți, pentru a garanta reparații precise și fiabile.
             </p>
           </div>
@@ -175,9 +175,9 @@ function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-4">
               <p className="text-lg">
-                Procesoarele BGA (Ball Grid Array) sunt utilizate pe scară largă în electronică, 
-                inclusiv în plăcile auto. Aceste cipuri folosesc bile de lipit pe partea inferioară 
-                pentru conexiuni, oferind dimensiuni compacte, densitate mare de pini și o disipare 
+                Procesoarele BGA (Ball Grid Array) sunt utilizate pe scară largă în electronică,
+                inclusiv în plăcile auto. Aceste cipuri folosesc bile de lipit pe partea inferioară
+                pentru conexiuni, oferind dimensiuni compacte, densitate mare de pini și o disipare
                 eficientă a căldurii.
               </p>
               <div className="bg-white/10 p-6 rounded-xl">
@@ -186,11 +186,11 @@ function About() {
               </div>
               <div className="bg-white/10 p-6 rounded-xl">
                 <h4 className="text-xl font-bold mb-2">Provocări:</h4>
-                <p>Reparațiile sunt complexe, necesită echipamente speciale, iar expunerea la căldură 
-                necontrolată poate deteriora placa.</p>
+                <p>Reparațiile sunt complexe, necesită echipamente speciale, iar expunerea la căldură
+                  necontrolată poate deteriora placa.</p>
               </div>
               <p className="text-lg">
-                În automobile, procesoarele BGA sunt esențiale în modulele de control (ECU) și alte 
+                În automobile, procesoarele BGA sunt esențiale în modulele de control (ECU) și alte
                 sisteme critice, contribuind la funcționarea sigură și eficientă a vehiculului.
               </p>
             </div>
@@ -218,8 +218,8 @@ function About() {
               <h3 className="text-2xl font-bold text-gray-900">Repararea panoului de bord</h3>
             </div>
             <p className="text-gray-700">
-              Panoul de bord este cea mai importantă legătură între șofer și vehicul. Acesta oferă 
-              o mulțime de informații și feedback-uri esențiale, fiind pur și simplu indispensabil 
+              Panoul de bord este cea mai importantă legătură între șofer și vehicul. Acesta oferă
+              o mulțime de informații și feedback-uri esențiale, fiind pur și simplu indispensabil
               pentru șofer.
             </p>
           </div>
@@ -233,8 +233,8 @@ function About() {
               <h3 className="text-2xl font-bold text-gray-900">Scurtcircuite pe plăci electronice</h3>
             </div>
             <p className="text-gray-700">
-              Un scurtcircuit apare atunci când un circuit electric primește un flux de curent mai mare 
-              decât poate suporta. Consecințele pot varia de la deteriorarea componentelor până la 
+              Un scurtcircuit apare atunci când un circuit electric primește un flux de curent mai mare
+              decât poate suporta. Consecințele pot varia de la deteriorarea componentelor până la
               declanșarea unui incendiu.
             </p>
           </div>
@@ -248,7 +248,7 @@ function About() {
               <h3 className="text-2xl font-bold text-gray-900">Daunele provocate de apă</h3>
             </div>
             <p className="text-gray-700">
-              Apa și umezeala sunt periculoase pentru plăcile electronice auto, provocând oxidare și 
+              Apa și umezeala sunt periculoase pentru plăcile electronice auto, provocând oxidare și
               coroziune rapidă. Aceasta poate duce la scurtcircuite și disfuncționalități grave.
             </p>
           </div>
@@ -262,8 +262,8 @@ function About() {
               <h3 className="text-2xl font-bold text-gray-900">Reparații și piese de schimb</h3>
             </div>
             <p className="text-gray-700">
-              Când o reparație nu mai este posibilă, putem furniza o piesă de schimb utilizată. 
-              Transferăm datele de pe dispozitivul original pe cel de schimb, astfel încât nu va mai 
+              Când o reparație nu mai este posibilă, putem furniza o piesă de schimb utilizată.
+              Transferăm datele de pe dispozitivul original pe cel de schimb, astfel încât nu va mai
               fi nevoie de o reprogramare.
             </p>
           </div>
@@ -358,32 +358,48 @@ function About() {
       </div>
 
       {/* CTA SECTION */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Reparații noi și neobișnuite</h2>
-          <p className="text-xl mb-8 text-red-100 max-w-3xl mx-auto">
-            Dacă nu găsiți un dispozitiv sau o defecțiune în catalogul nostru, ne puteți contacta. 
-            Investigăm zilnic noi posibilități de reparații și le adăugăm în portofoliul nostru.
+      <div className="relative py-20 overflow-hidden text-white">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{ backgroundImage: "url('bg-cta.png')" }}
+        ></div>
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-700/80 to-red-900/80 z-10"></div>
+
+        {/* SVG pattern overlay */}
+        <div className="absolute inset-0 opacity-10 z-20">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="white" strokeWidth="2" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-30 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
+            Ai nevoie de o reparație specializată?
+          </h2>
+          <p className="text-xl md:text-2xl mb-8 text-red-100 drop-shadow-sm">
+            Trimite-ne cererea ta și te vom contacta în cel mult 30 de minute
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/request-service"
-              className="bg-white text-red-600 hover:bg-gray-100 px-8 py-3 rounded-lg text-lg font-semibold transition duration-300"
-            >
-              Solicită expertiză
-            </Link>
-            <a
-              href="tel:+37369857294"
-              className="bg-transparent border-2 border-white hover:bg-white hover:text-red-600 text-white px-8 py-3 rounded-lg text-lg font-semibold transition duration-300"
-            >
-              Sună acum: +373 69 857 294
-            </a>
-          </div>
-          <p className="mt-8 text-red-200">
-            <strong>Program de lucru:</strong> Luni - Vineri: 8:00 - 18:00 • Sâmbătă: 9:00 - 14:00
+          <Link
+            to="/request-service"
+            className="inline-block bg-white text-red-600 hover:bg-gray-100 px-10 py-4 rounded-xl text-lg font-semibold transition duration-300 transform hover:scale-105 shadow-lg"
+          >
+            Solicită serviciu
+          </Link>
+          <p className="mt-4 text-red-200 text-sm md:text-base">
+            sau sună la <a href="tel:+37369857294" className="font-bold underline">+373 69 857 294</a>
           </p>
         </div>
       </div>
+
     </div>
   );
 }

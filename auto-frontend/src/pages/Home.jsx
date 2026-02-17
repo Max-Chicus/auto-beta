@@ -89,14 +89,14 @@ function Home() {
       image: "/gama-1.webp",
       features: ["Afișare kilometraj", "Indicatori lumină", "Resetare erori", "Calibrare senzori"]
     },
-    {
-      id: 2,
-      title: "Unități de control (ECU)",
-      description: "Reparație specializată pentru toate tipurile de unități de control: motor, ABS/ESP, airbag, transmisie, pompe.",
-      icon: "⚙️",
-      image: "/gama-2.webp",
-      features: ["Reprogramare", "Diagnosticare erori", "Reparație componente", "Testare completă"]
-    },
+    // {
+    //   id: 2,
+    //   title: "Unități de control (ECU)",
+    //   description: "Reparație specializată pentru toate tipurile de unități de control: motor, ABS/ESP, airbag, transmisie, pompe.",
+    //   icon: "⚙️",
+    //   image: "/gama-2.webp",
+    //   features: ["Reprogramare", "Diagnosticare erori", "Reparație componente", "Testare completă"]
+    // },
     {
       id: 3,
       title: "Sisteme de navigație",
@@ -105,14 +105,14 @@ function Home() {
       image: "/gama-3.webp",
       features: ["Actualizare hărți", "Reparare ecran", "Conectivitate", "Compatibilitate"]
     },
-    {
-      id: 4,
-      title: "Calculatoare de bord",
-      description: "Servicii complete pentru calculatoare de bord: afișare, calcul, stocare date vehicul.",
-      icon: "🧮",
-      image: "/gama-4.webp",
-      features: ["Calcul consum", "Diagnosticare", "Reprogramare", "Testare"]
-    },
+    // {
+    //   id: 4,
+    //   title: "Calculatoare de bord",
+    //   description: "Servicii complete pentru calculatoare de bord: afișare, calcul, stocare date vehicul.",
+    //   icon: "🧮",
+    //   image: "/gama-4.webp",
+    //   features: ["Calcul consum", "Diagnosticare", "Reprogramare", "Testare"]
+    // },
     {
       id: 5,
       title: "Instrumente de afișare",
@@ -128,7 +128,47 @@ function Home() {
       icon: "❄️",
       image: "/gama-6.webp",
       features: ["Control temperatură", "Reprogramare", "Testare senzori", "Calibrare"]
-    }
+    },
+    {
+      id: 7,
+      title: "Chei auto și imobilizatoare",
+      description: "Reprogramare chei originale, clonare transpondere, reparare unități imobilizator și service chei pentru toate mărcile auto.",
+      icon: "🔑",
+      image: "/gama-7.webp",
+      features: ["Reprogramare chei", "Clonare transponder", "Reparație imobilizator", "Chei pierdute"]
+    },
+    {
+      id: 8,
+      title: "Sisteme multimedia",
+      description: "Reparație și actualizare pentru sisteme audio, display-uri centrale, navigație și unități head-unit pentru confort și divertisment.",
+      icon: "📱",
+      image: "/gama-8.webp",
+      features: ["Reparație ecran tactil", "Actualizare firmware", "Integrare smartphone", "Sisteme audio"]
+    },
+    {
+      id: 9,
+      title: "Cutii de viteze automate",
+      description: "Diagnosticare și reparație unități de control pentru transmisii automate (TCU), resetare adaptări și optimizare schimbare viteze.",
+      icon: "⚡",
+      image: "/gama-9.webp",
+      features: ["Reprogramare TCU", "Diagnosticare erori", "Resetare adaptări", "Optimizare schimbări"]
+    },
+    {
+      id: 10,
+      title: "Reparație Airbag",
+      description: "Resetare și reparare unități de control airbag după accident, dezactivare erori și testare funcționalitate sisteme de siguranță.",
+      icon: "🛡️",
+      image: "/gama-10.webp",
+      features: ["Resetare airbag", "Reparație ACU", "Ștergere erori", "Testare senzori"]
+    },
+    {
+      id: 11,
+      title: "Reparație ABS",
+      description: "Reparație unități de control pentru sisteme de frânare antiblocare și control stabilitate, calibrare senzori și reprogramare.",
+      icon: "🛞",
+      image: "/gama-11.webp",
+      features: ["Reparație ABS", "Calibrare ESP", "Ștergere erori", "Testare modul"]
+    },
   ];
 
   // Funcție pentru a găsi ID-ul corect din baza de date
@@ -383,8 +423,18 @@ function Home() {
       </div>
 
       {/* CTA SECTION */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800 text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
+      <div className="relative py-20 overflow-hidden text-white">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{ backgroundImage: "url('bg-cta.png')" }}
+        ></div>
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-700/80 to-red-900/80 z-10"></div>
+
+        {/* SVG pattern overlay */}
+        <div className="absolute inset-0 opacity-10 z-20">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
@@ -395,24 +445,26 @@ function Home() {
           </svg>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+        {/* Content */}
+        <div className="relative z-30 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
             Ai nevoie de o reparație specializată?
           </h2>
-          <p className="text-xl mb-8 text-red-100">
+          <p className="text-xl md:text-2xl mb-8 text-red-100 drop-shadow-sm">
             Trimite-ne cererea ta și te vom contacta în cel mult 30 de minute
           </p>
           <Link
             to="/request-service"
-            className="inline-block bg-white text-red-600 hover:bg-gray-100 px-8 py-3 rounded-lg text-lg font-semibold transition duration-300 transform hover:scale-105"
+            className="inline-block bg-white text-red-600 hover:bg-gray-100 px-10 py-4 rounded-xl text-lg font-semibold transition duration-300 transform hover:scale-105 shadow-lg"
           >
             Solicită serviciu
           </Link>
-          <p className="mt-4 text-red-200">
+          <p className="mt-4 text-red-200 text-sm md:text-base">
             sau sună la <a href="tel:+37369857294" className="font-bold underline">+373 69 857 294</a>
           </p>
         </div>
       </div>
+
     </div>
   );
 }
