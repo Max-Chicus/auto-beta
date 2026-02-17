@@ -273,9 +273,12 @@ function Home() {
                       </div>
                     </div>
 
-                    {/* Buton detalii - ACUM FOLOSEȘTE ID-UL CORECT DIN BD */}
+                    {/* Buton detalii - VERSIUNEA CORECTĂ */}
                     <Link
-                      to={`/services?serviceType=${dbId || service.id}`}
+                      to={`/services?serviceType=${dbServiceTypes.find(
+                        st => st.name.toLowerCase().trim() === service.title.toLowerCase().trim()
+                      )?._id || service.id
+                        }`}
                       className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white py-3 rounded-lg font-medium transition-colors duration-300"
                     >
                       Vezi servicii specifice →
