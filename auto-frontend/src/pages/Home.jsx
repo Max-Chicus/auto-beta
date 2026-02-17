@@ -15,10 +15,21 @@ function Home() {
   const [newServices, setNewServices] = useState([]);
   const [popularBrands, setPopularBrands] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dbServiceTypes, setDbServiceTypes] = useState([]);
 
   useEffect(() => {
     fetchHomeData();
+    fetchServiceTypes();
   }, []);
+
+  const fetchServiceTypes = async () => {
+    try {
+      const res = await API.get('/filters');
+      setDbServiceTypes(res.data.serviceTypes || []);
+    } catch (err) {
+      console.error('❌ Eroare la încărcarea tipurilor de servicii:', err);
+    }
+  };
 
   const fetchHomeData = async () => {
     setLoading(true);
@@ -30,7 +41,7 @@ function Home() {
         API.get('/public/stats')
       ]);
 
-      setFeaturedServices(featuredRes.data || []);  
+      setFeaturedServices(featuredRes.data || []);
 
       if (allServicesRes.data) {
         const sortedByNewest = [...allServicesRes.data]
@@ -72,7 +83,7 @@ function Home() {
   const serviceTypes = [
     {
       id: 1,
-      title: "Panouri de bord",
+      title: "Panou de bord",
       description: "Reparăm și reprogramăm toate tipurile de panouri de bord pentru afișare corectă a informațiilor vehiculului.",
       icon: "📊",
       image: "/gama-1.webp",
@@ -119,6 +130,14 @@ function Home() {
       features: ["Control temperatură", "Reprogramare", "Testare senzori", "Calibrare"]
     }
   ];
+
+  // Funcție pentru a găsi ID-ul corect din baza de date
+  const getDbServiceTypeId = (serviceTitle) => {
+    const match = dbServiceTypes.find(
+      db => db.name.toLowerCase().trim() === serviceTitle.toLowerCase().trim()
+    );
+    return match?._id || null;
+  };
 
   return (
     <div>
@@ -203,65 +222,68 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {serviceTypes.map((service) => (
-              <div
-                key={service.id}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
-              >
-                {/* Imagine serviciu */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
-                    }}
-                  />
-                  <div className="absolute top-4 left-4 bg-red-600 text-white p-3 rounded-full">
-                    <span className="text-2xl">{service.icon}</span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
-                    {service.title}
-                  </h3>
-                </div>
-
-                {/* Conținut card */}
-                <div className="p-6">
-                  <p className="text-gray-600 mb-6">
-                    {service.description}
-                  </p>
-
-                  {/* Caracteristici */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
-                      <span className="text-red-600 mr-2">✓</span>
-                      Servicii incluse:
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {service.features.map((feature, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
-                        >
-                          {feature}
-                        </span>
-                      ))}
+            {serviceTypes.map((service) => {
+              const dbId = getDbServiceTypeId(service.title);
+              return (
+                <div
+                  key={service.id}
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
+                >
+                  {/* Imagine serviciu */}
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+                      }}
+                    />
+                    <div className="absolute top-4 left-4 bg-red-600 text-white p-3 rounded-full">
+                      <span className="text-2xl">{service.icon}</span>
                     </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
+                      {service.title}
+                    </h3>
                   </div>
 
-                  {/* Buton detalii */}
-                  <Link
-                    to={`/services?search=${encodeURIComponent(service.title)}`}
-                    className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white py-3 rounded-lg font-medium transition-colors duration-300"
-                  >
-                    Vezi servicii specifice →
-                  </Link>
+                  {/* Conținut card */}
+                  <div className="p-6">
+                    <p className="text-gray-600 mb-6">
+                      {service.description}
+                    </p>
+
+                    {/* Caracteristici */}
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                        <span className="text-red-600 mr-2">✓</span>
+                        Servicii incluse:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {service.features.map((feature, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Buton detalii - ACUM FOLOSEȘTE ID-UL CORECT DIN BD */}
+                    <Link
+                      to={`/services?serviceType=${dbId || service.id}`}
+                      className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white py-3 rounded-lg font-medium transition-colors duration-300"
+                    >
+                      Vezi servicii specifice →
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Text suplimentar */}
@@ -277,48 +299,6 @@ function Home() {
           </div>
         </div>
       </div>
-
-      {/* SERVICII RECOMANDATE */}
-      {/* <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Servicii recomandate</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Cele mai solicitate servicii de reparație pentru sisteme electronice auto
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-            <p className="mt-4 text-gray-600">Se încarcă serviciile...</p>
-          </div>
-        ) : featuredServices.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredServices.map(service => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-gray-50 rounded-xl">
-            <p className="text-gray-500">Nu sunt servicii recomandate disponibile</p>
-            <Link
-              to="/services"
-              className="inline-block mt-4 text-red-600 hover:text-red-800 font-medium"
-            >
-              Vezi toate serviciile →
-            </Link>
-          </div>
-        )}
-
-        <div className="text-center mt-12">
-          <Link
-            to="/services"
-            className="inline-block border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition duration-300"
-          >
-            Vezi toate serviciile →
-          </Link>
-        </div>
-      </div> */}
 
       {/* SERVICII NOI ADAUGATE */}
       <div className="bg-gray-50 py-16">
