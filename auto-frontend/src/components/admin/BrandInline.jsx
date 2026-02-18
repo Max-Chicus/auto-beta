@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { createBrand } from '../../api/api';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function BrandInline({ onBrandAdded, existingBrands = [] }) {
   const [showForm, setShowForm] = useState(false);
   const [newBrand, setNewBrand] = useState({
@@ -33,8 +35,7 @@ function BrandInline({ onBrandAdded, existingBrands = [] }) {
       const formData = new FormData();
       formData.append('logo', file);
 
-      // 🔥 FIX: Folosește URL-ul complet ca în ImageUpload.jsx
-      const res = await fetch('http://localhost:5000/api/upload-image/brand-logo', {
+      const res = await fetch(`${API_URL}/api/upload-image/brand-logo`, {
         method: 'POST',
         body: formData
       });

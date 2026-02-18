@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -29,7 +31,7 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
         const formData = new FormData();
         formData.append('image', file);
 
-        const res = await fetch('http://localhost:5000/api/upload-image', {
+        const res = await fetch(`${API_URL}/api/upload-image`, {
           method: 'POST',
           body: formData
         });
@@ -39,7 +41,7 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
         }
 
         const data = await res.json();
-        
+
         // Adăugăm imaginea primită de la server
         onImagesChange([...images, {
           url: data.url,  // URL de la Vercel Blob
