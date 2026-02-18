@@ -12,6 +12,8 @@ const API = axios.create({
   timeout: 10000
 });
 
+
+
 // Interceptor pentru token admin
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
