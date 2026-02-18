@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import { API_BASE_URL } from '../../api/api'; // Sau config direct
 
 function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
   const [uploading, setUploading] = useState(false);
@@ -15,8 +14,6 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
     setUploading(true);
 
     try {
-      const newImages = [];
-
       for (const file of files) {
         if (!file.type.startsWith('image/')) {
           alert(`Fișierul ${file.name} nu este o imagine`);
@@ -28,35 +25,38 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
           continue;
         }
 
-        // Convertim la base64 și salvăm ca obiect
-        const base64 = await convertToBase64(file);
-        newImages.push({
-          url: base64,  // base64 string
-          name: file.name,  // numele original
-          size: file.size  // dimensiunea
-        });
-      }
+        // 🔥 NOU: Trimitem fișierul la backend
+        const formData = new FormData();
+        formData.append('image', file);
 
-      onImagesChange([...images, ...newImages]);
+        const res = await fetch('http://localhost:5000/api/upload-image', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          throw new Error('Upload eșuat');
+        }
+
+        const data = await res.json();
+        
+        // Adăugăm imaginea primită de la server
+        onImagesChange([...images, {
+          url: data.url,  // URL de la Vercel Blob
+          name: data.name,
+          size: data.size
+        }]);
+      }
 
     } catch (err) {
       console.error('Eroare upload:', err);
-      alert('Eroare la încărcarea imaginilor');
+      alert('Eroare la încărcarea imaginilor: ' + err.message);
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
-  };
-
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
   };
 
   const removeImage = (index) => {
@@ -71,7 +71,6 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
 
   return (
     <div>
-      {/* Input hidden pentru fișiere */}
       <input
         type="file"
         ref={fileInputRef}
@@ -81,7 +80,6 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
         className="hidden"
       />
 
-      {/* Zone upload */}
       <div
         onClick={triggerFileInput}
         className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-red-400 hover:bg-red-50 transition"
@@ -105,7 +103,6 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
         )}
       </div>
 
-      {/* Preview imagini */}
       {images.length > 0 && (
         <div className="mt-4">
           <p className="text-sm font-medium text-gray-700 mb-2">Imagini încărcate:</p>
@@ -113,7 +110,7 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
             {images.map((img, index) => (
               <div key={index} className="relative group">
                 <img
-                  src={typeof img === 'string' ? img : img.url}  // Acceptă atât string cât și object
+                  src={img.url}
                   alt={`Preview ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg border"
                 />

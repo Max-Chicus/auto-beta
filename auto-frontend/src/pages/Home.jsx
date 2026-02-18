@@ -5,10 +5,11 @@ import ServiceFinder from '../components/ServiceFinder';
 import ServiceCard from '../components/ServiceCard';
 import { getFullImageUrl } from '../utils/imageUtils';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { Autoplay, Pagination, Navigation, FreeMode } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import 'swiper/css/free-mode';
 
 function Home() {
   const [featuredServices, setFeaturedServices] = useState([]);
@@ -169,6 +170,30 @@ function Home() {
       image: "/gama-11.webp",
       features: ["Reparație ABS", "Calibrare ESP", "Ștergere erori", "Testare modul"]
     },
+  ];
+
+  // Imagini pentru galeria de 20 de slide-uri
+  const galleryImages = [
+    { id: 1, url: "/gallery-1.webp", alt: "Chei auto" },
+    { id: 2, url: "/gallery-2.webp", alt: "Panou de bord" },
+    { id: 3, url: "/gallery-3.webp", alt: "Sistem multimedia" },
+    { id: 4, url: "/gallery-4.webp", alt: "greseli panou auto" },
+    { id: 5, url: "/gallery-5.webp", alt: "Cutie de viteze" },
+    { id: 6, url: "/gallery-6.webp", alt: "ABS" },
+    { id: 7, url: "/gallery-7.webp", alt: "Panou de bord" },
+    { id: 8, url: "/gallery-8.webp", alt: "Placa" },
+    { id: 9, url: "/gallery-9.webp", alt: "Diagnoza" },
+    { id: 10, url: "/gallery-10.webp", alt: "airbag" },
+    { id: 11, url: "/gallery-11.webp", alt: "ABS" },
+    { id: 12, url: "/gallery-12.webp", alt: "Reparatii electronice" },
+    { id: 13, url: "/gallery-13.webp", alt: "Reparatii electronice" },
+    { id: 14, url: "/gallery-14.webp", alt: "Placa" },
+    { id: 15, url: "/gallery-15.webp", alt: "Placa" },
+    { id: 16, url: "/gallery-16.webp", alt: "Placa" },
+    { id: 17, url: "/gallery-17.webp", alt: "Reparatii electronice" },
+    { id: 18, url: "/gallery-18.webp", alt: "Panou de bord" },
+    { id: 19, url: "/gallery-19.webp", alt: "Derstronik" },
+    { id: 20, url: "/gallery-20.webp", alt: "Derstronik" },
   ];
 
   // Funcție pentru a găsi ID-ul corect din baza de date
@@ -373,6 +398,98 @@ function Home() {
         </div>
       </div>
 
+      {/* NOU: GALERIE IMAGINI SWIPER - 20 SLIDE-URI */}
+      <div className="py-16 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Galerie service</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Imagini din activitatea noastră zilnică
+            </p>
+          </div>
+
+          <div className="relative">
+            <Swiper
+              modules={[Autoplay, Pagination, Navigation, FreeMode]}
+              spaceBetween={20}
+              slidesPerView={2}
+              freeMode={true}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              pagination={{ 
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              navigation={{
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+              }}
+              loop={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 3,
+                  spaceBetween: 20,
+                },
+                768: {
+                  slidesPerView: 4,
+                  spaceBetween: 25,
+                },
+                1024: {
+                  slidesPerView: 5,
+                  spaceBetween: 30,
+                },
+                1280: {
+                  slidesPerView: 6,
+                  spaceBetween: 30,
+                },
+              }}
+              className="gallery-swiper"
+            >
+              {galleryImages.map((image) => (
+                <SwiperSlide key={image.id}>
+                  <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                    <div className="aspect-w-4 aspect-h-3">
+                      <img
+                        src={image.url}
+                        alt={image.alt}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+                        }}
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                      <p className="text-sm font-medium truncate">{image.alt}</p>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            
+            {/* Navigare personalizată */}
+            <div className="swiper-button-prev !text-red-600 !bg-white/80 !w-10 !h-10 rounded-full shadow-lg hover:!bg-red-600 hover:!text-white transition-all duration-300 after:!text-lg"></div>
+            <div className="swiper-button-next !text-red-600 !bg-white/80 !w-10 !h-10 rounded-full shadow-lg hover:!bg-red-600 hover:!text-white transition-all duration-300 after:!text-lg"></div>
+            
+            {/* Paginație personalizată */}
+            <style jsx>{`
+              .gallery-swiper .swiper-pagination-bullet {
+                background: #dc2626 !important;
+                opacity: 0.5;
+              }
+              .gallery-swiper .swiper-pagination-bullet-active {
+                opacity: 1;
+                background: #dc2626 !important;
+              }
+            `}</style>
+          </div>
+        </div>
+      </div>
+
       {/* POPULAR BRANDS */}
       <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -464,7 +581,6 @@ function Home() {
           </p>
         </div>
       </div>
-
     </div>
   );
 }

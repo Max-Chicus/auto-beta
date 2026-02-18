@@ -2,6 +2,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const path = require('path');
+const uploadRouter = require('./routes/upload');
 require('dotenv').config();
 
 const app = express();
@@ -85,6 +86,7 @@ app.use('/filters', require('./routes/filters'));
 app.use('/admin', require('./routes/admin'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/public', require('./routes/public'));
+app.use('/api/upload-image', uploadRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -89,36 +89,11 @@ router.post('/brands', async (req, res) => {
       return res.status(400).json({ error: 'Brandul există deja' });
     }
 
-    const brandData = { name };
-
-    // Procesează logo-ul dacă există
-    if (logo && logo.startsWith('data:image')) {
-      const uploadDir = path.join(__dirname, '../uploads/brands');
-
-      // Creează directorul dacă nu există
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-
-      // Extrage datele din base64
-      const matches = logo.match(/^data:(image\/\w+);base64,(.+)$/);
-      if (matches) {
-        const mimeType = matches[1];
-        const base64Data = matches[2];
-        const buffer = Buffer.from(base64Data, 'base64');
-
-        // Generează nume unic pentru fișier
-        const extension = mimeType.split('/')[1] || 'png';
-        const fileName = `brand-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${extension}`;
-        const filePath = path.join(uploadDir, fileName);
-
-        // Salvează fișierul
-        fs.writeFileSync(filePath, buffer);
-
-        // Adaugă calea logo-ului la datele brandului
-        brandData.logo = `/uploads/brands/${fileName}`;
-      }
-    }
+    // 🔥 IMPORTANT: Folosește direct URL-ul primit de la Vercel Blob
+    const brandData = {
+      name,
+      logo: logo || null  // logo este deja URL-ul complet de la Vercel
+    };
 
     // Creează brandul
     const brand = await Brand.create(brandData);
@@ -210,7 +185,7 @@ router.get('/services/:id', async (req, res) => {
   }
 });
 
-// CREATE service - FĂRĂ middleware care cauzează probleme
+// CREATE service - VERSIUNE SIMPLIFICATĂ (FĂRĂ PROCESARE IMAGINI)
 router.post('/services', async (req, res) => {
   console.log('🚀 CREATE SERVICE REQUEST');
 
@@ -282,123 +257,8 @@ router.post('/services', async (req, res) => {
       }));
     }
 
-    // Înainte de procesarea imaginilor, adaugă:
-    console.log('=== DEBUG IMAGINI ===');
-    console.log('Tipul serviceData.images:', typeof serviceData.images);
-    console.log('Este array?', Array.isArray(serviceData.images));
-    console.log('Număr imagini:', serviceData.images?.length || 0);
-
-    if (serviceData.images && Array.isArray(serviceData.images) && serviceData.images.length > 0) {
-      console.log('Prima imagine:', {
-        tip: typeof serviceData.images[0],
-        esteObiect: typeof serviceData.images[0] === 'object',
-        keys: Object.keys(serviceData.images[0] || {}),
-        url: serviceData.images[0].url,
-        urlIncepeCuData: serviceData.images[0].url?.startsWith('data:image'),
-        urlLength: serviceData.images[0].url?.length
-      });
-
-      // Verifică dacă e string în loc de object
-      if (typeof serviceData.images[0] === 'string') {
-        console.log('⚠️ ATENȚIE: Imaginea este string, nu object!');
-        console.log('Valoare string:', serviceData.images[0].substring(0, 100) + '...');
-      }
-    }
-
-    // PROCESEAZĂ IMAGINILE - VERSIUNE CORECTĂ
-    console.log('=== ÎNCEPE PROCESAREA IMAGINILOR ===');
-
-    if (serviceData.images && Array.isArray(serviceData.images)) {
-      console.log(`🔍 Am ${serviceData.images.length} imagini de procesat`);
-
-      const processedImages = [];
-      const uploadsPath = path.join(__dirname, '../uploads');
-
-      // Creează directorul
-      if (!fs.existsSync(uploadsPath)) {
-        console.log(`📁 Creăm directorul uploads: ${uploadsPath}`);
-        fs.mkdirSync(uploadsPath, { recursive: true });
-      } else {
-        console.log(`📁 Directorul uploads există: ${uploadsPath}`);
-      }
-
-      for (let i = 0; i < serviceData.images.length; i++) {
-        console.log(`--- Procesez imaginea ${i + 1} ---`);
-        const image = serviceData.images[i];
-
-        // DEBUG detaliat pentru fiecare imagine
-        console.log('Tip imagine:', typeof image);
-        console.log('Este string?', typeof image === 'string');
-        console.log('Este object?', typeof image === 'object' && image !== null);
-
-        let imageUrl, imageName;
-
-        if (typeof image === 'string') {
-          // Dacă imaginea e string (URL direct)
-          console.log(`📄 Imagine ${i + 1} este string: ${image.substring(0, 50)}...`);
-          imageUrl = image;
-          imageName = `Imagine ${i + 1}`;
-
-        } else if (image && typeof image === 'object' && image.url) {
-          // Dacă imaginea e object cu proprietatea url
-          console.log(`📦 Imagine ${i + 1} este object cu url:`, image.url.substring(0, 50) + '...');
-          imageUrl = image.url;
-          imageName = image.name || `Imagine ${i + 1}`;
-
-        } else {
-          console.warn(`⚠️ Imagine ${i + 1} are format necunoscut:`, image);
-          continue;
-        }
-
-        // Procesează doar dacă e base64
-        if (imageUrl && imageUrl.startsWith('data:image')) {
-          console.log(`🖼️ Imagine ${i + 1} este base64`);
-          try {
-            const matches = imageUrl.match(/^data:(image\/\w+);base64,(.+)$/);
-            if (!matches) {
-              console.warn(`❌ Format base64 invalid pentru imaginea ${i + 1}`);
-              continue;
-            }
-
-            const mimeType = matches[1];
-            const base64Data = matches[2];
-            const buffer = Buffer.from(base64Data, 'base64');
-
-            // Extensie
-            const extension = mimeType.split('/')[1] || 'jpg';
-            const fileName = `service-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}.${extension}`;
-            const filePath = path.join(uploadsPath, fileName);
-
-            // Salvează
-            fs.writeFileSync(filePath, buffer);
-            console.log(`✅ Imagine ${i + 1} salvată: ${fileName} (${buffer.length} bytes)`);
-
-            processedImages.push({
-              url: `/uploads/${fileName}`,
-              name: imageName,
-              size: buffer.length
-            });
-
-          } catch (imgErr) {
-            console.error(`❌ Eroare la imaginea ${i + 1}:`, imgErr.message);
-          }
-        } else if (imageUrl) {
-          // Dacă e URL normal
-          console.log(`🔗 Imagine ${i + 1} are URL: ${imageUrl.substring(0, 100)}...`);
-          processedImages.push({
-            url: imageUrl,
-            name: imageName,
-            size: 0
-          });
-        }
-      }
-
-      serviceData.images = processedImages;
-      console.log(`=== FINAL: ${processedImages.length} imagini procesate ===`);
-    } else {
-      console.log('📭 Nu sunt imagini de procesat');
-      serviceData.images = [];
-    }
+    // 🔥 AM ȘTERS TOT BLOCUL DE PROCESARE IMAGINI 🔥
+    // Acum imaginile vin direct ca URL-uri de la Vercel Blob
 
     // ADAUGĂ CÂMPURI DEFAULT
     if (!serviceData.isActive) serviceData.isActive = true;
@@ -454,54 +314,13 @@ router.post('/services', async (req, res) => {
   }
 });
 
-// UPDATE service
+// UPDATE service - VERSIUNE SIMPLIFICATĂ (FĂRĂ PROCESARE IMAGINI)
 router.put('/services/:id', async (req, res) => {
   try {
     const serviceData = req.body;
 
-    // Procesează imagini noi
-    if (serviceData.images && Array.isArray(serviceData.images)) {
-      const processedImages = [];
-      const uploadDir = path.join(__dirname, '../uploads');
-
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-
-      for (let i = 0; i < serviceData.images.length; i++) {
-        const image = serviceData.images[i];
-
-        if (image.url && image.url.startsWith('data:image')) {
-          try {
-            const matches = image.url.match(/^data:(image\/\w+);base64,(.+)$/);
-            if (!matches) continue;
-
-            const mimeType = matches[1];
-            const base64Data = matches[2];
-            const buffer = Buffer.from(base64Data, 'base64');
-
-            const extension = mimeType.split('/')[1] || 'jpg';
-            const fileName = `service-update-${Date.now()}-${i}.${extension}`;
-            const filePath = path.join(uploadDir, fileName);
-
-            fs.writeFileSync(filePath, buffer);
-
-            processedImages.push({
-              url: `/uploads/${fileName}`,
-              name: image.name || fileName,
-              size: buffer.length
-            });
-
-          } catch (imgErr) {
-            console.error(`Eroare imagine ${i + 1}:`, imgErr.message);
-          }
-        } else if (image.url) {
-          processedImages.push(image);
-        }
-      }
-
-      serviceData.images = processedImages;
-    }
+    // 🔥 AM ȘTERS TOT BLOCUL DE PROCESARE IMAGINI DE AICI 🔥
+    // Acum imaginile vin direct ca URL-uri de la Vercel Blob
 
     const service = await Service.findByIdAndUpdate(
       req.params.id,
@@ -552,14 +371,14 @@ router.post('/service-requests', async (req, res) => {
   try {
     // Salvează în DB
     const serviceRequest = await ServiceRequest.create(req.body);
-    
+
     // Returnează răspuns
     res.status(201).json({
       success: true,
       requestNumber: serviceRequest._id,
       message: 'Cerere salvată'
     });
-    
+
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }

@@ -157,20 +157,13 @@ export const getBrands = async () => {
   return API.get('/admin/brands');
 };
 
-// În api.js, modifică funcția createBrand:
+// 🔥 FUNCȚIA CORECTATĂ PENTRU CREATE BRAND 🔥
 export const createBrand = async (brandData) => {
-  // Dacă brandData are logo (base64), procesează-l
-  if (brandData.logo && brandData.logo.startsWith('data:image')) {
-    // Convert base64 logo la format backend-friendly
-    const processedBrandData = {
-      name: brandData.name,
-      logo: brandData.logo // trimite ca base64, backend-ul va procesa
-    };
-    return API.post('/admin/brands', processedBrandData);
-  }
-
-  // Dacă nu are logo, trimite doar numele
-  return API.post('/admin/brands', { name: brandData.name });
+  // Trimite datele exact așa cum vin - fără nicio modificare
+  // brandData poate conține:
+  // - name: string
+  // - logo: URL de la Vercel Blob (https://...) SAU null
+  return API.post('/admin/brands', brandData);
 };
 
 export const getServiceTypes = async () => {
