@@ -12,25 +12,17 @@ function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo - Varianta îmbunătățită */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3 group">
               {/* Icon container */}
               <div className="relative">
                 <div className="absolute inset-0 bg-red-600/10 rounded-xl blur-md group-hover:blur-lg transition-all"></div>
                 <div className="relative bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-3 shadow-sm">
-                  {/* Circuit board icon */}
-                  <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none">
-                    {/* Chip base */}
-                    <rect x="4" y="4" width="16" height="16" rx="2"
-                      stroke="#dc2626" strokeWidth="2" />
-                    {/* Pins */}
-                    <path d="M4 8H2M4 12H2M4 16H2M22 8H20M22 12H20M22 16H20M8 4V2M12 4V2M16 4V2M8 20V22M12 20V22M16 20V22"
-                      stroke="#dc2626" strokeWidth="1.5" strokeLinecap="round" />
-                    {/* Lightning inside */}
-                    <path d="M12 8L9 13H12L11 16L15 11H12L13 8Z"
-                      fill="#dc2626" />
-                  </svg>
+                  <img
+                    src="/header-logo.svg"
+                    alt="Derstronik Logo"
+                    className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
                 </div>
               </div>
 
@@ -80,6 +72,14 @@ function Header() {
             >
               Solicită serviciu
             </Link>
+
+            {/* Numar de telefon */}
+            <a
+              href="tel:+37369857294"
+              className="ml-4 px-4 py-2 bg-gray-100 text-gray-900 font-semibold rounded-lg hover:bg-red-600 hover:text-white transition-all duration-200 flex items-center gap-2"
+            >
+              📞 +373 69 857 294
+            </a>
 
             {/* Admin Link (dacă e logat) */}
             {isAdminLoggedIn() && (

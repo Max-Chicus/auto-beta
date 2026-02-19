@@ -68,15 +68,33 @@ function Home() {
     },
     {
       id: 2,
-      title: "Garanție 100% pentru toate reparațiile",
-      description: "Oferim garanție până la 24 luni pentru toate serviciile noastre. Calitatea și fiabilitatea sunt garantate!",
+      title: "Reparație și recondiționare panouri de bord auto",
+      description: "Diagnosticare și reparare profesională a panourilor de bord (instrument cluster): afișaj defect, pixeli lipsă, indicatoare eronate, iluminare slabă sau probleme de comunicare CAN.",
       image: "/hero-2.webp"
     },
     {
       id: 3,
-      title: "Diagnosticare precisă cu echipamente de ultimă generație",
-      description: "Utilizăm sisteme de diagnosticare Bosch și Autel pentru identificarea precisă a problemelor electronice auto.",
+      title: "Reparație unități electronice cutii de viteze",
+      description: "Diagnosticare și reparație profesională a modulelor TCU și mecatronică pentru cutii automate și semi-automate. Remediem erori de schimbare trepte, mod avarie și probleme de comunicare.",
       image: "/hero-3.webp"
+    },
+    {
+      id: 4,
+      title: "Service specializat module ABS și ESP",
+      description: "Reparăm module ABS și ESP pentru toate tipurile de vehicule. Eliminăm erori de frânare, probleme hidraulice și defecțiuni electronice, garantând siguranță și fiabilitate.",
+      image: "/hero-4.webp"
+    },
+    {
+      id: 5,
+      title: "Recondiționare și întreținere panouri auto",
+      description: "Serviciu complet pentru panouri de bord auto: restaurăm afișaje digitale și analogice, corectăm indicatoare defecte, refacem iluminarea și rezolvăm probleme de comunicație electronică.",
+      image: "/hero-5.webp"
+    },
+    {
+      id: 6,
+      title: "Reparație plăci electronice auto",
+      description: "Diagnosticăm și reparăm plăci electronice și circuite auto: reparații componente SMD, lipituri defecte, condensatori și alte probleme care afectează funcționarea sistemelor electronice.",
+      image: "/hero-6.webp"
     }
   ];
 
@@ -90,110 +108,79 @@ function Home() {
       image: "/gama-1.webp",
       features: ["Afișare kilometraj", "Indicatori lumină", "Resetare erori", "Calibrare senzori"]
     },
-    // {
-    //   id: 2,
-    //   title: "Unități de control (ECU)",
-    //   description: "Reparație specializată pentru toate tipurile de unități de control: motor, ABS/ESP, airbag, transmisie, pompe.",
-    //   icon: "⚙️",
-    //   image: "/gama-2.webp",
-    //   features: ["Reprogramare", "Diagnosticare erori", "Reparație componente", "Testare completă"]
-    // },
     {
-      id: 3,
-      title: "Sisteme de navigație",
-      description: "Reparăm și actualizăm sisteme de navigație pentru toate mărcile și modelele de autovehicule.",
-      icon: "📍",
-      image: "/gama-3.webp",
-      features: ["Actualizare hărți", "Reparare ecran", "Conectivitate", "Compatibilitate"]
-    },
-    // {
-    //   id: 4,
-    //   title: "Calculatoare de bord",
-    //   description: "Servicii complete pentru calculatoare de bord: afișare, calcul, stocare date vehicul.",
-    //   icon: "🧮",
-    //   image: "/gama-4.webp",
-    //   features: ["Calcul consum", "Diagnosticare", "Reprogramare", "Testare"]
-    // },
-    {
-      id: 5,
-      title: "Instrumente de afișare",
-      description: "Reparăm toate instrumentele de afișare: tahometre, vitezometre, indicatoare nivel.",
-      icon: "📈",
-      image: "/gama-5.webp",
-      features: ["Calibrare", "Iluminare LED", "Afșare digitală", "Compatibilitate"]
-    },
-    {
-      id: 6,
-      title: "Sisteme de climatizare",
-      description: "Reparație unități de control climatizare, afișaje temperatură și sisteme automate.",
-      icon: "❄️",
-      image: "/gama-6.webp",
-      features: ["Control temperatură", "Reprogramare", "Testare senzori", "Calibrare"]
-    },
-    {
-      id: 7,
+      id: 2,
       title: "Chei auto și imobilizatoare",
       description: "Reprogramare chei originale, clonare transpondere, reparare unități imobilizator și service chei pentru toate mărcile auto.",
       icon: "🔑",
-      image: "/gama-7.webp",
+      image: "/gama-2.webp",
       features: ["Reprogramare chei", "Clonare transponder", "Reparație imobilizator", "Chei pierdute"]
     },
     {
-      id: 8,
+      id: 3,
       title: "Sisteme multimedia",
       description: "Reparație și actualizare pentru sisteme audio, display-uri centrale, navigație și unități head-unit pentru confort și divertisment.",
       icon: "📱",
-      image: "/gama-8.webp",
+      image: "/gama-3.webp",
       features: ["Reparație ecran tactil", "Actualizare firmware", "Integrare smartphone", "Sisteme audio"]
     },
     {
-      id: 9,
+      id: 4,
       title: "Cutii de viteze automate",
       description: "Diagnosticare și reparație unități de control pentru transmisii automate (TCU), resetare adaptări și optimizare schimbare viteze.",
       icon: "⚡",
-      image: "/gama-9.webp",
+      image: "/gama-4.webp",
       features: ["Reprogramare TCU", "Diagnosticare erori", "Resetare adaptări", "Optimizare schimbări"]
     },
     {
-      id: 10,
+      id: 5,
       title: "Reparație Airbag",
       description: "Resetare și reparare unități de control airbag după accident, dezactivare erori și testare funcționalitate sisteme de siguranță.",
       icon: "🛡️",
-      image: "/gama-10.webp",
+      image: "/gama-5.webp",
       features: ["Resetare airbag", "Reparație ACU", "Ștergere erori", "Testare senzori"]
     },
     {
-      id: 11,
+      id: 6,
       title: "Reparație ABS",
       description: "Reparație unități de control pentru sisteme de frânare antiblocare și control stabilitate, calibrare senzori și reprogramare.",
       icon: "🛞",
-      image: "/gama-11.webp",
+      image: "/gama-6.webp",
       features: ["Reparație ABS", "Calibrare ESP", "Ștergere erori", "Testare modul"]
     },
+    {
+      id: 7,
+      title: "Reparație ECU pentru vehicule comerciale",
+      description: "Evită downtime-ul flotei! Reparăm unități de control electronice (ECU) pentru camioane și utilitare, asigurând eficiență maximă și repornire rapidă a vehiculului.",
+      icon: "🚛",
+      image: "/gama-7.webp",
+      features: [
+        "Procesare rapidă – vehiculele revin pe drum rapid",
+        "Reducere până la 70% comparativ cu achiziția unei unități noi",
+        "Diagnosticare avansată și reparație ECU",
+        "Compatibilitate cu toate tipurile de vehicule comerciale"
+      ]
+    }
+
   ];
 
   // Imagini pentru galeria de 20 de slide-uri
   const galleryImages = [
     { id: 1, url: "/gallery-1.webp", alt: "Chei auto" },
-    { id: 2, url: "/gallery-2.webp", alt: "Panou de bord" },
-    { id: 3, url: "/gallery-3.webp", alt: "Sistem multimedia" },
-    { id: 4, url: "/gallery-4.webp", alt: "greseli panou auto" },
-    { id: 5, url: "/gallery-5.webp", alt: "Cutie de viteze" },
+    { id: 2, url: "/gallery-2.webp", alt: "Sistem multimedia" },
+    { id: 3, url: "/gallery-3.webp", alt: "greseli panou auto" },
+    { id: 4, url: "/gallery-4.webp", alt: "Diagnoza" },
+    { id: 5, url: "/gallery-5.webp", alt: "Derstronik" },
     { id: 6, url: "/gallery-6.webp", alt: "ABS" },
-    { id: 7, url: "/gallery-7.webp", alt: "Panou de bord" },
-    { id: 8, url: "/gallery-8.webp", alt: "Placa" },
-    { id: 9, url: "/gallery-9.webp", alt: "Diagnoza" },
-    { id: 10, url: "/gallery-10.webp", alt: "airbag" },
-    { id: 11, url: "/gallery-11.webp", alt: "ABS" },
+    { id: 7, url: "/gallery-7.webp", alt: "Reparatii electronice" },
+    { id: 8, url: "/gallery-8.webp", alt: "Reparatii electronice" },
+    { id: 9, url: "/gallery-9.webp", alt: "Placa" },
+    { id: 10, url: "/gallery-10.webp", alt: "Placa" },
+    { id: 11, url: "/gallery-11.webp", alt: "Placa" },
     { id: 12, url: "/gallery-12.webp", alt: "Reparatii electronice" },
-    { id: 13, url: "/gallery-13.webp", alt: "Reparatii electronice" },
-    { id: 14, url: "/gallery-14.webp", alt: "Placa" },
-    { id: 15, url: "/gallery-15.webp", alt: "Placa" },
-    { id: 16, url: "/gallery-16.webp", alt: "Placa" },
-    { id: 17, url: "/gallery-17.webp", alt: "Reparatii electronice" },
-    { id: 18, url: "/gallery-18.webp", alt: "Panou de bord" },
-    { id: 19, url: "/gallery-19.webp", alt: "Derstronik" },
-    { id: 20, url: "/gallery-20.webp", alt: "Derstronik" },
+    { id: 13, url: "/gallery-13.webp", alt: "Panou de bord" },
+    { id: 14, url: "/gallery-14.webp", alt: "Derstronik" },
+    { id: 15, url: "/gallery-15.webp", alt: "airbag" },
   ];
 
   // Funcție pentru a găsi ID-ul corect din baza de date
@@ -308,8 +295,9 @@ function Home() {
                     <div className="absolute top-4 left-4 bg-red-600 text-white p-3 rounded-full">
                       <span className="text-2xl">{service.icon}</span>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">
+                    {/* Overlay cu gradient albastru la hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/40 group-hover:to-blue-400/20 transition-all duration-500"></div>
+                    <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white drop-shadow-lg">
                       {service.title}
                     </h3>
                   </div>
@@ -330,25 +318,38 @@ function Home() {
                         {service.features.map((feature, idx) => (
                           <span
                             key={idx}
-                            className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
+                            className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full transition-colors duration-300 group-hover:bg-blue-100"
                           >
                             {feature}
                           </span>
                         ))}
                       </div>
                     </div>
-
-                    {/* Buton detalii - trimite după nume */}
-                    <Link
-                      to={`/services?serviceTypeName=${encodeURIComponent(service.title)}`}
-                      className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white py-3 rounded-lg font-medium transition-colors duration-300"
-                    >
-                      Vezi servicii specifice →
-                    </Link>
                   </div>
                 </div>
               );
             })}
+
+            {/* Card decorativ CTA */}
+            <Link
+              to="/services"
+              className="relative h-48 rounded-2xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex items-center justify-center group bg-cover bg-center"
+              style={{ backgroundImage: "url('/gama-all.webp')" }}
+            >
+              {/* Overlay pentru contrast text */}
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-gradient-to-r group-hover:from-black/30 group-hover:to-blue-500/20 transition-all duration-300"></div>
+
+              {/* Conținut text centrat */}
+              <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
+                <h3 className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg mb-2">
+                  Vezi toate serviciile noastre
+                </h3>
+                <span className="inline-block mt-2 px-4 py-2 bg-red-600 text-white font-semibold rounded-full text-sm md:text-base drop-shadow-lg transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-red-600 group-hover:via-blue-400 group-hover:to-red-700 cursor-pointer">
+                  Accesează catalogul →
+                </span>
+              </div>
+            </Link>
+
           </div>
 
           {/* Text suplimentar */}
@@ -398,12 +399,25 @@ function Home() {
         </div>
       </div>
 
-      {/* NOU: GALERIE IMAGINI SWIPER - 20 SLIDE-URI */}
-      <div className="py-16 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* GALERIE HI-TECH */}
+      <div className="py-16 relative overflow-hidden">
+        {/* Background hi-tech gradient + pattern */}
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-blue-800/10 to-blue-50/30 z-0"></div>
+        <div className="absolute inset-0 opacity-20 pointer-events-none z-10">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="techGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M0 0L40 0 0 40" fill="none" stroke="#3b82f6" strokeWidth="0.5" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#techGrid)" />
+          </svg>
+        </div>
+
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Galerie service</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">Galerie service</h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
               Imagini din activitatea noastră zilnică
             </p>
           </div>
@@ -419,7 +433,7 @@ function Home() {
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
-              pagination={{ 
+              pagination={{
                 clickable: true,
                 dynamicBullets: true,
               }}
@@ -429,22 +443,10 @@ function Home() {
               }}
               loop={true}
               breakpoints={{
-                640: {
-                  slidesPerView: 3,
-                  spaceBetween: 20,
-                },
-                768: {
-                  slidesPerView: 4,
-                  spaceBetween: 25,
-                },
-                1024: {
-                  slidesPerView: 5,
-                  spaceBetween: 30,
-                },
-                1280: {
-                  slidesPerView: 6,
-                  spaceBetween: 30,
-                },
+                640: { slidesPerView: 3, spaceBetween: 20 },
+                768: { slidesPerView: 4, spaceBetween: 25 },
+                1024: { slidesPerView: 5, spaceBetween: 30 },
+                1280: { slidesPerView: 6, spaceBetween: 30 },
               }}
               className="gallery-swiper"
             >
@@ -458,37 +460,44 @@ function Home() {
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
                         }}
                       />
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    {/* Overlay glow albastru */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-blue-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    {/* Text slide cu glow */}
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                      <p className="text-sm font-medium truncate">{image.alt}</p>
+                      <p className="text-sm font-medium truncate drop-shadow-[0_0_10px_#3b82f6]">{image.alt}</p>
                     </div>
                   </div>
                 </SwiperSlide>
               ))}
             </Swiper>
-            
+
             {/* Navigare personalizată */}
-            <div className="swiper-button-prev !text-red-600 !bg-white/80 !w-10 !h-10 rounded-full shadow-lg hover:!bg-red-600 hover:!text-white transition-all duration-300 after:!text-lg"></div>
-            <div className="swiper-button-next !text-red-600 !bg-white/80 !w-10 !h-10 rounded-full shadow-lg hover:!bg-red-600 hover:!text-white transition-all duration-300 after:!text-lg"></div>
-            
+            <div className="swiper-button-prev !text-white !bg-blue-500/30 !w-10 !h-10 rounded-full shadow-lg hover:!bg-blue-500 hover:!text-white transition-all duration-300 after:!text-lg"></div>
+            <div className="swiper-button-next !text-white !bg-blue-500/30 !w-10 !h-10 rounded-full shadow-lg hover:!bg-blue-500 hover:!text-white transition-all duration-300 after:!text-lg"></div>
+
             {/* Paginație personalizată */}
-            <style jsx>{`
-              .gallery-swiper .swiper-pagination-bullet {
-                background: #dc2626 !important;
-                opacity: 0.5;
-              }
-              .gallery-swiper .swiper-pagination-bullet-active {
-                opacity: 1;
-                background: #dc2626 !important;
-              }
-            `}</style>
+            <style>{`
+        .gallery-swiper .swiper-pagination-bullet {
+          background: #3b82f6 !important;
+          opacity: 0.5;
+        }
+        .gallery-swiper .swiper-pagination-bullet-active {
+          opacity: 1;
+          background: #3b82f6 !important;
+        }
+      `}</style>
           </div>
         </div>
       </div>
+
+
 
       {/* POPULAR BRANDS */}
       <div className="bg-white py-16">

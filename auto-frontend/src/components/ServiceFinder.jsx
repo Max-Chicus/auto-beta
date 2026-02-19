@@ -130,11 +130,11 @@ function ServiceFinder({ onSearch }) {
   );
 
   return (
-    <div className="bg-white rounded-xl border shadow-lg p-6">
+    <div className="bg-gradient-to-b from-blue-50/50 to-blue-100 rounded-2xl border border-blue-200 shadow-lg p-6">
       {/* HEADER */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Găsește serviciul potrivit</h2>
-        <p className="text-gray-600 mt-1">Selectează marca și modelul mașinii tale</p>
+        <h2 className="text-2xl font-bold text-blue-900 drop-shadow-sm">Găsește serviciul potrivit</h2>
+        <p className="text-blue-700 mt-1">Selectează marca și modelul mașinii tale</p>
       </div>
 
       {/* STEPS INDICATOR - modificat la 3 pași */}
@@ -143,7 +143,7 @@ function ServiceFinder({ onSearch }) {
           <div key={stepNum} className="flex flex-col items-center z-10">
             <div className={`
               w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg
-              ${step >= stepNum ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500'}
+              ${step >= stepNum ? 'bg-blue-600 text-white' : 'bg-blue-200 text-blue-500'}
             `}>
               {stepNum}
             </div>
@@ -154,7 +154,7 @@ function ServiceFinder({ onSearch }) {
             </span>
           </div>
         ))}
-        <div className="absolute top-5 left-12 right-12 h-0.5 bg-gray-200 -z-10"></div>
+        <div className="absolute top-5 left-12 right-12 h-0.5 bg-gradient-to-r from-red-500 via-blue-400 to-blue-500 -z-10"></div>
       </div>
 
       {/* STEP 1: SELECTARE BRAND */}
@@ -166,7 +166,7 @@ function ServiceFinder({ onSearch }) {
               <button
                 key={brand._id}
                 onClick={() => handleBrandSelect(brand._id, brand.name)}
-                className="border border-gray-300 rounded-lg p-4 hover:border-red-500 hover:bg-red-50 transition-all text-center"
+                className="border border-blue-300 rounded-lg p-4 transition-all text-center hover:bg-gradient-to-r hover:from-blue-400 hover:to-red-500 hover:text-white hover:shadow-lg"
               >
                 <div className="font-medium text-gray-900">{brand.name}</div>
               </button>
@@ -197,7 +197,7 @@ function ServiceFinder({ onSearch }) {
               value={modelSearch}
               onChange={(e) => setModelSearch(e.target.value)}
               placeholder="Caută model..."
-              className="w-full border border-gray-300 rounded-lg px-4 py-3"
+              className="w-full border border-blue-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -282,7 +282,7 @@ function ServiceFinder({ onSearch }) {
               {services.map(service => (
                 <div
                   key={service._id}
-                  className="border border-gray-300 rounded-lg p-4 hover:border-red-300 hover:shadow-md transition cursor-pointer"
+                  className="border border-blue-200 rounded-lg p-4 hover:shadow-2xl transition cursor-pointer hover:bg-blue-50"
                   onClick={() => navigate(`/service/${service._id}`)}
                 >
                   <div className="flex justify-between items-start">
@@ -319,8 +319,8 @@ function ServiceFinder({ onSearch }) {
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 border rounded-lg bg-gray-50">
-              <div className="text-4xl mb-4">🔧</div>
+            <div className="text-center py-8 border rounded-lg bg-blue-50/70">
+              <div className="text-4xl mb-4 text-blue-600">🔧</div>
               <h4 className="text-xl font-semibold text-gray-700 mb-2">
                 Nu s-au găsit servicii specifice
               </h4>

@@ -2,18 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+/* DEFINIRE CLASE CUSTOM PENTRU FONTURI */
+@layer base {
+  /* Text normal pe tot site-ul */
+  body {
+    font-family: theme('fontFamily.sans');
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  /* Titluri generale */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: theme('fontFamily.heading');
+  }
+
+  /* Butoane globale */
+  button {
+    font-family: theme('fontFamily.heading');
+  }
+}
+
+/* ANIMAȚII */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
-    animation: fade-in-up 0.6s ease-out;
+  animation: fade-in-up 0.6s ease-out;
 }

@@ -2,7 +2,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-12 pb-8">
+    <footer className="bg-gradient-to-br from-gray-950 via-gray-900 to-red-950 text-white pt-14 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -10,11 +10,12 @@ function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="bg-red-600 p-2 rounded-lg">
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                  <rect x="4" y="4" width="16" height="16" rx="2" stroke="white" strokeWidth="2" />
-                  <path d="M12 8L9 13H12L11 16L15 11H12L13 8Z" fill="white" />
-                </svg>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3 flex items-center justify-center">
+                <img
+                  src="/footer-logo.svg"
+                  alt="Derstronik Logo"
+                  className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                />
               </div>
               <div>
                 <div className="font-bold text-xl">DERSTRONIK</div>
