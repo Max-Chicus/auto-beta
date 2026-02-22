@@ -92,30 +92,6 @@ function AdminDashboard() {
             </div>
           </div>
 
-          {/* <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
-                <span className="text-blue-600 text-2xl">🏢</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Mărci</p>
-                <p className="text-2xl font-bold">{stats?.brands || 0}</p>
-              </div>
-            </div>
-          </div> */}
-
-          {/* <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-green-100 p-3 rounded-lg">
-                <span className="text-green-600 text-2xl">🏷️</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Tipuri Servicii</p>
-                <p className="text-2xl font-bold">{stats?.serviceTypes || 0}</p>
-              </div>
-            </div>
-          </div> */}
-
           <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
             <div className="flex items-center">
               <div className="flex-shrink-0 bg-purple-100 p-3 rounded-lg">
@@ -146,59 +122,35 @@ function AdminDashboard() {
               >
                 🔧 Servicii
               </Link>
-              {/* <Link
-                to="/admin/service-types"
+              <Link
+                to="/admin/gallery"
                 className="block py-3 px-4 bg-white hover:bg-gray-50 rounded-lg border font-medium"
               >
-                🏷️ Tipuri Servicii
-              </Link> */}
+                🖼️ Galerie
+              </Link>
               <Link
                 to="/admin/service-requests"
                 className="block py-3 px-4 bg-white hover:bg-gray-50 rounded-lg border font-medium"
               >
                 📋 Cereri Servicii
               </Link>
-              {/* <Link
-                to="/admin/brands"
-                className="block py-3 px-4 bg-white hover:bg-gray-50 rounded-lg border font-medium"
-              >
-                🏢 Mărci
-              </Link> */}
             </nav>
 
             {/* Quick Actions pentru SERVICII */}
             <div className="mt-8 p-6 bg-white rounded-lg shadow">
               <h3 className="font-bold mb-4">Acțiuni rapide</h3>
-              
+
               <button
                 onClick={() => navigate('/admin/services?action=create')}
                 className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium mb-3"
               >
                 + Serviciu nou
               </button>
-              
-              {/* <button
-                onClick={() => navigate('/admin/service-types')}
-                className="w-full border border-red-600 text-red-600 py-3 rounded-lg hover:bg-red-50 font-medium"
-              >
-                + Tip serviciu
-              </button> */}
-              
+
               <p className="text-sm text-gray-600 mt-3">
                 Adaugă servicii noi.
               </p>
-              
-              {/* <div className="mt-4 text-xs text-gray-500 space-y-1">
-                <p className="flex items-center">
-                  <span className="mr-1">✓</span> Garanție inclusă
-                </p>
-                <p className="flex items-center">
-                  <span className="mr-1">✓</span> Diagnostic gratuit
-                </p>
-                <p className="flex items-center">
-                  <span className="mr-1">✓</span> Compatibilitate completă
-                </p>
-              </div> */}
+
             </div>
           </aside>
 

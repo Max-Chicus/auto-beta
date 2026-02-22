@@ -20,14 +20,14 @@ function About() {
 
         <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-5">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4">
               D E R S T R O N I K
             </h1>
             <p className="text-2xl md:text-3xl mb-8 text-gray-200 font-light">
               Testarea și repararea profesională a echipamentului auto electronic
             </p>
             <div className="inline-block bg-red-600 px-6 py-2 rounded-full">
-              <span className="text-lg">✓ Atelier autorizat ✓ Garanție 24 luni ✓ Experiență 10+ ani</span>
+              <span className="text-lg">✓ Atelier autorizat ✓ Garanție 12 luni ✓ Experiență 10+ ani</span>
             </div>
           </div>
         </div>
@@ -38,35 +38,38 @@ function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Despre compania noastră
+              Despre DERSTRONIK SRL
             </h2>
             <div className="space-y-4 text-gray-700 text-lg leading-relaxed">
               <p>
-                Compania noastră este un atelier specializat în electronică auto. Oferim
-                servicii de diagnosticare, întreținere, reparații și montaj pentru echipamente
-                electronice auto.
+                DERSTRONIK SRL este un atelier specializat în <strong>electronica auto</strong>, oferind servicii complete de
+                diagnosticare, întreținere și reparație pentru <strong>autoturisme și camioane</strong>.
               </p>
-              <p>
-                <strong>Gama largă a serviciilor noastre include reparații pentru:</strong>
-              </p>
+              <h3>Serviciile noastre includ:</h3>
               <ul className="list-disc pl-6 space-y-2">
-                <li>Panouri de bord</li>
-                <li>Unități de control (unități de control motor, unități de control ABS/ESP, unități de control airbag, unități de control transmisie, unități de control pompe, etc.)</li>
-                <li>Sisteme de navigație</li>
-                <li>Calculatoare de bord</li>
-                <li>Diverse alte instrumente de afișare pentru autovehicule</li>
+                <li>Reparații <strong>panouri și ceasuri de bord</strong>, display-uri și sisteme multimedia</li>
+                <li>Unități de control: <strong>ECU motor, ABS/ESP, Airbag (SRS), EZS/EIS, BSI/UCH</strong>, unități
+                  pentru transmisie și pompe</li>
+                <li>Calculatoare de bord și alte instrumente de afișare pentru vehicule</li>
               </ul>
               <p className="pt-4">
-                Punem un mare accent pe precizia și calitatea superioară a muncii noastre,
-                precum și pe o atenție individualizată pentru clienți, oferind prețuri corecte
-                și transparente.
+                Punem accent pe <strong>precizie, calitate și atenție individuală pentru fiecare client</strong>, oferind servicii
+                la <strong>prețuri corecte și transparente</strong>.
+              </p>
+              <p>
+                Colaborăm cu <strong>dealeri auto și ateliere</strong>, oferind o alternativă sigură, fiabilă și mai economică față
+                de înlocuirea scumpă a modulelor cu piese noi.
+              </p>
+              <p>
+                Contactați-ne pentru reparații profesionale la unități de comandă pentru <strong>motor, cutie de viteze,
+                  ABS, Airbag, ceasuri/panouri de bord</strong> sau alte module electronice.
               </p>
             </div>
           </div>
 
           <div className="relative">
             <img
-              src="/about-equipment.webp"
+              src="/about-1.webp"
               alt="Echipamente de testare electronică auto"
               className="rounded-2xl shadow-2xl"
             />
@@ -122,7 +125,7 @@ function About() {
       </div>
 
       {/* PLATFORME DE TESTARE */}
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+      {/* <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Platforme / Bănci de testare
@@ -162,10 +165,10 @@ function About() {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* PROCESOARE BGA */}
-      <div className="bg-gradient-to-r from-gray-900 to-red-900 text-white py-16">
+      {/* <div className="bg-gradient-to-r from-gray-900 to-red-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Tehnologia BGA în electronică auto</h2>
@@ -204,7 +207,7 @@ function About() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* SECTIUNI IMPORTANTE */}
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
@@ -357,36 +360,27 @@ function About() {
         </div>
       </div>
 
-      {/* CTA SECTION */}
+      {/* CTA SECTION - VERSION WITH CLEAR BACKGROUND */}
       <div className="relative py-20 overflow-hidden text-white">
-        {/* Background image */}
+        {/* Background image - full visibility */}
         <div
           className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ backgroundImage: "url('bg-cta.png')" }}
+          style={{
+            backgroundImage: "url('cta-bg.webp')",
+            filter: "brightness(0.7)" // doar puțin întuneric pentru lizibilitatea textului
+          }}
         ></div>
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-red-700/80 to-red-900/80 z-10"></div>
-
-        {/* SVG pattern overlay */}
-        <div className="absolute inset-0 opacity-10 z-20">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="white" strokeWidth="2" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
+        {/* Simple dark overlay - foarte subtil pentru text */}
+        <div className="absolute inset-0 bg-black/30 z-10"></div>
 
         {/* Content */}
-        <div className="relative z-30 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
             Ai nevoie de o reparație specializată?
           </h2>
-          <p className="text-xl md:text-2xl mb-8 text-red-100 drop-shadow-sm">
-            Trimite-ne cererea ta și te vom contacta în cel mult 30 de minute
+          <p className="text-xl md:text-2xl mb-8 text-white drop-shadow-md">
+            Trimite-ne cererea ta și te vom contacta
           </p>
           <Link
             to="/request-service"
@@ -394,7 +388,7 @@ function About() {
           >
             Solicită serviciu
           </Link>
-          <p className="mt-4 text-red-200 text-sm md:text-base">
+          <p className="mt-4 text-white text-sm md:text-base drop-shadow">
             sau sună la <a href="tel:+37369857294" className="font-bold underline">+373 69 857 294</a>
           </p>
         </div>

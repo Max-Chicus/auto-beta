@@ -13,6 +13,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import AdminHome from './components/admin/AdminHome';
 import AdminServices from './components/admin/AdminServices';
 import AdminServiceRequests from './components/admin/AdminServiceRequests';
+import AdminGallery from './components/admin/AdminGallery';
 import "./App.css"
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
             <Route index element={<AdminHome />} />
             <Route path="services" element={<AdminServices />} />
             <Route path="service-requests" element={<AdminServiceRequests />} />
+            <Route path="/admin/gallery" element={<AdminGallery />} />
           </Route>
 
         </Routes>

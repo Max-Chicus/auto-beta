@@ -17,10 +17,12 @@ function Home() {
   const [popularBrands, setPopularBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dbServiceTypes, setDbServiceTypes] = useState([]);
+  const [galleryImages, setGalleryImages] = useState([]);
 
   useEffect(() => {
     fetchHomeData();
     fetchServiceTypes();
+    fetchGallery();
   }, []);
 
   const fetchServiceTypes = async () => {
@@ -58,6 +60,41 @@ function Home() {
     }
   };
 
+  const fetchGallery = async () => {
+    try {
+      const res = await API.get('/public/gallery');
+      if (res.data && res.data.length > 0) {
+        setGalleryImages(res.data);
+      } else {
+        // Fallback la imagini statice dacă nu sunt încărcate
+        setGalleryImages([
+          { _id: 1, url: "/gallery-1.webp", alt: "Chei auto" },
+          { _id: 2, url: "/gallery-2.webp", alt: "Sistem multimedia" },
+          { _id: 3, url: "/gallery-3.webp", alt: "greseli panou auto" },
+          { _id: 4, url: "/gallery-4.webp", alt: "Diagnoza" },
+          { _id: 5, url: "/gallery-5.webp", alt: "Derstronik" },
+          { _id: 6, url: "/gallery-6.webp", alt: "ABS" },
+          { _id: 7, url: "/gallery-7.webp", alt: "Reparatii electronice" },
+          { _id: 8, url: "/gallery-8.webp", alt: "Reparatii electronice" },
+          { _id: 9, url: "/gallery-9.webp", alt: "Placa" },
+          { _id: 10, url: "/gallery-10.webp", alt: "Placa" },
+          { _id: 11, url: "/gallery-11.webp", alt: "Placa" },
+          { _id: 12, url: "/gallery-12.webp", alt: "Reparatii electronice" },
+          { _id: 13, url: "/gallery-13.webp", alt: "Panou de bord" },
+          { _id: 14, url: "/gallery-14.webp", alt: "Derstronik" },
+          { _id: 15, url: "/gallery-15.webp", alt: "airbag" },
+        ]);
+      }
+    } catch (err) {
+      console.error('❌ Eroare la încărcarea galeriei:', err);
+      // Fallback la imagini statice
+      setGalleryImages([
+        { _id: 1, url: "/gallery-1.webp", alt: "Chei auto" },
+        // ... restul imaginilor statice
+      ]);
+    }
+  };
+
   // Slider data
   const heroSlides = [
     {
@@ -75,7 +112,7 @@ function Home() {
     {
       id: 3,
       title: "Reparație unități electronice cutii de viteze",
-      description: "Diagnosticare și reparație profesională a modulelor TCU și mecatronică pentru cutii automate și semi-automate. Remediem erori de schimbare trepte, mod avarie și probleme de comunicare.",
+      description: "Diagnosticare și reparație profesională a modulelor TCU. Remediem erori de schimbare trepte, mod avarie și probleme de comunicare.",
       image: "/hero-3.webp"
     },
     {
@@ -86,14 +123,14 @@ function Home() {
     },
     {
       id: 5,
-      title: "Recondiționare și întreținere panouri auto",
-      description: "Serviciu complet pentru panouri de bord auto: restaurăm afișaje digitale și analogice, corectăm indicatoare defecte, refacem iluminarea și rezolvăm probleme de comunicație electronică.",
+      title: "Reparație plăci electronice auto",
+      description: "Diagnosticăm și reparăm plăci electronice și circuite auto: reparații componente SMD, lipituri defecte, condensatori și alte probleme care afectează funcționarea sistemelor electronice.",
       image: "/hero-5.webp"
     },
     {
       id: 6,
-      title: "Reparație plăci electronice auto",
-      description: "Diagnosticăm și reparăm plăci electronice și circuite auto: reparații componente SMD, lipituri defecte, condensatori și alte probleme care afectează funcționarea sistemelor electronice.",
+      title: "Reparație unități de comandă pentru vehicule comerciale",
+      description: "PTM, EDC6, EDC7, ACM, MCM, Delphi ETC3, coordonator Scania COO7, EMS, Mercedes-Benz CPC3 / CPC4, sistem de frânare EBS (Wabco) precum și alte sisteme electronice.",
       image: "/hero-6.webp"
     }
   ];
@@ -102,11 +139,17 @@ function Home() {
   const serviceTypes = [
     {
       id: 1,
-      title: "Panou de bord",
+      title: "Ceasuri/panoul de bord",
       description: "Reparăm și reprogramăm toate tipurile de panouri de bord pentru afișare corectă a informațiilor vehiculului.",
       icon: "📊",
       image: "/gama-1.webp",
-      features: ["Afișare kilometraj", "Indicatori lumină", "Resetare erori", "Calibrare senzori"]
+      features: [
+        "Defecțiunea instrumentelor analogice",
+        "Defecțiunea afișajelor digitale",
+        "Defecțiune la iluminarea panoului de bord",
+        "Defecțiune totală a panoului de bord",
+        "Acele indicatoare rămân blocate sau vibrează"
+      ]
     },
     {
       id: 2,
@@ -114,44 +157,68 @@ function Home() {
       description: "Reprogramare chei originale, clonare transpondere, reparare unități imobilizator și service chei pentru toate mărcile auto.",
       icon: "🔑",
       image: "/gama-2.webp",
-      features: ["Reprogramare chei", "Clonare transponder", "Reparație imobilizator", "Chei pierdute"]
+      features: ["Reprogramare chei", "Clonare transponder", "Reparație imobilizator", "Chei pierdute", "Programare unitate de control Immo"]
     },
     {
       id: 3,
-      title: "Sisteme multimedia",
+      title: "Reparație Sisteme multimedia",
       description: "Reparație și actualizare pentru sisteme audio, display-uri centrale, navigație și unități head-unit pentru confort și divertisment.",
       icon: "📱",
       image: "/gama-3.webp",
-      features: ["Reparație ecran tactil", "Actualizare firmware", "Integrare smartphone", "Sisteme audio"]
+      features: [
+        "CD / DVD nu mai funcționează",
+        "Ecran alb sau negru",
+        "Navigația nu pornește sau se repornește mereu",
+        "Navigația nu poate găsi locația",
+        "Lipsă sunet sau imagine"
+      ]
     },
     {
       id: 4,
-      title: "Cutii de viteze automate",
+      title: "Reparație unități de control Cutii de viteze automate",
       description: "Diagnosticare și reparație unități de control pentru transmisii automate (TCU), resetare adaptări și optimizare schimbare viteze.",
       icon: "⚡",
       image: "/gama-4.webp",
-      features: ["Reprogramare TCU", "Diagnosticare erori", "Resetare adaptări", "Optimizare schimbări"]
+      features: [
+        "Probleme de comunicare",
+        "Lipsă semnal de viteză a treptelor",
+        "Schimbarea treptelor imposibil",
+        "Lipsă afișarea treptelor",
+        "Activare mod avarie"
+      ]
     },
     {
       id: 5,
-      title: "Reparație Airbag",
+      title: "Reparație unități de control Airbag",
       description: "Resetare și reparare unități de control airbag după accident, dezactivare erori și testare funcționalitate sisteme de siguranță.",
       icon: "🛡️",
       image: "/gama-5.webp",
-      features: ["Resetare airbag", "Reparație ACU", "Ștergere erori", "Testare senzori"]
+      features: [
+        "Resetare airbag după accidente",
+        "Eliminare erori interne",
+        "Ștergere erori",
+        "Testarea sistemului",
+        "Programarea/Înlocuirea unităților Airbag"
+      ]
     },
     {
       id: 6,
-      title: "Reparație ABS",
+      title: "Reparație pentru ABS / ESP",
       description: "Reparație unități de control pentru sisteme de frânare antiblocare și control stabilitate, calibrare senzori și reprogramare.",
       icon: "🛞",
       image: "/gama-6.webp",
-      features: ["Reparație ABS", "Calibrare ESP", "Ștergere erori", "Testare modul"]
+      features: [
+        "Sunt afișate erori ale senzorilor de roată",
+        "Probleme/erori de comunicare",
+        "Funcționare ABS neplauzibilă / incorectă",
+        "Eroare la motorul pompei sau motorul pompei funcționează permanent",
+        "Lipsă presiune de frânare la una dintre roți"
+      ]
     },
     {
       id: 7,
-      title: "Reparație ECU pentru vehicule comerciale",
-      description: "Evită downtime-ul flotei! Reparăm unități de control electronice (ECU) pentru camioane și utilitare, asigurând eficiență maximă și repornire rapidă a vehiculului.",
+      title: "Reparație unități de control electronice pentru vehicule comerciale",
+      description: "Efectuăm reparații expres a unităților de control electronice (Motor, Cutie de viteză, sistem de frânare, unități electronice centrale, Ceasuri panouri de bord).",
       icon: "🚛",
       image: "/gama-7.webp",
       features: [
@@ -160,27 +227,62 @@ function Home() {
         "Diagnosticare avansată și reparație ECU",
         "Compatibilitate cu toate tipurile de vehicule comerciale"
       ]
+    },
+    {
+      id: 8,
+      title: "Reparația unităților electronice (ECU) motor",
+      description: "Diagnosticăm și reparăm unitățile de control motor pentru funcționare optimă, programare și resoftare.",
+      icon: "⚙️",
+      image: "/gama-8.webp",
+      features: [
+        "Funcționare motor incorect",
+        "Lipsă semnal injectoare/bobine",
+        "Programare/optimizare/resoftare",
+        "Alimentare senzori incorectă",
+        "Lipsă comunicare cu unitatea de control"
+      ]
+    },
+    {
+      id: 9,
+      title: "Reparație contacte de cheie, unitate blocare volan EZS/ELV",
+      description: "Diagnosticăm și reparăm unitățile electronice de contact și blocare volan pentru sistemele de imobilizare și pornire.",
+      icon: "🔑",
+      image: "/gama-9.webp",
+      features: [
+        "Probleme/erori de comunicare",
+        "Permisiune pornire motor blocată",
+        "Date corupte",
+        "Probleme mecanice",
+        "Lipsă sincronizare (EZS/ELV)"
+      ]
+    },
+    {
+      id: 10,
+      title: "Reparație selectoare de viteză",
+      description: "Diagnosticăm și reparăm selectoarele electronice de viteză pentru transmisii automate și semiautomate.",
+      icon: "🕹️",
+      image: "/gama-10.webp",
+      features: [
+        "Lipsa comunicarea cu unitatea electronică",
+        "Afișare falsă a vitezelor",
+        "Probleme mecanice",
+        "Blocarea manetei în poziția P"
+      ]
+    },
+    {
+      id: 11,
+      title: "Reparație unitate centrală electronică (BDC, BSM, FEM, BSI)",
+      description: "Diagnosticăm și reparăm unitățile centrale electronice care gestionează funcțiile caroseriei, iluminatul și sistemele de confort.",
+      icon: "💻",
+      image: "/gama-11.webp",
+      features: [
+        "Lumini interioare/exterioare nefuncționale",
+        "Lipsă comunicare",
+        "Unitatea prezintă erori eronate",
+        "Date corupte sau pierdute",
+        "Alte/diferite funcții nefuncționale"
+      ]
     }
-
-  ];
-
-  // Imagini pentru galeria de 20 de slide-uri
-  const galleryImages = [
-    { id: 1, url: "/gallery-1.webp", alt: "Chei auto" },
-    { id: 2, url: "/gallery-2.webp", alt: "Sistem multimedia" },
-    { id: 3, url: "/gallery-3.webp", alt: "greseli panou auto" },
-    { id: 4, url: "/gallery-4.webp", alt: "Diagnoza" },
-    { id: 5, url: "/gallery-5.webp", alt: "Derstronik" },
-    { id: 6, url: "/gallery-6.webp", alt: "ABS" },
-    { id: 7, url: "/gallery-7.webp", alt: "Reparatii electronice" },
-    { id: 8, url: "/gallery-8.webp", alt: "Reparatii electronice" },
-    { id: 9, url: "/gallery-9.webp", alt: "Placa" },
-    { id: 10, url: "/gallery-10.webp", alt: "Placa" },
-    { id: 11, url: "/gallery-11.webp", alt: "Placa" },
-    { id: 12, url: "/gallery-12.webp", alt: "Reparatii electronice" },
-    { id: 13, url: "/gallery-13.webp", alt: "Panou de bord" },
-    { id: 14, url: "/gallery-14.webp", alt: "Derstronik" },
-    { id: 15, url: "/gallery-15.webp", alt: "airbag" },
   ];
 
   // Funcție pentru a găsi ID-ul corect din baza de date
@@ -214,16 +316,16 @@ function Home() {
                 <img
                   src={slide.image}
                   alt={slide.title}
-                  className="w-full h-full object-cover opacity-30"
+                  className="w-full h-full object-cover"
                   loading="lazy"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30 flex items-center">
+                <div className="absolute inset-0 flex items-center">
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                    <div className="lg:w-2/3 animate-fade-in-up">
+                    <div className="lg:w-2/3 animate-fade-in-up bg-black/50 p-8 rounded-lg">
                       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                         {slide.title}
                       </h1>
@@ -268,9 +370,6 @@ function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Gama largă de servicii</h2>
-            <p className="text-gray-600 max-w-3xl mx-auto text-lg">
-              Specializăm în reparația tuturor sistemelor electronice auto. Gama noastră completă de servicii include:
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -312,7 +411,7 @@ function Home() {
                     <div className="mb-6">
                       <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
                         <span className="text-red-600 mr-2">✓</span>
-                        Servicii incluse:
+                        Acțiuni cheie:
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {service.features.map((feature, idx) => (
@@ -451,11 +550,11 @@ function Home() {
               className="gallery-swiper"
             >
               {galleryImages.map((image) => (
-                <SwiperSlide key={image.id}>
+                <SwiperSlide key={image._id}>
                   <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                     <div className="aspect-w-4 aspect-h-3">
                       <img
-                        src={image.url}
+                        src={image.url.startsWith('http') ? image.url : image.url}
                         alt={image.alt}
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                         onError={(e) => {
@@ -548,36 +647,27 @@ function Home() {
         </div>
       </div>
 
-      {/* CTA SECTION */}
+      {/* CTA SECTION - VERSION WITH CLEAR BACKGROUND */}
       <div className="relative py-20 overflow-hidden text-white">
-        {/* Background image */}
+        {/* Background image - full visibility */}
         <div
           className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ backgroundImage: "url('bg-cta.png')" }}
+          style={{
+            backgroundImage: "url('cta-bg.webp')",
+            filter: "brightness(0.7)" // doar puțin întuneric pentru lizibilitatea textului
+          }}
         ></div>
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-red-700/80 to-red-900/80 z-10"></div>
-
-        {/* SVG pattern overlay */}
-        <div className="absolute inset-0 opacity-10 z-20">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="white" strokeWidth="2" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
+        {/* Simple dark overlay - foarte subtil pentru text */}
+        <div className="absolute inset-0 bg-black/30 z-10"></div>
 
         {/* Content */}
-        <div className="relative z-30 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
             Ai nevoie de o reparație specializată?
           </h2>
-          <p className="text-xl md:text-2xl mb-8 text-red-100 drop-shadow-sm">
-            Trimite-ne cererea ta și te vom contacta în cel mult 30 de minute
+          <p className="text-xl md:text-2xl mb-8 text-white drop-shadow-md">
+            Trimite-ne cererea ta și te vom contacta
           </p>
           <Link
             to="/request-service"
@@ -585,7 +675,7 @@ function Home() {
           >
             Solicită serviciu
           </Link>
-          <p className="mt-4 text-red-200 text-sm md:text-base">
+          <p className="mt-4 text-white text-sm md:text-base drop-shadow">
             sau sună la <a href="tel:+37369857294" className="font-bold underline">+373 69 857 294</a>
           </p>
         </div>

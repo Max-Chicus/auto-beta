@@ -556,4 +556,172 @@ router.patch('/service-requests/:id/status', async (req, res) => {
   }
 });
 
+// ========== CRUD PENTRU GALERIE ==========
+
+// GET toate imaginile din galerie
+router.get('/gallery', async (req, res) => {
+  try {
+    // Verifică dacă modelul Gallery există, dacă nu, returnează array gol
+    let Gallery;
+    try {
+      Gallery = require('../models/Gallery');
+    } catch (err) {
+      console.log('⚠️ Modelul Gallery nu există încă, returnez array gol');
+      return res.json([]);
+    }
+
+    const images = await Gallery.find().sort({ order: 1, createdAt: -1 });
+    res.json(images);
+  } catch (err) {
+    console.error('Eroare la încărcarea galeriei:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST imagine nouă în galerie
+router.post('/gallery', async (req, res) => {
+  console.log('🚀 CREATE GALLERY IMAGE REQUEST');
+
+  try {
+    // Verifică dacă modelul Gallery există
+    let Gallery;
+    try {
+      Gallery = require('../models/Gallery');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul Gallery nu este definit' });
+    }
+
+    const { images } = req.body;
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: 'Nu s-au primit imagini' });
+    }
+
+    const savedImages = [];
+
+    for (const img of images) {
+      // Validează URL-ul imaginii
+      if (!img.url) {
+        return res.status(400).json({ error: 'URL-ul imaginii este obligatoriu' });
+      }
+
+      // Creează intrarea în galerie
+      const galleryImage = new Gallery({
+        url: img.url,
+        alt: img.alt || 'Galerie imagine',
+        order: img.order || 0
+      });
+
+      await galleryImage.save();
+      savedImages.push(galleryImage);
+    }
+
+    console.log(`✅ ${savedImages.length} imagini salvate în galerie`);
+    res.status(201).json(savedImages);
+
+  } catch (err) {
+    console.error('❌ CREATE GALLERY ERROR:', err.message);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// PUT actualizare imagine din galerie
+router.put('/gallery/:id', async (req, res) => {
+  try {
+    let Gallery;
+    try {
+      Gallery = require('../models/Gallery');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul Gallery nu este definit' });
+    }
+
+    const { alt, order } = req.body;
+    const updateData = {};
+
+    if (alt !== undefined) updateData.alt = alt;
+    if (order !== undefined) updateData.order = order;
+
+    const image = await Gallery.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!image) {
+      return res.status(404).json({ error: 'Imaginea nu a fost găsită' });
+    }
+
+    res.json({
+      message: 'Imagine actualizată cu succes',
+      image
+    });
+
+  } catch (err) {
+    console.error('Eroare update imagine:', err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// DELETE șterge imagine din galerie
+router.delete('/gallery/:id', async (req, res) => {
+  try {
+    let Gallery;
+    try {
+      Gallery = require('../models/Gallery');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul Gallery nu este definit' });
+    }
+
+    const image = await Gallery.findById(req.params.id);
+
+    if (!image) {
+      return res.status(404).json({ error: 'Imaginea nu a fost găsită' });
+    }
+
+    // Șterge intrarea din baza de date
+    await image.deleteOne();
+
+    res.json({
+      message: 'Imagine ștearsă cu succes',
+      imageId: image._id
+    });
+
+  } catch (err) {
+    console.error('Eroare ștergere imagine:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST reordonare imagini
+router.post('/gallery/reorder', async (req, res) => {
+  try {
+    let Gallery;
+    try {
+      Gallery = require('../models/Gallery');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul Gallery nu este definit' });
+    }
+
+    const { images } = req.body; // array de { id, order }
+
+    if (!images || !Array.isArray(images)) {
+      return res.status(400).json({ error: 'Date invalide pentru reordonare' });
+    }
+
+    // Actualizează fiecare imagine
+    for (const item of images) {
+      await Gallery.findByIdAndUpdate(item.id, { order: item.order });
+    }
+
+    res.json({
+      message: 'Ordine actualizată cu succes',
+      count: images.length
+    });
+
+  } catch (err) {
+    console.error('Eroare reordonare:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

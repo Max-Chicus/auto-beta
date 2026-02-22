@@ -527,19 +527,6 @@ function AdminServices() {
                         />
                       </div>
 
-                      {/* <div>
-                        <label className="block text-xs text-gray-600 mb-1">
-                          Cod model
-                        </label>
-                        <input
-                          type="text"
-                          value={model.modelCode}
-                          onChange={(e) => handleModelChange(index, 'modelCode', e.target.value)}
-                          className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                          placeholder="Ex: B5, 8D"
-                        />
-                      </div> */}
-
                       <div>
                         <label className="block text-xs text-gray-600 mb-1">
                           An de la *
@@ -571,32 +558,7 @@ function AdminServices() {
                           required
                         />
                       </div>
-
-                      {/* <div>
-                        <label className="block text-xs text-gray-600 mb-1">
-                          Motoare (virgulă)
-                        </label>
-                        <input
-                          type="text"
-                          value={model.engineCodes}
-                          onChange={(e) => handleModelChange(index, 'engineCodes', e.target.value)}
-                          className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                          placeholder="Ex: 1.6 TDI, 2.0 TFSI"
-                        />
-                      </div> */}
-
-                      {/* <div>
-                        <label className="block text-xs text-gray-600 mb-1">
-                          Note
-                        </label>
-                        <input
-                          type="text"
-                          value={model.notes}
-                          onChange={(e) => handleModelChange(index, 'notes', e.target.value)}
-                          className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                          placeholder="Note adiționale"
-                        />
-                      </div> */}
+                      
                     </div>
                   </div>
                 ))}

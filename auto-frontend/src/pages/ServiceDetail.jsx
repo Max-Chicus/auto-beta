@@ -187,10 +187,7 @@ function ServiceDetail() {
                 >
                   Solicită acest serviciu
                 </button>
-                
-                <p className="text-xs text-gray-500 text-center mt-3">
-                  Diagnostic gratuit • Transport gratuit
-                </p>
+              
               </div>
             </div>
 
@@ -433,11 +430,11 @@ function ServiceDetail() {
             <ul className="space-y-3 text-sm text-blue-800">
               <li className="flex items-start gap-2">
                 <span>✓</span>
-                <span>Diagnosticul este gratuit</span>
+                <span>Diagnostic profesional cuplat la prețul reparației</span>
               </li>
               <li className="flex items-start gap-2">
                 <span>✓</span>
-                <span>Transport gratuit pentru unități</span>
+                <span>Transport în regim propriu (contra cost)</span>
               </li>
               <li className="flex items-start gap-2">
                 <span>✓</span>
@@ -466,9 +463,6 @@ function ServiceDetail() {
             >
               Contactează-ne
             </Link>
-            <p className="text-xs text-gray-600 text-center mt-3">
-              Răspundem în maxim 30 minute
-            </p>
           </div>
 
           {/* SHARE BUTTONS */}
