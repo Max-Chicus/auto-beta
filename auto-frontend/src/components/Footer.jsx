@@ -2,7 +2,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-br from-gray-950 via-gray-900 to-red-950 text-white pt-14 pb-10">
+    <footer id="footer" className="bg-gradient-to-br from-gray-950 via-gray-900 to-red-950 text-white pt-14 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -38,18 +38,17 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
+          {/* Contact Info with Map */}
+          <div className="col-span-1 md:col-span-1">
             <h3 className="font-bold text-lg mb-4 text-white">Contact</h3>
-            <ul className="space-y-3">
+
+            {/* Contact details */}
+            <ul className="space-y-3 mb-4">
               <li className="flex items-center gap-3">
                 <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <a
-                  href="tel:+37369857294"
-                  className="text-gray-400 hover:text-red-400 transition-colors duration-300"
-                >
+                <a href="tel:+37369857294" className="text-gray-400 hover:text-red-400 transition-colors">
                   +373 69 857 294
                 </a>
               </li>
@@ -59,14 +58,39 @@ function Footer() {
                 </svg>
                 <span className="text-gray-400">derstronik.info@gmail.com</span>
               </li>
-              <li className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-gray-400">Chișinău, Moldova<br /> Șoseaua Balcani 53</span>
+                <span className="text-gray-400">Șoseaua Balcani 53, Chișinău</span>
               </li>
             </ul>
+
+            {/* Hartă responsive - Derstronik */}
+            <div className="mt-4 rounded-xl overflow-hidden border border-gray-700">
+              <div className="relative w-full" style={{ paddingBottom: "75%" }}> {/* Raport 4:3 pentru footer */}
+                <iframe
+                  title="Locația Derstronik - Chișinău"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2718.999313850137!2d28.7414078635309!3d47.040244271023255!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40c97d544e206711%3A0xe559d46d8f86f418!2sDerstronik!5e0!3m2!1sro!2sus!4v1771779791992!5m2!1sro!2sus"
+                  className="absolute top-0 left-0 w-full h-full"
+                  style={{ border: 0, filter: "invert(90%) hue-rotate(180deg)" }} /* Opțional: face harta mai potrivită pentru tema închisă */
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </div>
+
+            {/* Link către Google Maps */}
+            <a
+              href="https://maps.app.goo.gl/EzSENraGTnT1PG2z5"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-3 text-sm text-gray-400 hover:text-red-400 transition-colors"
+            >
+              📍 Deschide în Google Maps →
+            </a>
           </div>
 
           {/* Social Media */}

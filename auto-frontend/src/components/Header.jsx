@@ -66,6 +66,18 @@ function Header() {
               <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-red-600 group-hover:w-3/4 transition-all duration-300"></span>
             </Link>
 
+            <a
+              href="#footer"
+              className="px-5 py-2.5 text-gray-700 hover:text-red-600 font-medium rounded-lg hover:bg-red-50 transition-all duration-200 relative group"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <span>Contact</span>
+              <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-red-600 group-hover:w-3/4 transition-all duration-300"></span>
+            </a>
+
             <Link
               to="/request-service"
               className="ml-2 px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-lg hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
