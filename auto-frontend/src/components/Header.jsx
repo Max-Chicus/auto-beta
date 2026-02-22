@@ -145,6 +145,18 @@ function Header() {
               >
                 Servicii
               </Link>
+              <a
+                href="#footer"
+                className="px-4 py-3 text-gray-700 hover:text-red-600 font-medium rounded-lg hover:bg-red-50 transition-colors flex items-center gap-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <span className="text-lg">📞</span>
+                <span>Contact</span>
+              </a>
               <Link
                 to="/request-service"
                 className="px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-lg hover:from-red-700 hover:to-red-800 transition-all mt-2"
