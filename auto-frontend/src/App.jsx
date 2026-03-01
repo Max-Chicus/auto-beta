@@ -15,6 +15,8 @@ import AdminHome from './components/admin/AdminHome';
 import AdminServices from './components/admin/AdminServices';
 import AdminServiceRequests from './components/admin/AdminServiceRequests';
 import AdminGallery from './components/admin/AdminGallery';
+import ShippingLabel from './pages/ShippingLabel';
+import AdminShippingRequests from './components/admin/AdminShippingRequests';
 import "./App.css"
 
 function App() {
@@ -34,6 +36,8 @@ function App() {
           <Route path="/request-service" element={<ServiceRequest />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/shipping-label" element={<ShippingLabel />} />
+          <Route path="/shipping-label/:serviceId" element={<ShippingLabel />} />
 
           {/* RUTE ADMIN */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -46,6 +50,7 @@ function App() {
             <Route path="services" element={<AdminServices />} />
             <Route path="service-requests" element={<AdminServiceRequests />} />
             <Route path="/admin/gallery" element={<AdminGallery />} />
+            <Route path="shipping-requests" element={<AdminShippingRequests />} />
           </Route>
 
         </Routes>

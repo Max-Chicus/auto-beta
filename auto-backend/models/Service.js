@@ -92,6 +92,13 @@ const ServiceSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
+  // NOU: Preț testare
+  testPrice: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 0
+  },
   currency: {
     type: String,
     default: 'EUR',
@@ -158,8 +165,5 @@ ServiceSchema.virtual('serviceTypeName', {
   justOne: true,
   options: { select: 'name icon' }
 });
-
-// **ELIMINĂ COMPLET middleware-ul pre-save care cauzează problema**
-// Nu folosi pre('save') deloc - validează în controller
 
 module.exports = mongoose.model('Service', ServiceSchema);

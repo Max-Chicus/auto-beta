@@ -101,37 +101,37 @@ function Home() {
       id: 1,
       title: "Reparație profesională de unități auto electronice",
       description: "Specializați în reparația unităților de control (ECU), ABS, ESP, airbag, panouri de bord și alte sisteme electronice.",
-      image: "/hero-1.webp"
+      image: "/hero-1.jpg"
     },
     {
       id: 2,
       title: "Reparație și recondiționare panouri de bord auto",
       description: "Diagnosticare și reparare profesională a panourilor de bord (instrument cluster): afișaj defect, pixeli lipsă, indicatoare eronate, iluminare slabă sau probleme de comunicare CAN.",
-      image: "/hero-2.webp"
+      image: "/hero-2.jpg"
     },
     {
       id: 3,
       title: "Reparație unități electronice cutii de viteze",
       description: "Diagnosticare și reparație profesională a modulelor TCU. Remediem erori de schimbare trepte, mod avarie și probleme de comunicare.",
-      image: "/hero-3.webp"
+      image: "/hero-3.jpg"
     },
     {
       id: 4,
       title: "Service specializat module ABS și ESP",
       description: "Reparăm module ABS și ESP pentru toate tipurile de vehicule. Eliminăm erori de frânare, probleme hidraulice și defecțiuni electronice, garantând siguranță și fiabilitate.",
-      image: "/hero-4.webp"
+      image: "/hero-4.jpg"
     },
     {
       id: 5,
       title: "Reparație plăci electronice auto",
       description: "Diagnosticăm și reparăm plăci electronice și circuite auto: reparații componente SMD, lipituri defecte, condensatori și alte probleme care afectează funcționarea sistemelor electronice.",
-      image: "/hero-5.webp"
+      image: "/hero-5.jpg"
     },
     {
       id: 6,
       title: "Reparație unități de comandă pentru vehicule comerciale",
       description: "PTM, EDC6, EDC7, ACM, MCM, Delphi ETC3, coordonator Scania COO7, EMS, Mercedes-Benz CPC3 / CPC4, sistem de frânare EBS (Wabco) precum și alte sisteme electronice.",
-      image: "/hero-6.webp"
+      image: "/hero-6.jpg"
     }
   ];
 
@@ -357,12 +357,15 @@ function Home() {
 
       {/* SERVICE FINDER */}
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 -mt-16 relative z-10">
-        <ServiceFinder onSearch={(data) => {
-          const params = new URLSearchParams();
-          if (data.brandId) params.append('brand', data.brandId);
-          if (data.model) params.append('model', data.model);
-          window.location.href = `/services?${params.toString()}`;
-        }} />
+        <ServiceFinder
+          onSearch={(data) => {
+            const params = new URLSearchParams();
+            if (data.brandId) params.append('brand', data.brandId);
+            if (data.model) params.append('model', data.model);
+            window.location.href = `/services?${params.toString()}`;
+          }}
+          dbServiceTypes={dbServiceTypes}
+        />
       </div>
 
       {/* GAMA DE SERVICII - NOUA SECȚIUNE */}
@@ -449,18 +452,6 @@ function Home() {
               </div>
             </Link>
 
-          </div>
-
-          {/* Text suplimentar */}
-          <div className="mt-12 bg-white border border-gray-200 rounded-2xl p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 text-red-600 rounded-full mb-4">
-              <span className="text-2xl">➕</span>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Și multe altele...</h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Reparăm și alte instrumente electronice auto: sisteme de audio, camere de marsalier,
-              unități de control pentru geamuri electrice, sisteme de imobilizare și multe altele.
-            </p>
           </div>
         </div>
       </div>
@@ -596,7 +587,151 @@ function Home() {
         </div>
       </div>
 
+      {/* SECȚIUNE NOUĂ - EXPEDIERE PIESĂ */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
+            {/* Partea stângă - Text și beneficii */}
+            <div className="space-y-6">
+              <div className="inline-block px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold">
+                📦 - SERVICE LA DISTANȚĂ
+              </div>
+
+              <h2 className="text-4xl font-bold text-gray-900 leading-tight">
+                Expediază piesa și o reparam la distanță
+              </h2>
+
+              <p className="text-lg text-gray-600">
+                Nu mai ești limitat la Chișinău! Acum poți trimite piesa prin curier
+                de oriunde din țară și noi o reparam profesional.
+              </p>
+
+              {/* Listă beneficii */}
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Completează formularul</h3>
+                    <p className="text-gray-600">Spune-ne ce piesă ai și completează datele tale</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Printează eticheta</h3>
+                    <p className="text-gray-600">Generezi PDF-ul cu etichetă și instrucțiuni</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                    3
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Expediază coletul</h3>
+                    <p className="text-gray-600">Lipești eticheta și trimiți piesa prin curier la atelier</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="pt-4">
+                <Link
+                  to="/shipping-label"
+                  className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-blue-800 transform hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl"
+                >
+                  <span className="text-2xl">📦</span>
+                  <span>Generează eticheta de expediere</span>
+                  <span className="text-xl">→</span>
+                </Link>
+                <p className="text-sm text-gray-500 mt-3">
+                  * Funcționează cu orice serviciu de curierat (DHL, FanCurier, Cargus etc.)
+                </p>
+              </div>
+            </div>
+
+            {/* Partea dreaptă - Imagine/Illustration */}
+            <div className="relative">
+              <div className="relative bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-8 shadow-2xl overflow-hidden">
+                {/* Elemente decorative */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mt-10 -mr-10"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -mb-10 -ml-10"></div>
+
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-bold text-white mb-6">Ce primești în PDF:</h3>
+
+                  <div className="space-y-4">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                      <div className="font-semibold">📋 Etichetă cu adresa atelierului</div>
+                      <div className="text-sm opacity-90">Șoseaua Balcani 53, Chișinău</div>
+                    </div>
+
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                      <div className="font-semibold">🏷️ Etichetă cu adresa ta de return</div>
+                      <div className="text-sm opacity-90">completată automat din formular</div>
+                    </div>
+
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                      <div className="font-semibold">🔢 Număr unic de urmărire</div>
+                      <div className="text-sm opacity-90">DER-12345678-001 - pentru tracking</div>
+                    </div>
+
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-white">
+                      <div className="font-semibold">📝 Instrucțiuni clare</div>
+                      <div className="text-sm opacity-90">Cum să împachetezi și să expediazi</div>
+                    </div>
+                  </div>
+
+                  {/* Mockup PDF preview */}
+                  <div className="mt-6 bg-white rounded-lg p-3 shadow-inner">
+                    <div className="flex items-center gap-3 border-b pb-2 mb-2">
+                      <span className="text-red-600 text-xl">📄</span>
+                      <span className="font-mono text-sm">eticheta-expediere-DER-12345678-001.pdf</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600">Dimensiune: 245 KB</span>
+                      <span className="text-blue-600">⬇️ Previzualizare</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Badge curier parteneri */}
+              <div className="absolute -bottom-4 -right-4 bg-white rounded-full shadow-xl p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🚚</span>
+                  <span className="font-bold text-sm">DHL • FanCurier • Cargus • NovaPost • Poșta Moldovei</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card cu statistici */}
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+              <div className="text-3xl mb-2">📦</div>
+              <div className="text-2xl font-bold text-gray-900">100%</div>
+              <div className="text-gray-600">Piese returnate clienților</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+              <div className="text-3xl mb-2">⚡</div>
+              <div className="text-2xl font-bold text-gray-900">24-48h</div>
+              <div className="text-gray-600">Diagnosticare rapidă</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+              <div className="text-3xl mb-2">🛡️</div>
+              <div className="text-2xl font-bold text-gray-900">12 luni</div>
+              <div className="text-gray-600">Garanție la reparații</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* POPULAR BRANDS */}
       <div className="bg-white py-16">

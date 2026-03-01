@@ -1,52 +1,70 @@
-import { Link } from 'react-router-dom';
-import { getFirstImageUrl, getFullImageUrl } from '../utils/imageUtils'; // <- ADĂUGĂ getFullImageUrl
+import { Link, useNavigate } from 'react-router-dom';
+import { getFirstImageUrl, getFullImageUrl } from '../utils/imageUtils';
 
 function ServiceCard({ service }) {
+  const navigate = useNavigate();
+  
   // Obține URL-ul primei imagini
   const imageUrl = getFirstImageUrl(service.images);
-  
+
   // Extrage datele
   const brandName = service.brand?.name || 'Necunoscut';
   const brandLogo = service.brand?.logo;
   const serviceTypeName = service.serviceType?.name || 'Serviciu';
   const serviceTypeIcon = service.serviceType?.icon || '⚙️';
-  
+
+  // Funcție pentru navigare la shipping cu datele serviciului
+  const handleShippingClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate('/shipping-label', {
+      state: {
+        serviceId: service._id,
+        serviceName: service.name
+      }
+    });
+  };
+
   return (
-    <Link
-      to={`/service/${service._id}`}
-      className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-red-300 transition-all duration-300"
-    >
-      {/* IMAGINE SERVICIU */}
-      <div className="h-48 bg-gray-100 relative overflow-hidden">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={service.name}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
-              e.target.className = 'w-full h-full object-contain p-4';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-6xl">{serviceTypeIcon}</span>
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-red-300 transition-all duration-300">
+      {/* IMAGINE SERVICIU - click duce la detalii */}
+      <Link to={`/service/${service._id}`} className="block">
+        <div className="h-48 bg-gray-100 relative overflow-hidden">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={service.name}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
+                e.target.className = 'w-full h-full object-contain p-4';
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-6xl">{serviceTypeIcon}</span>
+            </div>
+          )}
+
+          {/* BADGE RECOMANDAT */}
+          {service.featured && (
+            <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+              🔥 Recomandat
+            </div>
+          )}
+
+          {/* BADGE PREȚ */}
+          <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg shadow p-2">
+            <div className="text-right">
+              <div className="text-xs text-gray-500">Reparație:</div>
+              <div className="font-bold text-red-600 text-sm">{service.repairPrice} {service.currency}</div>
+              <div className="text-xs text-gray-500 mt-1">Testare:</div>
+              <div className="font-bold text-blue-600 text-sm">{service.testPrice} {service.currency}</div>
+            </div>
           </div>
-        )}
-        
-        {/* BADGE RECOMANDAT */}
-        {service.featured && (
-          <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-            🔥 Recomandat
-          </div>
-        )}
-        
-        {/* BADGE PREȚ */}
-        <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-red-600 font-bold px-3 py-2 rounded-lg shadow">
-          {service.repairPrice} {service.currency}
         </div>
-      </div>
+      </Link>
 
       {/* CONTENT */}
       <div className="p-5">
@@ -54,7 +72,7 @@ function ServiceCard({ service }) {
           <div className="flex-1">
             {/* LOGO BRAND + NUME SERVICIU */}
             <div className="flex items-center gap-3 mb-3">
-              {/* LOGO BRAND - FOLOSEȘTE getFullImageUrl() */}
+              {/* LOGO BRAND */}
               {brandLogo ? (
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
                   <img
@@ -65,7 +83,7 @@ function ServiceCard({ service }) {
                       console.error('❌ Eroare logo:', brandLogo);
                       e.target.onerror = null;
                       e.target.style.display = 'none';
-                      e.target.parentElement.innerHTML = 
+                      e.target.parentElement.innerHTML =
                         `<span class="text-sm font-bold text-gray-600">${brandName.charAt(0)}</span>`;
                     }}
                   />
@@ -77,12 +95,14 @@ function ServiceCard({ service }) {
                   </span>
                 </div>
               )}
-              
+
               {/* NUME SERVICIU */}
               <div className="flex-1">
-                <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-1">
-                  {service.name}
-                </h3>
+                <Link to={`/service/${service._id}`}>
+                  <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-1 hover:text-red-600 transition-colors">
+                    {service.name}
+                  </h3>
+                </Link>
                 <p className="text-sm text-gray-600">
                   {brandName}
                 </p>
@@ -97,7 +117,7 @@ function ServiceCard({ service }) {
               </span>
             </div>
           </div>
-          
+
           {/* ICON TIP SERVICIU (dreapta) */}
           <div className="flex-shrink-0 ml-2">
             <span className="text-3xl text-gray-300">{serviceTypeIcon}</span>
@@ -145,14 +165,25 @@ function ServiceCard({ service }) {
           </div>
         </div>
 
-        {/* BUTON DETALII */}
-        <div className="mt-4">
-          <button className="w-full bg-gray-50 hover:bg-red-50 text-red-600 font-medium py-2.5 rounded-lg transition-colors border border-gray-200 hover:border-red-200 hover:shadow-sm">
-            Vezi detalii complete →
+        {/* BUTOANE ACȚIUNE - VERSIUNE CU 2 BUTOANE FRUMOASE */}
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          <Link
+            to={`/service/${service._id}`}
+            className="bg-gray-50 hover:bg-red-50 text-red-600 font-medium py-2.5 px-3 rounded-lg transition-colors border border-gray-200 hover:border-red-200 hover:shadow-sm text-sm text-center"
+          >
+            Vezi detalii
+          </Link>
+          
+          <button
+            onClick={handleShippingClick}
+            className="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2.5 px-3 rounded-lg transition-colors border border-blue-200 hover:border-blue-300 hover:shadow-sm text-sm flex items-center justify-center gap-1"
+          >
+            <span>📦</span>
+            <span>Expediază</span>
           </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 

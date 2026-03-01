@@ -78,33 +78,6 @@ function AdminDashboard() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards pentru SERVICII */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-red-100 p-3 rounded-lg">
-                <span className="text-red-600 text-2xl">🔧</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Servicii</p>
-                <p className="text-2xl font-bold">{stats?.services || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6 hover:shadow-md transition">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-purple-100 p-3 rounded-lg">
-                <span className="text-purple-600 text-2xl">📋</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Cereri</p>
-                <p className="text-2xl font-bold">{stats?.serviceRequests || 0}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Sidebar Navigation pentru SERVICII */}
           <aside className="md:col-span-1">
@@ -133,6 +106,12 @@ function AdminDashboard() {
                 className="block py-3 px-4 bg-white hover:bg-gray-50 rounded-lg border font-medium"
               >
                 📋 Cereri Servicii
+              </Link>
+              <Link
+                to="/admin/shipping-requests"
+                className="block py-3 px-4 bg-white hover:bg-gray-50 rounded-lg border font-medium"
+              >
+                📦 Expediieri
               </Link>
             </nav>
 

@@ -5,10 +5,10 @@ import API from '../api/api';
 function ServiceRequest() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Date din navigare (dacă vine de la un serviciu specific)
   const { serviceId, serviceName } = location.state || {};
-  
+
   const [formData, setFormData] = useState({
     customer: {
       name: '',
@@ -40,7 +40,7 @@ function ServiceRequest() {
 
   useEffect(() => {
     fetchData();
-    
+
     // Dacă avem serviceId, preia informațiile serviciului pentru a pre-popula brandul și modelul
     if (serviceId) {
       fetchServiceDetails(serviceId);
@@ -53,7 +53,7 @@ function ServiceRequest() {
         API.get('/filters'),
         API.get('/services?limit=50')
       ]);
-      
+
       setBrands(brandsRes.data.brands || []);
       setServices(servicesRes.data || []);
     } catch (err) {
@@ -66,22 +66,22 @@ function ServiceRequest() {
       const res = await API.get(`/services/${id}`);
       const service = res.data;
       setSelectedService(service);
-      
+
       // Pre-populează brandul din serviciu
       if (service.brand?._id) {
         handleChange('vehicle.brand', service.brand._id);
       }
-      
+
       // Pre-populează descrierea problemei cu un text generic bazat pe numele serviciului
       const defaultDescription = `Solicit serviciul "${service.name}" pentru mașina mea.`;
       handleChange('issueDescription', defaultDescription);
-      
+
       // Dacă serviciul are modele compatibile, sugerează primul model
       if (service.compatibleModels && service.compatibleModels.length > 0) {
         const firstModel = service.compatibleModels[0];
         if (firstModel.modelName) {
           handleChange('vehicle.model', firstModel.modelName);
-          
+
           // Sugerează și anul dacă este disponibil
           if (firstModel.yearFrom) {
             handleChange('vehicle.year', firstModel.yearFrom);
@@ -98,11 +98,11 @@ function ServiceRequest() {
     setFormData(prev => {
       const newData = { ...prev };
       let current = newData;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]];
       }
-      
+
       current[keys[keys.length - 1]] = value;
       return newData;
     });
@@ -175,14 +175,14 @@ function ServiceRequest() {
       // PAS 1: SALVEAZĂ ÎN BAZA DE DATE (API-ul tău)
       // ============================================
       const res = await API.post('/service-requests', cleanData);
-      
+
       const savedRequestId = res.data.requestNumber || res.data._id;
       console.log('✅ Cerere salvată în DB cu ID:', savedRequestId);
 
       // ============================================
       // PAS 2: TRIMITE EMAIL CU WEB3FORMS
       // ============================================
-      
+
       // ============================================
       // 🚨 ATENȚIE: ÎNLOCUIEȘTE URMĂTOAREA CHEIE CU ACCESS KEY-UL TĂU REAL DE LA WEB3FORMS.COM
       // Obține cheia de la: https://web3forms.com > Dashboard > Access Keys
@@ -196,7 +196,7 @@ function ServiceRequest() {
         subject: `🔔 CERERE SERVICIU NOUĂ: ${cleanData.customer.name} - ${brandName} ${cleanData.vehicle.model}`,
         from_name: 'Derstronik Electronic',
         botcheck: '', // Lăsat gol pentru protecție anti-spam
-        
+
         // Conținut HTML pentru email
         html: `
 <!DOCTYPE html>
@@ -308,7 +308,7 @@ function ServiceRequest() {
 </body>
 </html>
         `,
-        
+
         // Date suplimentare pentru dashboard-ul Web3Forms
         customer_name: cleanData.customer.name,
         customer_phone: cleanData.customer.phone,
@@ -319,7 +319,7 @@ function ServiceRequest() {
       };
 
       console.log('📧 Se trimite email via Web3Forms...');
-      
+
       // Trimite cererea către Web3Forms
       const emailResponse = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -331,7 +331,7 @@ function ServiceRequest() {
       });
 
       const emailResult = await emailResponse.json();
-      
+
       if (emailResult.success) {
         console.log('✅ Email trimis cu succes via Web3Forms!');
       } else {
@@ -344,7 +344,7 @@ function ServiceRequest() {
       // ============================================
       setSuccess(true);
       setRequestId(savedRequestId);
-      
+
       // Reset form după 5 secunde
       setTimeout(() => {
         navigate('/');
@@ -352,7 +352,7 @@ function ServiceRequest() {
 
     } catch (err) {
       console.error('❌ Eroare la trimiterea cererii:', err);
-      
+
       // Afișează mesajul de eroare din backend dacă există
       if (err.response?.data?.message) {
         alert(`Eroare: ${err.response.data.message}`);
@@ -519,11 +519,11 @@ function ServiceRequest() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-3"
                 required
               />
-              {selectedService && formData.vehicle.model && selectedService.compatibleModels?.some(m => 
+              {selectedService && formData.vehicle.model && selectedService.compatibleModels?.some(m =>
                 m.modelName.toLowerCase() === formData.vehicle.model.toLowerCase()
               ) && (
-                <p className="text-sm text-green-600 mt-1">✓ Model compatibil cu serviciul</p>
-              )}
+                  <p className="text-sm text-green-600 mt-1">✓ Model compatibil cu serviciul</p>
+                )}
             </div>
 
             <div>
@@ -573,7 +573,7 @@ function ServiceRequest() {
         {/* SERVICIU SOLICITAT */}
         <div className="bg-white rounded-xl border p-6">
           <h2 className="text-xl font-bold mb-6 pb-3 border-b">Serviciu solicitat</h2>
-          
+
           {serviceName ? (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex justify-between items-center">
@@ -586,7 +586,10 @@ function ServiceRequest() {
                         {selectedService.brand?.name}
                       </span>
                       <span className="inline-block bg-gray-100 px-2 py-1 rounded mr-2">
-                        {selectedService.repairPrice} {selectedService.currency}
+                        <span className="text-red-600">Reparație: {selectedService.repairPrice} {selectedService.currency}</span>
+                      </span>
+                      <span className="inline-block bg-gray-100 px-2 py-1 rounded mr-2">
+                        <span className="text-blue-600">Testare: {selectedService.testPrice} {selectedService.currency}</span>
                       </span>
                       <span className="inline-block bg-gray-100 px-2 py-1 rounded">
                         ⏱️ {selectedService.duration}
@@ -610,7 +613,7 @@ function ServiceRequest() {
                 <option value="">Alege un serviciu</option>
                 {services.map(s => (
                   <option key={s._id} value={s._id}>
-                    {s.brand?.name} - {s.name} ({s.repairPrice} {s.currency})
+                    {s.brand?.name} - {s.name} (Rep: {s.repairPrice} {s.currency} | Test: {s.testPrice} {s.currency})
                   </option>
                 ))}
               </select>
@@ -652,7 +655,7 @@ function ServiceRequest() {
                 + Adaugă simptom
               </button>
             </div>
-            
+
             {formData.symptoms.map((symptom, index) => (
               <div key={index} className="flex gap-2 mb-3">
                 <input
@@ -689,7 +692,7 @@ function ServiceRequest() {
                 + Adaugă cod
               </button>
             </div>
-            
+
             {formData.errorCodes.map((code, index) => (
               <div key={index} className="flex gap-2 mb-3">
                 <input

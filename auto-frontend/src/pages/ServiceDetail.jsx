@@ -21,14 +21,14 @@ function ServiceDetail() {
         API.get(`/services/${id}`),
         API.get('/services?limit=4') // Pentru servicii similare
       ]);
-      
+
       setService(serviceRes.data);
-      
+
       // Filtrează servicii similare (același brand sau același tip)
       const filteredRelated = relatedRes.data
         .filter(s => s._id !== id)
         .slice(0, 3);
-      
+
       setRelatedServices(filteredRelated);
     } catch (err) {
       console.error('Eroare serviciu:', err);
@@ -38,17 +38,17 @@ function ServiceDetail() {
   };
 
   const handleRequestService = () => {
-    navigate('/request-service', { 
-      state: { 
+    navigate('/request-service', {
+      state: {
         serviceId: id,
-        serviceName: service?.name 
-      } 
+        serviceName: service?.name
+      }
     });
   };
 
   const handlePrevImage = () => {
     if (service.images && service.images.length > 0) {
-      setSelectedImageIndex(prev => 
+      setSelectedImageIndex(prev =>
         prev === 0 ? service.images.length - 1 : prev - 1
       );
     }
@@ -56,7 +56,7 @@ function ServiceDetail() {
 
   const handleNextImage = () => {
     if (service.images && service.images.length > 0) {
-      setSelectedImageIndex(prev => 
+      setSelectedImageIndex(prev =>
         prev === service.images.length - 1 ? 0 : prev + 1
       );
     }
@@ -87,7 +87,7 @@ function ServiceDetail() {
   // Obține toate URL-urile imaginilor
   const imageUrls = getAllImageUrls(service.images);
   const firstImageUrl = getFirstImageUrl(service.images);
-  
+
   // Extrage datele brandului
   const brandName = service.brand?.name || 'Necunoscut';
   const brandLogo = service.brand?.logo;
@@ -121,7 +121,7 @@ function ServiceDetail() {
                     </span>
                   )}
                 </div>
-                
+
                 {/* BRAND INFO CU LOGO */}
                 <div className="flex items-center gap-4 text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ function ServiceDetail() {
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.style.display = 'none';
-                            e.target.parentElement.innerHTML = 
+                            e.target.parentElement.innerHTML =
                               `<span class="text-xs font-bold text-gray-600">${brandName.charAt(0)}</span>`;
                           }}
                         />
@@ -149,7 +149,7 @@ function ServiceDetail() {
                     )}
                     <span>{brandName}</span>
                   </div>
-                  
+
                   <span className="flex items-center gap-2">
                     <span className="text-lg">⚙️</span>
                     {serviceTypeName}
@@ -163,13 +163,15 @@ function ServiceDetail() {
                 <p className="text-gray-700 mb-6">{service.description}</p>
               </div>
 
-              {/* PRICE BOX */}
+              {/* PRICE BOX - MODIFICAT: Acum arată ambele prețuri */}
               <div className="bg-gray-50 border rounded-lg p-6 min-w-[250px]">
                 <div className="text-center mb-4">
                   <div className="text-3xl font-bold text-red-600">{service.repairPrice} {service.currency}</div>
                   <p className="text-sm text-gray-600">preț reparație</p>
+                  <div className="mt-3 text-2xl font-bold text-blue-600">{service.testPrice} {service.currency}</div>
+                  <p className="text-sm text-gray-600">preț testare</p>
                 </div>
-                
+
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Garanție:</span>
@@ -187,7 +189,6 @@ function ServiceDetail() {
                 >
                   Solicită acest serviciu
                 </button>
-              
               </div>
             </div>
 
@@ -195,7 +196,7 @@ function ServiceDetail() {
             {imageUrls.length > 0 && (
               <div className="mt-8 pt-6 border-t">
                 <h3 className="text-xl font-bold mb-4">Imagini serviciu</h3>
-                
+
                 {/* Imagine principală */}
                 <div className="relative mb-4">
                   <div className="relative h-96 bg-gray-100 rounded-lg overflow-hidden">
@@ -209,7 +210,7 @@ function ServiceDetail() {
                         e.target.className = 'w-full h-full object-cover';
                       }}
                     />
-                    
+
                     {/* Navigare între imagini (dacă sunt mai multe) */}
                     {imageUrls.length > 1 && (
                       <>
@@ -228,7 +229,7 @@ function ServiceDetail() {
                       </>
                     )}
                   </div>
-                  
+
                   {/* Contor imagini */}
                   {imageUrls.length > 1 && (
                     <div className="text-center mt-2 text-sm text-gray-600">
@@ -244,11 +245,10 @@ function ServiceDetail() {
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
-                        className={`relative h-20 rounded-lg overflow-hidden border-2 ${
-                          selectedImageIndex === index 
-                            ? 'border-red-500' 
-                            : 'border-transparent'
-                        }`}
+                        className={`relative h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index
+                          ? 'border-red-500'
+                          : 'border-transparent'
+                          }`}
                       >
                         <img
                           src={url}
@@ -287,7 +287,7 @@ function ServiceDetail() {
                       {model.yearFrom}-{model.yearTo}
                     </span>
                   </div>
-                  
+
                   {model.engineCodes?.length > 0 && (
                     <div className="mt-2">
                       <p className="text-sm text-gray-600 mb-1">Motoare:</p>
@@ -300,7 +300,7 @@ function ServiceDetail() {
                       </div>
                     </div>
                   )}
-                  
+
                   {model.notes && (
                     <p className="text-sm text-gray-500 mt-2 italic">Note: {model.notes}</p>
                   )}
@@ -353,7 +353,7 @@ function ServiceDetail() {
                 {relatedServices.map(related => {
                   const relatedBrandName = related.brand?.name || 'Necunoscut';
                   const relatedBrandLogo = related.brand?.logo;
-                  
+
                   return (
                     <Link
                       key={related._id}
@@ -379,10 +379,10 @@ function ServiceDetail() {
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900 line-clamp-2">{related.name}</h4>
-                          
+
                           {/* BRAND INFO CU LOGO ÎN RELATED SERVICES */}
                           <div className="flex items-center gap-2 mt-1">
                             {relatedBrandLogo ? (
@@ -406,7 +406,7 @@ function ServiceDetail() {
                             )}
                             <span className="text-sm text-gray-600">{relatedBrandName}</span>
                           </div>
-                          
+
                           <div className="flex justify-between items-center mt-2">
                             <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                               {related.serviceType?.name}
@@ -449,6 +449,22 @@ function ServiceDetail() {
                 <span>Garanție inclusă în preț</span>
               </li>
             </ul>
+          </div>
+
+          {/* Buton EXPEDIERE PIESA */}
+          <div className="mt-3">
+            <button
+              onClick={() => navigate('/shipping-label', {
+                state: {
+                  serviceId: service._id,
+                  serviceName: service.name
+                }
+              })}
+              className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 font-medium flex items-center justify-center gap-2"
+            >
+              <span>📦</span>
+              Expediază piesa prin curier
+            </button>
           </div>
 
           {/* CONTACT CTA */}

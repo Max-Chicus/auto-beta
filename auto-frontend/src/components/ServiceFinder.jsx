@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../api/api';
+import { getFirstImageUrl, getFullImageUrl } from '../utils/imageUtils'; // IMPORTĂ ȘI getFullImageUrl
 
-function ServiceFinder({ onSearch }) {
+function ServiceFinder({ onSearch, dbServiceTypes }) {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -46,12 +47,10 @@ function ServiceFinder({ onSearch }) {
     try {
       setLoading(true);
 
-      // Folosește noul endpoint pentru modele
       const res = await API.get(`/filters/models?brand=${selectedBrand}`);
 
       if (res.data.success) {
         setModels(res.data.models || []);
-        // Salvează numele brandului selectat
         const brand = brands.find(b => b._id === selectedBrand);
         if (brand) {
           setSelectedBrandName(brand.name);
@@ -78,7 +77,6 @@ function ServiceFinder({ onSearch }) {
 
   const handleModelSelect = (modelName) => {
     setSelectedModel(modelName);
-    // Eliminat pasul cu anul, merg direct la căutarea serviciilor
     findServices(modelName);
   };
 
@@ -86,20 +84,11 @@ function ServiceFinder({ onSearch }) {
     try {
       setLoading(true);
 
-      console.log('🔍 Trimit request cu:', {
-        brand: selectedBrand,
-        brandName: selectedBrandName,
-        model: modelName
-      });
-
       const params = new URLSearchParams();
       if (selectedBrand) params.append('brand', selectedBrand);
       if (modelName) params.append('model', modelName);
 
       const res = await API.get(`/services?${params.toString()}`);
-
-      console.log('📦 Primit:', res.data.length, 'servicii');
-      console.log('📦 Lista servicii:', res.data.map(s => s.name));
 
       setServices(res.data || []);
       setShowResults(true);
@@ -124,6 +113,12 @@ function ServiceFinder({ onSearch }) {
     setStep(1);
   };
 
+  // Funcție pentru a obține imaginea serviciului - EXACT CA ÎN ServiceCard
+  const getServiceImage = (service) => {
+    // Folosește aceeași logică ca în ServiceCard
+    return getFirstImageUrl(service.images);
+  };
+
   // Modele filtrate după căutare
   const filteredModels = models.filter(model =>
     model.modelName.toLowerCase().includes(modelSearch.toLowerCase())
@@ -137,7 +132,7 @@ function ServiceFinder({ onSearch }) {
         <p className="text-blue-700 mt-1">Selectează marca și modelul mașinii tale</p>
       </div>
 
-      {/* STEPS INDICATOR - modificat la 3 pași */}
+      {/* STEPS INDICATOR */}
       <div className="flex justify-between mb-8 relative max-w-md mx-auto">
         {[1, 2, 3].map((stepNum) => (
           <div key={stepNum} className="flex flex-col items-center z-10">
@@ -190,7 +185,6 @@ function ServiceFinder({ onSearch }) {
             </button>
           </div>
 
-          {/* SEARCH BAR pentru modele */}
           <div className="mb-4">
             <input
               type="text"
@@ -229,7 +223,6 @@ function ServiceFinder({ onSearch }) {
             </div>
           )}
 
-          {/* MANUAL MODEL INPUT (fallback) */}
           <div className="mt-6 pt-6 border-t">
             <p className="text-sm text-gray-600 mb-3">Nu găsești modelul?</p>
             <div className="flex gap-2">
@@ -252,7 +245,7 @@ function ServiceFinder({ onSearch }) {
         </div>
       )}
 
-      {/* STEP 3: REZULTATE */}
+      {/* STEP 3: REZULTATE CU IMAGINI - PĂSTRĂM DESIGNUL TĂU */}
       {step === 3 && showResults && (
         <div className="animate-fadeIn">
           <div className="flex justify-between items-center mb-6">
@@ -282,39 +275,92 @@ function ServiceFinder({ onSearch }) {
               {services.map(service => (
                 <div
                   key={service._id}
-                  className="border border-blue-200 rounded-lg p-4 hover:shadow-2xl transition cursor-pointer hover:bg-blue-50"
+                  className="border border-blue-200 rounded-lg overflow-hidden hover:shadow-2xl transition cursor-pointer hover:bg-blue-50"
                   onClick={() => navigate(`/service/${service._id}`)}
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-bold text-lg text-gray-900">{service.name}</h4>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="text-sm text-gray-600 flex items-center gap-1">
-                          <span>{service.serviceType?.icon}</span>
-                          {service.serviceType?.name}
-                        </span>
-                        <span className="text-sm text-gray-600">⏱️ {service.duration}</span>
-                        <span className="text-sm text-gray-600">🛡️ {service.warranty}</span>
+                  <div className="flex flex-col sm:flex-row">
+                    {/* IMAGINEA SERVICIULUI - ACUM FOLOSEȘTE getFirstImageUrl() */}
+                    <div className="sm:w-48 h-32 sm:h-auto bg-gray-100 overflow-hidden">
+                      {getServiceImage(service) ? (
+                        <img
+                          src={getServiceImage(service)}
+                          alt={service.name}
+                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
+                            e.target.className = 'w-full h-full object-contain p-4';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-4xl text-gray-400">
+                            {service.serviceType?.icon || '🔧'}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* BADGE PREȚ - ca în ServiceCard */}
+                      <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-red-600 font-bold px-3 py-1 rounded-lg shadow">
+                        {service.repairPrice} {service.currency || 'LEI'}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-red-600">
-                        {service.repairPrice} {service.currency}
+                    
+                    {/* DETALII SERVICIU */}
+                    <div className="flex-1 p-5">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          {/* NUME SERVICIU */}
+                          <h4 className="font-bold text-lg text-gray-900 mb-1">
+                            {service.name}
+                          </h4>
+                          
+                          {/* TIP SERVICIU */}
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-sm text-gray-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full flex items-center gap-2">
+                              <span className="text-base">{service.serviceType?.icon || '🔧'}</span>
+                              <span>{service.serviceType?.name || 'Serviciu'}</span>
+                            </span>
+                          </div>
+                          
+                          {/* DESCRIERE SCURTĂ */}
+                          {service.description && (
+                            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                              {service.description}
+                            </p>
+                          )}
+                          
+                          {/* DETALII SERVICIU - durată și garanție */}
+                          <div className="border-t border-gray-100 pt-3 flex justify-between text-sm text-gray-500">
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-400">⏱️</span>
+                              <span>{service.duration || '2-3 zile'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-400">🛡️ Garanție</span>
+                              <span>{service.warranty || '12 luni'}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* BUTON DETALII */}
+                        <div className="ml-4 flex-shrink-0">
+                          <button className="bg-gray-50 hover:bg-red-50 text-red-600 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-200 hover:border-red-200 text-sm whitespace-nowrap">
+                            Vezi detalii →
+                          </button>
+                        </div>
                       </div>
-                      <button className="mt-2 text-sm text-red-600 hover:text-red-800">
-                        Vezi detalii →
-                      </button>
                     </div>
                   </div>
                 </div>
               ))}
 
-              <div className="pt-4 border-t">
+              <div className="pt-4 border-t text-center">
                 <button
                   onClick={() => navigate('/services')}
-                  className="w-full border border-red-600 text-red-600 py-3 rounded-lg hover:bg-red-50"
+                  className="border border-red-600 text-red-600 px-6 py-3 rounded-lg hover:bg-red-50 transition"
                 >
-                  Vezi toate serviciile disponibile
+                  Vezi toate serviciile disponibile →
                 </button>
               </div>
             </div>
@@ -367,7 +413,6 @@ function ServiceFinder({ onSearch }) {
         </div>
       )}
 
-      {/* STYLE PENTRU ANIMAȚIE */}
       <style jsx="true">{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -375,6 +420,12 @@ function ServiceFinder({ onSearch }) {
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </div>

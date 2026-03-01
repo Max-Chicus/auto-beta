@@ -724,4 +724,291 @@ router.post('/gallery/reorder', async (req, res) => {
   }
 });
 
+// ========== SHIPPING REQUESTS (EXPEDIERI) ==========
+
+// GET toate cererile de expediere
+router.get('/shipping-requests', async (req, res) => {
+  console.log('📦 GET shipping requests');
+
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      status = '',
+      search = ''
+    } = req.query;
+
+    const skip = (page - 1) * limit;
+    let query = {};
+
+    // Filtrare după status
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+
+    // Căutare
+    if (search) {
+      query.$or = [
+        { 'customer.name': { $regex: search, $options: 'i' } },
+        { 'customer.phone': { $regex: search, $options: 'i' } },
+        { 'trackingNumber': { $regex: search, $options: 'i' } },
+        { 'serviceName': { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Verifică dacă modelul ShippingRequest există
+    let ShippingRequest;
+    try {
+      ShippingRequest = require('../models/ShippingRequest');
+    } catch (err) {
+      console.log('⚠️ Modelul ShippingRequest nu există încă, returnez array gol');
+      return res.json({
+        requests: [],
+        total: 0,
+        pages: 0,
+        currentPage: parseInt(page),
+        stats: { pending: 0, received: 0, returned: 0 }
+      });
+    }
+
+    const [requests, total] = await Promise.all([
+      ShippingRequest.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit)),
+      ShippingRequest.countDocuments(query)
+    ]);
+
+    // Statistici
+    const stats = await ShippingRequest.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const statsObj = {
+      pending: 0,
+      received: 0,
+      in_repair: 0,
+      returned: 0,
+      cancelled: 0
+    };
+
+    stats.forEach(item => {
+      statsObj[item._id] = item.count;
+    });
+
+    res.json({
+      requests,
+      total,
+      pages: Math.ceil(total / limit),
+      currentPage: parseInt(page),
+      stats: statsObj
+    });
+
+  } catch (err) {
+    console.error('❌ Eroare la încărcarea expedierilor:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET o singură expediere
+router.get('/shipping-requests/:id', async (req, res) => {
+  try {
+    let ShippingRequest;
+    try {
+      ShippingRequest = require('../models/ShippingRequest');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul ShippingRequest nu este definit' });
+    }
+
+    const request = await ShippingRequest.findById(req.params.id);
+
+    if (!request) {
+      return res.status(404).json({ error: 'Expedierea nu a fost găsită' });
+    }
+
+    res.json(request);
+
+  } catch (err) {
+    console.error('❌ Eroare la preluarea expedierii:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST crează o nouă cerere de expediere (din frontend)
+router.post('/shipping-requests', async (req, res) => {
+  console.log('📦 CREATE shipping request');
+
+  try {
+    const shippingData = req.body;
+
+    // Validări de bază
+    if (!shippingData.customer?.name || !shippingData.customer?.phone || !shippingData.customer?.address) {
+      return res.status(400).json({ error: 'Numele, telefonul și adresa sunt obligatorii' });
+    }
+
+    if (!shippingData.trackingNumber) {
+      // Generează un număr de tracking dacă nu există
+      const prefix = 'DER';
+      const timestamp = Date.now().toString().slice(-8);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      shippingData.trackingNumber = `${prefix}-${timestamp}-${random}`;
+    }
+
+    // Setează statusul inițial
+    shippingData.status = shippingData.status || 'pending';
+
+    // Verifică dacă modelul ShippingRequest există
+    let ShippingRequest;
+    try {
+      ShippingRequest = require('../models/ShippingRequest');
+    } catch (err) {
+      console.log('⚠️ Modelul ShippingRequest nu există, nu pot salva');
+      return res.status(201).json({
+        message: 'Cerere procesată (fără salvare în DB)',
+        trackingNumber: shippingData.trackingNumber
+      });
+    }
+
+    // Salvează în baza de date
+    const shippingRequest = await ShippingRequest.create(shippingData);
+
+    console.log(`✅ Shipping request salvat: ${shippingRequest._id} - ${shippingRequest.trackingNumber}`);
+
+    res.status(201).json({
+      message: 'Cerere de expediere salvată cu succes',
+      trackingNumber: shippingRequest.trackingNumber,
+      id: shippingRequest._id
+    });
+
+  } catch (err) {
+    console.error('❌ Eroare la salvarea expedierii:', err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// PUT actualizează statusul unei expedieri
+router.put('/shipping-requests/:id/status', async (req, res) => {
+  try {
+    const { status, notes } = req.body;
+
+    const validStatuses = ['pending', 'received', 'in_repair', 'returned', 'cancelled'];
+
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Status invalid' });
+    }
+
+    let ShippingRequest;
+    try {
+      ShippingRequest = require('../models/ShippingRequest');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul ShippingRequest nu este definit' });
+    }
+
+    const updateData = { status };
+    if (notes) {
+      updateData.adminNotes = notes;
+    }
+
+    const request = await ShippingRequest.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!request) {
+      return res.status(404).json({ error: 'Expedierea nu a fost găsită' });
+    }
+
+    res.json({
+      message: `Status actualizat la: ${status}`,
+      request
+    });
+
+  } catch (err) {
+    console.error('❌ Eroare la actualizarea statusului:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE șterge o expediere (doar admin)
+router.delete('/shipping-requests/:id', async (req, res) => {
+  try {
+    let ShippingRequest;
+    try {
+      ShippingRequest = require('../models/ShippingRequest');
+    } catch (err) {
+      return res.status(500).json({ error: 'Modelul ShippingRequest nu este definit' });
+    }
+
+    const request = await ShippingRequest.findByIdAndDelete(req.params.id);
+
+    if (!request) {
+      return res.status(404).json({ error: 'Expedierea nu a fost găsită' });
+    }
+
+    res.json({
+      message: 'Expediere ștearsă cu succes',
+      id: request._id
+    });
+
+  } catch (err) {
+    console.error('❌ Eroare la ștergerea expedierii:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET statistici expedieri (pentru dashboard)
+router.get('/shipping-requests/stats/summary', async (req, res) => {
+  try {
+    let ShippingRequest;
+    try {
+      ShippingRequest = require('../models/ShippingRequest');
+    } catch (err) {
+      return res.json({
+        pending: 0,
+        received: 0,
+        in_repair: 0,
+        returned: 0,
+        cancelled: 0,
+        total: 0
+      });
+    }
+
+    const stats = await ShippingRequest.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const total = await ShippingRequest.countDocuments();
+
+    const result = {
+      pending: 0,
+      received: 0,
+      in_repair: 0,
+      returned: 0,
+      cancelled: 0,
+      total
+    };
+
+    stats.forEach(item => {
+      result[item._id] = item.count;
+    });
+
+    res.json(result);
+
+  } catch (err) {
+    console.error('❌ Eroare la statistici expedieri:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
