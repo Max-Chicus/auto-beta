@@ -18,7 +18,7 @@ function AdminServices() {
   const navigate = useNavigate();
   const action = searchParams.get('action');
 
-  // Form state
+  // Form state - CU AMBELE PREȚURI
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -33,7 +33,8 @@ function AdminServices() {
     }],
     commonFaults: [''],
     description: '',
-    repairPrice: '',
+    repairPrice: '',        // preț reparație
+    testPrice: '',          // preț testare
     currency: 'EUR',
     duration: '2-3 zile lucrătoare',
     warranty: '12 luni',
@@ -145,13 +146,13 @@ function AdminServices() {
     }
   };
 
-  // Submit form
+  // Submit form - trimite ambele prețuri
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validare
-    if (!formData.name || !formData.brand || !formData.serviceType || !formData.repairPrice) {
-      alert('Completează câmpurile obligatorii: Nume, Brand, Tip serviciu, Preț!');
+    // Validare - verificăm ambele prețuri
+    if (!formData.name || !formData.brand || !formData.serviceType || !formData.repairPrice || !formData.testPrice) {
+      alert('Completează câmpurile obligatorii: Nume, Brand, Tip serviciu, Preț reparație, Preț testare!');
       return;
     }
 
@@ -161,12 +162,13 @@ function AdminServices() {
     }
 
     try {
-      // Pregătește datele
+      // Pregătește datele - includem testPrice
       const serviceData = {
         name: formData.name,
         brand: formData.brand,
         serviceType: formData.serviceType,
         repairPrice: Number(formData.repairPrice),
+        testPrice: Number(formData.testPrice),
         currency: formData.currency,
         compatibleModels: formData.compatibleModels.map(model => ({
           modelName: model.modelName,
@@ -182,26 +184,15 @@ function AdminServices() {
         description: formData.description || '',
         duration: formData.duration,
         warranty: formData.warranty,
-        images: formData.images, // trimite imagini așa cum sunt
+        images: formData.images,
         diagramImage: formData.diagramImage || '',
         featured: Boolean(formData.featured)
       };
 
-      // DEBUG: Afișează structura imaginilor
-      console.log('=== DEBUG FRONTEND IMAGES ===');
-      console.log('Număr imagini:', formData.images.length);
-
-      console.log('📤 Trimitem serviciu...');
-
-      if (formData.images.length > 0) {
-        console.log('Prima imagine:', {
-          tip: typeof formData.images[0],
-          esteObiect: typeof formData.images[0] === 'object',
-          keys: formData.images[0] ? Object.keys(formData.images[0]) : [],
-          url: formData.images[0]?.url,
-          urlIncepeCuData: formData.images[0]?.url?.startsWith('data:image')
-        });
-      }
+      console.log('📤 Trimitem serviciu cu prețuri:', {
+        repairPrice: serviceData.repairPrice,
+        testPrice: serviceData.testPrice
+      });
 
       let result;
       if (editingService) {
@@ -222,7 +213,6 @@ function AdminServices() {
       if (err.response?.data?.error) {
         const errorData = err.response.data;
         if (errorData.details) {
-          // Afișează erorile de validare
           let errorMsg = 'Erori de validare:\n';
           Object.keys(errorData.details).forEach(key => {
             errorMsg += `• ${errorData.details[key]}\n`;
@@ -237,7 +227,7 @@ function AdminServices() {
     }
   };
 
-  // Edit service
+  // Edit service - încărcăm ambele prețuri
   const handleEdit = (service) => {
     setEditingService(service);
     setFormData({
@@ -257,6 +247,7 @@ function AdminServices() {
       commonFaults: service.commonFaults?.length > 0 ? service.commonFaults : [''],
       description: service.description || '',
       repairPrice: service.repairPrice || '',
+      testPrice: service.testPrice || '',
       currency: service.currency || 'EUR',
       duration: service.duration || '2-3 zile lucrătoare',
       warranty: service.warranty || '12 luni',
@@ -291,6 +282,7 @@ function AdminServices() {
       commonFaults: [''],
       description: '',
       repairPrice: '',
+      testPrice: '',
       currency: 'EUR',
       duration: '2-3 zile lucrătoare',
       warranty: '12 luni',
@@ -360,7 +352,7 @@ function AdminServices() {
         </div>
       </div>
 
-      {/* FORMULAR ÎMBUNĂTĂȚIT */}
+      {/* FORMULAR CU DOUĂ PREȚURI */}
       {showForm && (
         <div className="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow">
           <h2 className="text-xl font-bold mb-4">
@@ -446,10 +438,10 @@ function AdminServices() {
                   </div>
                 </div>
 
-                {/* Preț */}
+                {/* Preț reparație */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Preț (EUR) *
+                    Preț reparație ({formData.currency}) *
                   </label>
                   <input
                     type="number"
@@ -458,6 +450,24 @@ function AdminServices() {
                     onChange={handleInputChange}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                     placeholder="Ex: 139"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+
+                {/* Preț testare */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preț testare ({formData.currency}) *
+                  </label>
+                  <input
+                    type="number"
+                    name="testPrice"
+                    value={formData.testPrice}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                    placeholder="Ex: 49"
                     min="0"
                     step="0.01"
                     required
@@ -558,7 +568,6 @@ function AdminServices() {
                           required
                         />
                       </div>
-                      
                     </div>
                   </div>
                 ))}
@@ -697,7 +706,7 @@ function AdminServices() {
         </div>
       )}
 
-      {/* TABEL SERVICII */}
+      {/* TABEL SERVICII - CU AMBELE PREȚURI */}
       <div className="bg-white border border-gray-200 rounded-xl shadow overflow-hidden">
         {filteredServices.length === 0 ? (
           <div className="p-12 text-center">
@@ -721,7 +730,7 @@ function AdminServices() {
                   <th className="p-4 text-left font-semibold text-gray-700">Serviciu</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Marcă / Tip</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Modele</th>
-                  <th className="p-4 text-left font-semibold text-gray-700">Preț</th>
+                  <th className="p-4 text-left font-semibold text-gray-700">Prețuri</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Acțiuni</th>
                 </tr>
               </thead>
@@ -814,12 +823,24 @@ function AdminServices() {
                     </td>
 
                     <td className="p-4">
-                      <span className="font-bold text-red-600">
-                        {service.repairPrice} {service.currency}
-                      </span>
-                      <p className="text-xs text-gray-500">
-                        {service.duration}
-                      </p>
+                      {/* Afișăm ambele prețuri */}
+                      <div className="space-y-1">
+                        <div>
+                          <span className="text-xs text-gray-500">Reparație:</span>
+                          <span className="ml-2 font-bold text-red-600">
+                            {service.repairPrice} {service.currency}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-gray-500">Testare:</span>
+                          <span className="ml-2 font-bold text-blue-600">
+                            {service.testPrice} {service.currency}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {service.duration}
+                        </p>
+                      </div>
                     </td>
 
                     <td className="p-4">

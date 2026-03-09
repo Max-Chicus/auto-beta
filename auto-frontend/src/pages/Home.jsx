@@ -388,7 +388,7 @@ function Home() {
                     <img
                       src={service.image}
                       alt={service.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-contain bg-gray-100 p-2 group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";

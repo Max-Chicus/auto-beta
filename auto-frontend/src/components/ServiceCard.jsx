@@ -3,7 +3,7 @@ import { getFirstImageUrl, getFullImageUrl } from '../utils/imageUtils';
 
 function ServiceCard({ service }) {
   const navigate = useNavigate();
-  
+
   // Obține URL-ul primei imagini
   const imageUrl = getFirstImageUrl(service.images);
 
@@ -30,22 +30,22 @@ function ServiceCard({ service }) {
       {/* IMAGINE SERVICIU - click duce la detalii */}
       <Link to={`/service/${service._id}`} className="block">
         <div className="h-48 bg-gray-100 relative overflow-hidden">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={service.name}
-              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
-                e.target.className = 'w-full h-full object-contain p-4';
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl">{serviceTypeIcon}</span>
-            </div>
-          )}
+{imageUrl ? (
+  <img
+    src={imageUrl}
+    alt={service.name}
+    className="w-full h-full object-contain p-2 scale-150 transition-transform duration-500 hover:scale-105"
+    onError={(e) => {
+      e.target.onerror = null;
+      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
+      e.target.className = 'w-full h-full object-contain p-4';
+    }}
+  />
+) : (
+  <div className="w-full h-full flex items-center justify-center">
+    <span className="text-6xl">{serviceTypeIcon}</span>
+  </div>
+)}
 
           {/* BADGE RECOMANDAT */}
           {service.featured && (
@@ -148,9 +148,23 @@ function ServiceCard({ service }) {
 
         {/* DESCRIERE SCURTĂ */}
         {service.description && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            {service.description}
-          </p>
+          <div className="mb-4 relative group">
+            <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <span>📝 Descriere:</span>
+              <span className="text-[10px] bg-gray-100 px-1.5 rounded-full">
+                {service.description.length > 50 ? 'detalii' : ''}
+              </span>
+            </p>
+            <p className="text-sm text-gray-700 truncate">
+              {service.description}
+            </p>
+            {service.description.length > 50 && (
+              <div className="absolute hidden group-hover:block bottom-full left-0 mb-2 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10 min-w-[250px] max-w-[300px]">
+                <div className="font-medium mb-1 text-gray-300">Descriere completă:</div>
+                <p className="text-gray-200 leading-relaxed">{service.description}</p>
+              </div>
+            )}
+          </div>
         )}
 
         {/* DETALII SERVICIU */}
@@ -173,7 +187,7 @@ function ServiceCard({ service }) {
           >
             Vezi detalii
           </Link>
-          
+
           <button
             onClick={handleShippingClick}
             className="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2.5 px-3 rounded-lg transition-colors border border-blue-200 hover:border-blue-300 hover:shadow-sm text-sm flex items-center justify-center gap-1"
