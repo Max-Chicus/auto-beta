@@ -296,7 +296,7 @@ function Home() {
   return (
     <div>
       {/* HERO SECTION CU SWIPER */}
-      <div className="relative bg-gradient-to-r from-gray-900 to-red-900 text-white overflow-hidden h-[600px] md:h-[700px]">
+      <div className="relative bg-gradient-to-r from-gray-900 to-red-900 text-white overflow-hidden h-[600px] md:h-[550px]">
         <Swiper
           modules={[Autoplay, Pagination, Navigation]}
           spaceBetween={0}
