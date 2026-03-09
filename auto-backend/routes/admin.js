@@ -344,27 +344,47 @@ router.put('/services/:id', async (req, res) => {
   }
 });
 
-// DELETE service
+// DELETE service - ȘTERGERE COMPLETĂ și verificare brand
 router.delete('/services/:id', async (req, res) => {
   try {
-    const service = await Service.findByIdAndUpdate(
-      req.params.id,
-      { isActive: false },
-      { new: true }
-    );
-
+    // Găsește serviciul înainte de a-l șterge
+    const service = await Service.findById(req.params.id);
+    
     if (!service) {
       return res.status(404).json({ error: 'Serviciul nu a fost găsit' });
     }
 
+    const brandId = service.brand; // Salvează brandId înainte de ștergere
+    const serviceName = service.name;
+
+    // Șterge serviciul
+    await Service.findByIdAndDelete(req.params.id);
+
+    console.log(`✅ Serviciu șters definitiv: ${serviceName}`);
+
+    // Verifică dacă mai există alte servicii pentru același brand
+    const remainingServices = await Service.countDocuments({ brand: brandId });
+    
+    // Dacă nu mai există servicii pentru acest brand, șterge și brandul
+    if (remainingServices === 0) {
+      const brand = await Brand.findByIdAndDelete(brandId);
+      if (brand) {
+        console.log(`✅ Brand șters automat (nu mai are servicii): ${brand.name}`);
+      }
+    }
+
     res.json({
-      message: 'Serviciu dezactivat cu succes',
-      serviceId: service._id
+      message: 'Serviciu șters definitiv cu succes',
+      serviceId: service._id,
+      brandDeleted: remainingServices === 0
     });
+
   } catch (err) {
+    console.error('❌ Eroare la ștergerea serviciului:', err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // ========== SERVICE REQUESTS ==========
 router.post('/service-requests', async (req, res) => {

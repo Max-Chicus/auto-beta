@@ -123,7 +123,7 @@ function ServiceDetail() {
                 </div>
 
                 {/* BRAND INFO CU LOGO */}
-                <div className="flex items-center gap-4 text-gray-600 mb-4">
+                <div className="flex items-center gap-4 text-gray-600 mb-4 flex-wrap">
                   <div className="flex items-center gap-2">
                     {/* LOGO BRAND */}
                     {brandLogo ? (
