@@ -197,46 +197,46 @@ function ServiceDetail() {
               <div className="mt-8 pt-6 border-t">
                 <h3 className="text-xl font-bold mb-4">Imagini serviciu</h3>
 
-                {/* Imagine principală */}
-                <div className="relative mb-4">
-                  <div className="relative h-96 bg-gray-100 rounded-lg overflow-hidden">
-                    <img
-                      src={imageUrls[selectedImageIndex]}
-                      alt={`${service.name} - Imagine ${selectedImageIndex + 1}`}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/800x600?text=Imagine+indisponibila';
-                        e.target.className = 'w-full h-full object-cover';
-                      }}
-                    />
+{/* Imagine principală - VERSIUNE MICȘORATĂ */}
+<div className="relative mb-4">
+  <div className="relative h-64 bg-gray-100 rounded-lg overflow-hidden"> {/* Modificat de la h-96 la h-64 */}
+    <img
+      src={imageUrls[selectedImageIndex]}
+      alt={`${service.name} - Imagine ${selectedImageIndex + 1}`}
+      className="w-full h-full object-contain"  // Păstrăm object-contain pentru a nu tăia imaginea
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = 'https://via.placeholder.com/600x400?text=Imagine+indisponibila'; // Și placeholder mai mic
+        e.target.className = 'w-full h-full object-cover';
+      }}
+    />
 
-                    {/* Navigare între imagini (dacă sunt mai multe) */}
-                    {imageUrls.length > 1 && (
-                      <>
-                        <button
-                          onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70"
-                        >
-                          ←
-                        </button>
-                        <button
-                          onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70"
-                        >
-                          →
-                        </button>
-                      </>
-                    )}
-                  </div>
+    {/* Navigare între imagini (dacă sunt mai multe) */}
+    {imageUrls.length > 1 && (
+      <>
+        <button
+          onClick={handlePrevImage}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70"
+        >
+          ←
+        </button>
+        <button
+          onClick={handleNextImage}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70"
+        >
+          →
+        </button>
+      </>
+    )}
+  </div>
 
-                  {/* Contor imagini */}
-                  {imageUrls.length > 1 && (
-                    <div className="text-center mt-2 text-sm text-gray-600">
-                      Imagine {selectedImageIndex + 1} din {imageUrls.length}
-                    </div>
-                  )}
-                </div>
+  {/* Contor imagini */}
+  {imageUrls.length > 1 && (
+    <div className="text-center mt-2 text-sm text-gray-600">
+      Imagine {selectedImageIndex + 1} din {imageUrls.length}
+    </div>
+  )}
+</div>
 
                 {/* Thumbnail gallery */}
                 {imageUrls.length > 1 && (
