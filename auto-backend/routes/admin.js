@@ -137,10 +137,10 @@ router.post('/service-types', async (req, res) => {
 });
 
 // ========== CRUD PENTRU SERVICII ==========
+// ========== CRUD PENTRU SERVICII ==========
 router.get('/services', async (req, res) => {
   try {
-    const { page = 1, limit = 20, search = '', brand = '', serviceType = '', featured = '' } = req.query;
-    const skip = (page - 1) * limit;
+    const { search = '', brand = '', serviceType = '', featured = '' } = req.query;
     let query = { isActive: true };
 
     if (search) {
@@ -155,17 +155,12 @@ router.get('/services', async (req, res) => {
     if (serviceType) query.serviceType = serviceType;
     if (featured === 'true') query.featured = true;
 
-    const [services, total] = await Promise.all([
-      Service.find(query)
-        .populate('brand', 'name logo')
-        .populate('serviceType', 'name icon')
-        .skip(skip)
-        .limit(parseInt(limit))
-        .sort({ createdAt: -1 }),
-      Service.countDocuments(query)
-    ]);
+    const services = await Service.find(query)
+      .populate('brand', 'name logo')
+      .populate('serviceType', 'name icon')
+      .sort({ createdAt: -1 });
 
-    res.json({ services, total, pages: Math.ceil(total / limit), currentPage: parseInt(page) });
+    res.json({ services, total: services.length });
   } catch (err) {
     console.error('Eroare get services:', err);
     res.status(500).json({ error: err.message });
@@ -349,7 +344,7 @@ router.delete('/services/:id', async (req, res) => {
   try {
     // Găsește serviciul înainte de a-l șterge
     const service = await Service.findById(req.params.id);
-    
+
     if (!service) {
       return res.status(404).json({ error: 'Serviciul nu a fost găsit' });
     }
@@ -364,7 +359,7 @@ router.delete('/services/:id', async (req, res) => {
 
     // Verifică dacă mai există alte servicii pentru același brand
     const remainingServices = await Service.countDocuments({ brand: brandId });
-    
+
     // Dacă nu mai există servicii pentru acest brand, șterge și brandul
     if (remainingServices === 0) {
       const brand = await Brand.findByIdAndDelete(brandId);
@@ -446,18 +441,16 @@ router.patch('/service-requests/:id/status', async (req, res) => {
 // ========== SERVICE REQUESTS (ADMIN) ==========
 
 // GET all service requests (cu filtrare avansată pentru admin)
+// GET all service requests (FĂRĂ LIMITĂ)
 router.get('/service-requests', async (req, res) => {
   try {
     const {
-      page = 1,
-      limit = 20,
       status = '',
       dateFrom = '',
       dateTo = '',
       search = ''
     } = req.query;
 
-    const skip = (page - 1) * limit;
     let query = {};
 
     // Filtre
@@ -482,15 +475,10 @@ router.get('/service-requests', async (req, res) => {
       ];
     }
 
-    const [requests, total] = await Promise.all([
-      ServiceRequest.find(query)
-        .populate('service.serviceId', 'name code')
-        .populate('vehicle.brand', 'name')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      ServiceRequest.countDocuments(query)
-    ]);
+    const requests = await ServiceRequest.find(query)
+      .populate('service.serviceId', 'name code')
+      .populate('vehicle.brand', 'name')
+      .sort({ createdAt: -1 });
 
     // Statistici
     const stats = await ServiceRequest.aggregate([
@@ -504,9 +492,7 @@ router.get('/service-requests', async (req, res) => {
 
     res.json({
       requests,
-      total,
-      pages: Math.ceil(total / limit),
-      currentPage: parseInt(page),
+      total: requests.length,
       stats: stats.reduce((acc, curr) => {
         acc[curr._id] = curr.count;
         return acc;
@@ -747,18 +733,16 @@ router.post('/gallery/reorder', async (req, res) => {
 // ========== SHIPPING REQUESTS (EXPEDIERI) ==========
 
 // GET toate cererile de expediere
+// GET toate cererile de expediere (FĂRĂ LIMITĂ)
 router.get('/shipping-requests', async (req, res) => {
   console.log('📦 GET shipping requests');
 
   try {
     const {
-      page = 1,
-      limit = 20,
       status = '',
       search = ''
     } = req.query;
 
-    const skip = (page - 1) * limit;
     let query = {};
 
     // Filtrare după status
@@ -785,19 +769,12 @@ router.get('/shipping-requests', async (req, res) => {
       return res.json({
         requests: [],
         total: 0,
-        pages: 0,
-        currentPage: parseInt(page),
         stats: { pending: 0, received: 0, returned: 0 }
       });
     }
 
-    const [requests, total] = await Promise.all([
-      ShippingRequest.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      ShippingRequest.countDocuments(query)
-    ]);
+    const requests = await ShippingRequest.find(query)
+      .sort({ createdAt: -1 });
 
     // Statistici
     const stats = await ShippingRequest.aggregate([
@@ -823,9 +800,7 @@ router.get('/shipping-requests', async (req, res) => {
 
     res.json({
       requests,
-      total,
-      pages: Math.ceil(total / limit),
-      currentPage: parseInt(page),
+      total: requests.length,
       stats: statsObj
     });
 

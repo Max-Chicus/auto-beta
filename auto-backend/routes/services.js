@@ -82,7 +82,6 @@ router.get('/', async (req, res) => {
     let services = await Service.find(query)
       .populate('brand', 'name logo')
       .populate('serviceType', 'name icon')
-      .limit(parseInt(limit))
       .sort({ featured: -1, popularity: -1, name: 1 });
 
     console.log('📊 Total servicii din DB înainte de filtrarea model:', services.length);

@@ -723,9 +723,9 @@ function AdminServices() {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[1000px] overflow-y-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
                   <th className="p-4 text-left font-semibold text-gray-700">Serviciu</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Marcă / Tip</th>
