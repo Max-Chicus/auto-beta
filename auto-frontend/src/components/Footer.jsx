@@ -174,13 +174,6 @@ function Footer() {
             </a>
           </div>
         </div>
-
-        {/* Development Credit */}
-        <div className="text-center mt-8">
-          <p className="text-gray-500 text-xs">
-            Dezvoltat cu ❤️ pentru pasionații de electronică auto
-          </p>
-        </div>
       </div>
     </footer>
   );

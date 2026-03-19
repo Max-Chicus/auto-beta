@@ -30,22 +30,22 @@ function ServiceCard({ service }) {
       {/* IMAGINE SERVICIU - click duce la detalii */}
       <Link to={`/service/${service._id}`} className="block">
         <div className="h-48 bg-gray-100 relative overflow-hidden">
-{imageUrl ? (
-  <img
-    src={imageUrl}
-    alt={service.name}
-    className="w-full h-full object-contain p-2 scale-150 transition-transform duration-500 hover:scale-105"
-    onError={(e) => {
-      e.target.onerror = null;
-      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
-      e.target.className = 'w-full h-full object-contain p-4';
-    }}
-  />
-) : (
-  <div className="w-full h-full flex items-center justify-center">
-    <span className="text-6xl">{serviceTypeIcon}</span>
-  </div>
-)}
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={service.name}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(service.name)}&background=random&size=256`;
+                e.target.className = 'w-full h-full object-contain p-4';
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-6xl">{serviceTypeIcon}</span>
+            </div>
+          )}
 
           {/* BADGE RECOMANDAT */}
           {service.featured && (
