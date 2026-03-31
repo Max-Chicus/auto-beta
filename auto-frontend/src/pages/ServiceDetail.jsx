@@ -162,112 +162,92 @@ function ServiceDetail() {
 
                 <p className="text-gray-700 mb-6">{service.description}</p>
               </div>
-
-              {/* PRICE BOX - MODIFICAT: Acum arată ambele prețuri */}
-              <div className="bg-gray-50 border rounded-lg p-6 min-w-[250px]">
-                <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-red-600">{service.repairPrice} {service.currency}</div>
-                  <p className="text-sm text-gray-600">preț reparație</p>
-                  <div className="mt-3 text-2xl font-bold text-blue-600">{service.testPrice} {service.currency}</div>
-                  <p className="text-sm text-gray-600">preț testare</p>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Garanție:</span>
-                    <span className="font-medium">{service.warranty}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Durată:</span>
-                    <span className="font-medium">{service.duration}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleRequestService}
-                  className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-medium"
-                >
-                  Solicită acest serviciu
-                </button>
-              </div>
             </div>
 
-            {/* SECȚIUNE IMAGINI */}
+            {/* SECȚIUNE IMAGINI - MODIFICAT: mai mare și cu decor */}
             {imageUrls.length > 0 && (
-              <div className="mt-8 pt-6 border-t">
+              <div className="mt-4 pt-4 border-t">
                 <h3 className="text-xl font-bold mb-4">Imagini serviciu</h3>
 
-                {/* Imagine principală - VERSIUNE MICȘORATĂ */}
-                <div className="relative mb-4">
-                  <div className="relative h-80 w-80 bg-gray-100 rounded-lg overflow-hidden"> {/* Modificat de la h-96 la h-64 */}
-                    <img
-                      src={imageUrls[selectedImageIndex]}
-                      alt={`${service.name} - Imagine ${selectedImageIndex + 1}`}
-                      className="w-full h-full object-cover"  // Păstrăm object-contain pentru a nu tăia imaginea
-                      onError={(e) => { 
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/600x400?text=Imagine+indisponibila'; // Și placeholder mai mic
-                        e.target.className = 'w-full h-full object-cover';
-                      }}
-                    />
+                {/* Container cu decor și umbră */}
+                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-2xl shadow-lg">
+                  {/* Decor - elemente decorative în jurul imaginii */}
+                  <div className="absolute -top-3 -left-3 w-12 h-12 bg-red-100 rounded-full opacity-50 blur-sm"></div>
+                  <div className="absolute -bottom-3 -right-3 w-16 h-16 bg-blue-100 rounded-full opacity-50 blur-sm"></div>
+                  
+                  {/* Imagine principală - MAI MARE */}
+                  <div className="relative mb-4 flex justify-center">
+                    <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-md overflow-hidden">
+                      <div className="relative pt-[75%]"> {/* Raport 4:3 pentru imagine mai mare */}
+                        <img
+                          src={imageUrls[selectedImageIndex]}
+                          alt={`${service.name} - Imagine ${selectedImageIndex + 1}`}
+                          className="absolute top-0 left-0 w-full h-full object-contain bg-gray-100"
+                          onError={(e) => { 
+                            e.target.onerror = null;
+                            e.target.src = 'https://via.placeholder.com/800x600?text=Imagine+indisponibila';
+                          }}
+                        />
+                      </div>
 
-                    {/* Navigare între imagini (dacă sunt mai multe) */}
-                    {imageUrls.length > 1 && (
-                      <>
-                        <button
-                          onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70"
-                        >
-                          ←
-                        </button>
-                        <button
-                          onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/70"
-                        >
-                          →
-                        </button>
-                      </>
-                    )}
+                      {/* Navigare între imagini (dacă sunt mai multe) */}
+                      {imageUrls.length > 1 && (
+                        <>
+                          <button
+                            onClick={handlePrevImage}
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-lg"
+                          >
+                            ←
+                          </button>
+                          <button
+                            onClick={handleNextImage}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-lg"
+                          >
+                            →
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {/* Contor imagini */}
                   {imageUrls.length > 1 && (
-                    <div className="text-center mt-2 text-sm text-gray-600">
+                    <div className="text-center mt-2 text-sm text-gray-600 font-medium">
                       Imagine {selectedImageIndex + 1} din {imageUrls.length}
                     </div>
                   )}
-                </div>
 
-                {/* Thumbnail gallery */}
-                {imageUrls.length > 1 && (
-                  <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                    {imageUrls.map((url, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`relative h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index
-                          ? 'border-red-500'
-                          : 'border-transparent'
-                          }`}
-                      >
-                        <img
-                          src={url}
-                          alt={`Thumbnail ${index + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/100x80?text=Thumb';
-                          }}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  {/* Thumbnail gallery */}
+                  {imageUrls.length > 1 && (
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-4">
+                      {imageUrls.map((url, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImageIndex(index)}
+                          className={`relative pt-[100%] rounded-lg overflow-hidden border-2 transition-transform hover:scale-105 ${selectedImageIndex === index
+                            ? 'border-red-500 shadow-lg'
+                            : 'border-transparent opacity-70 hover:opacity-100'
+                            }`}
+                        >
+                          <img
+                            src={url}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="absolute top-0 left-0 w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://via.placeholder.com/100x100?text=Thumb';
+                            }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
 
-          {/* COMPATIBILE MODELS */}
+          {/* COMPATIBLE MODELS */}
           <div className="bg-white rounded-xl border p-6 mb-6">
             <h2 className="text-xl font-bold mb-4">Modele compatibile</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -309,20 +289,51 @@ function ServiceDetail() {
             </div>
           </div>
 
-          {/* COMMON FAULTS */}
-          {service.commonFaults && service.commonFaults.length > 0 && (
-            <div className="bg-white rounded-xl border p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">Defecțiuni frecvente</h2>
-              <ul className="space-y-3">
-                {service.commonFaults.map((fault, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <span className="text-red-500 mt-1">•</span>
-                    <span>{fault}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* COMMON FAULTS - MUTAT PRICE BOX LÂNGĂ DEFECȚIUNI */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Defecțiuni frecvente */}
+            {service.commonFaults && service.commonFaults.length > 0 && (
+              <div className="bg-white rounded-xl border p-6">
+                <h2 className="text-xl font-bold mb-4">Defecțiuni frecvente</h2>
+                <ul className="space-y-3">
+                  {service.commonFaults.map((fault, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="text-red-500 mt-1">•</span>
+                      <span>{fault}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* PRICE BOX - MUTAT LÂNGĂ DEFECȚIUNI */}
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 border rounded-xl p-6 shadow-md">
+              <div className="text-center mb-4">
+                <div className="text-3xl font-bold text-red-600">{service.repairPrice} {service.currency}</div>
+                <p className="text-sm text-gray-600">preț reparație</p>
+                <div className="mt-3 text-2xl font-bold text-blue-600">{service.testPrice} {service.currency}</div>
+                <p className="text-sm text-gray-600">preț testare</p>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Garanție:</span>
+                  <span className="font-medium">{service.warranty}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Durată:</span>
+                  <span className="font-medium">{service.duration}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleRequestService}
+                className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-medium transition"
+              >
+                Solicită acest serviciu
+              </button>
             </div>
-          )}
+          </div>
 
           {/* DIAGRAM IMAGE (dacă există) */}
           {service.diagramImage && (
