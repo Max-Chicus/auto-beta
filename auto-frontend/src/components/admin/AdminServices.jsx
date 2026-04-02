@@ -18,7 +18,7 @@ function AdminServices() {
   const navigate = useNavigate();
   const action = searchParams.get('action');
 
-  // Form state - CU AMBELE PREȚURI
+  // Form state - DOAR REPARAȚIE POATE FI "DE LA", TESTAREA E MEREU FIXĂ
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -33,8 +33,12 @@ function AdminServices() {
     }],
     commonFaults: [''],
     description: '',
-    repairPrice: '',        // preț reparație
-    testPrice: '',          // preț testare
+    // Pentru reparație
+    repairPriceType: 'fixed', // 'fixed' sau 'from'
+    repairPrice: '',        // preț fix reparație
+    repairPriceFrom: '',    // preț de la reparație
+    // Pentru testare - mereu fix
+    testPrice: '',          // preț fix testare
     currency: 'EUR',
     duration: '2-3 zile lucrătoare',
     warranty: '12 luni',
@@ -146,13 +150,32 @@ function AdminServices() {
     }
   };
 
-  // Submit form - trimite ambele prețuri
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validare - verificăm ambele prețuri
-    if (!formData.name || !formData.brand || !formData.serviceType || !formData.repairPrice || !formData.testPrice) {
-      alert('Completează câmpurile obligatorii: Nume, Brand, Tip serviciu, Preț reparație, Preț testare!');
+    // Validare bază
+    if (!formData.name || !formData.brand || !formData.serviceType) {
+      alert('Completează câmpurile obligatorii: Nume, Brand, Tip serviciu!');
+      return;
+    }
+
+    // Validare preț reparație în funcție de tip
+    if (formData.repairPriceType === 'fixed') {
+      if (!formData.repairPrice && formData.repairPrice !== 0) {
+        alert('Pentru preț fix, completează prețul reparației!');
+        return;
+      }
+    } else {
+      if (!formData.repairPriceFrom && formData.repairPriceFrom !== 0) {
+        alert('Pentru preț "de la", completează prețul minim al reparației!');
+        return;
+      }
+    }
+
+    // Validare preț testare - mereu necesar
+    if (!formData.testPrice && formData.testPrice !== 0) {
+      alert('Completează prețul testării!');
       return;
     }
 
@@ -162,12 +185,12 @@ function AdminServices() {
     }
 
     try {
-      // Pregătește datele - includem testPrice
+      // Pregătește datele - trimite DOAR câmpurile necesare
       const serviceData = {
         name: formData.name,
         brand: formData.brand,
         serviceType: formData.serviceType,
-        repairPrice: Number(formData.repairPrice),
+        repairPriceType: formData.repairPriceType,
         testPrice: Number(formData.testPrice),
         currency: formData.currency,
         compatibleModels: formData.compatibleModels.map(model => ({
@@ -189,17 +212,27 @@ function AdminServices() {
         featured: Boolean(formData.featured)
       };
 
+      // Adaugă DOAR prețul corespunzător tipului ales
+      if (formData.repairPriceType === 'fixed') {
+        serviceData.repairPrice = Number(formData.repairPrice);
+        // NU trimite repairPriceFrom deloc
+      } else {
+        serviceData.repairPriceFrom = Number(formData.repairPriceFrom);
+        // NU trimite repairPrice deloc
+      }
+
       console.log('📤 Trimitem serviciu cu prețuri:', {
+        repairPriceType: serviceData.repairPriceType,
         repairPrice: serviceData.repairPrice,
+        repairPriceFrom: serviceData.repairPriceFrom,
         testPrice: serviceData.testPrice
       });
 
-      let result;
       if (editingService) {
-        result = await API.put(`/admin/services/${editingService._id}`, serviceData);
+        await API.put(`/admin/services/${editingService._id}`, serviceData);
         alert('✅ Serviciu actualizat!');
       } else {
-        result = await API.post('/admin/services', serviceData);
+        await API.post('/admin/services', serviceData);
         alert('✅ Serviciu creat!');
       }
 
@@ -227,7 +260,7 @@ function AdminServices() {
     }
   };
 
-  // Edit service - încărcăm ambele prețuri
+  // Edit service
   const handleEdit = (service) => {
     setEditingService(service);
     setFormData({
@@ -246,7 +279,9 @@ function AdminServices() {
         : [{ modelName: '', modelCode: '', yearFrom: '', yearTo: '', engineCodes: '', notes: '' }],
       commonFaults: service.commonFaults?.length > 0 ? service.commonFaults : [''],
       description: service.description || '',
+      repairPriceType: service.repairPriceType || 'fixed',
       repairPrice: service.repairPrice || '',
+      repairPriceFrom: service.repairPriceFrom || '',
       testPrice: service.testPrice || '',
       currency: service.currency || 'EUR',
       duration: service.duration || '2-3 zile lucrătoare',
@@ -275,13 +310,14 @@ function AdminServices() {
   const resetForm = () => {
     setFormData({
       name: '',
-      code: '',
       brand: '',
       serviceType: '',
       compatibleModels: [{ modelName: '', modelCode: '', yearFrom: '', yearTo: '', engineCodes: '', notes: '' }],
       commonFaults: [''],
       description: '',
+      repairPriceType: 'fixed',
       repairPrice: '',
+      repairPriceFrom: '',
       testPrice: '',
       currency: 'EUR',
       duration: '2-3 zile lucrătoare',
@@ -292,6 +328,15 @@ function AdminServices() {
     });
     setEditingService(null);
     setShowForm(false);
+  };
+
+  // Funcție pentru formatarea afișării prețului reparației
+  const formatRepairPrice = (service) => {
+    if (service.repairPriceType === 'from') {
+      return `de la ${service.repairPriceFrom} ${service.currency}`;
+    } else {
+      return `${service.repairPrice} ${service.currency}`;
+    }
   };
 
   // Filter services
@@ -352,7 +397,7 @@ function AdminServices() {
         </div>
       </div>
 
-      {/* FORMULAR CU DOUĂ PREȚURI */}
+      {/* FORMULAR - DOAR REPARAȚIA POATE FI "DE LA" */}
       {showForm && (
         <div className="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow">
           <h2 className="text-xl font-bold mb-4">
@@ -400,7 +445,6 @@ function AdminServices() {
                     ))}
                   </select>
 
-                  {/* Adăugare brand inline */}
                   <div className="mt-2">
                     <BrandInline
                       onBrandAdded={handleBrandAdded}
@@ -429,7 +473,6 @@ function AdminServices() {
                     ))}
                   </select>
 
-                  {/* Adăugare tip serviciu inline */}
                   <div className="mt-2">
                     <ServiceTypeInline
                       onServiceTypeAdded={handleServiceTypeAdded}
@@ -438,25 +481,74 @@ function AdminServices() {
                   </div>
                 </div>
 
-                {/* Preț reparație */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Preț reparație ({formData.currency}) *
+                {/* TIP PREȚ REPARAȚIE - RADIO BUTTONS */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tip preț reparație *
                   </label>
-                  <input
-                    type="number"
-                    name="repairPrice"
-                    value={formData.repairPrice}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                    placeholder="Ex: 139"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
+                  <div className="flex space-x-6">
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="repairPriceType"
+                        value="fixed"
+                        checked={formData.repairPriceType === 'fixed'}
+                        onChange={handleInputChange}
+                        className="mr-2"
+                      />
+                      <span>Preț fix</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="repairPriceType"
+                        value="from"
+                        checked={formData.repairPriceType === 'from'}
+                        onChange={handleInputChange}
+                        className="mr-2"
+                      />
+                      <span>Preț de la (minim)</span>
+                    </label>
+                  </div>
                 </div>
 
-                {/* Preț testare */}
+                {/* CÂMPURI PREȚ REPARAȚIE - în funcție de tip */}
+                {formData.repairPriceType === 'fixed' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preț reparație ({formData.currency}) *
+                    </label>
+                    <input
+                      type="number"
+                      name="repairPrice"
+                      value={formData.repairPrice}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Ex: 139"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preț reparație - de la ({formData.currency}) *
+                    </label>
+                    <input
+                      type="number"
+                      name="repairPriceFrom"
+                      value={formData.repairPriceFrom}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                      placeholder="Ex: 99"
+                      min="0"
+                      step="0.01"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Prețul minim pentru reparație</p>
+                  </div>
+                )}
+
+                {/* PREȚ TESTARE - mereu fix */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Preț testare ({formData.currency}) *
@@ -566,6 +658,19 @@ function AdminServices() {
                           min={model.yearFrom || "1900"}
                           max={new Date().getFullYear()}
                           required
+                        />
+                      </div>
+
+                      <div className="lg:col-span-3">
+                        <label className="block text-xs text-gray-600 mb-1">
+                          Cod motor (separate prin virgulă)
+                        </label>
+                        <input
+                          type="text"
+                          value={model.engineCodes}
+                          onChange={(e) => handleModelChange(index, 'engineCodes', e.target.value)}
+                          className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                          placeholder="Ex: 1.9 TDI, 2.0 TDI"
                         />
                       </div>
                     </div>
@@ -706,7 +811,7 @@ function AdminServices() {
         </div>
       )}
 
-      {/* TABEL SERVICII - CU AMBELE PREȚURI */}
+      {/* TABEL SERVICII */}
       <div className="bg-white border border-gray-200 rounded-xl shadow overflow-hidden">
         {filteredServices.length === 0 ? (
           <div className="p-12 text-center">
@@ -730,7 +835,8 @@ function AdminServices() {
                   <th className="p-4 text-left font-semibold text-gray-700">Serviciu</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Marcă / Tip</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Modele</th>
-                  <th className="p-4 text-left font-semibold text-gray-700">Prețuri</th>
+                  <th className="p-4 text-left font-semibold text-gray-700">Preț reparație</th>
+                  <th className="p-4 text-left font-semibold text-gray-700">Preț testare</th>
                   <th className="p-4 text-left font-semibold text-gray-700">Acțiuni</th>
                 </tr>
               </thead>
@@ -739,7 +845,6 @@ function AdminServices() {
                   <tr key={service._id} className="hover:bg-gray-50">
                     <td className="p-4">
                       <div className="flex items-center">
-                        {/* Imagine serviciu */}
                         <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center mr-4 overflow-hidden">
                           {service.images && service.images.length > 0 ? (
                             <img
@@ -759,9 +864,6 @@ function AdminServices() {
                         </div>
                         <div>
                           <p className="font-medium">{service.name}</p>
-                          <p className="text-sm text-gray-500">
-                            {service.code && `Cod: ${service.code}`}
-                          </p>
                           {service.featured && (
                             <span className="inline-block mt-1 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
                               Recomandat
@@ -780,7 +882,6 @@ function AdminServices() {
                               alt={service.brand.name}
                               className="w-full h-full object-contain"
                               onError={(e) => {
-                                console.error('❌ Eroare logo brand:', service.brand.logo);
                                 e.target.onerror = null;
                                 e.target.style.display = 'none';
                                 e.target.parentElement.innerHTML =
@@ -823,28 +924,22 @@ function AdminServices() {
                     </td>
 
                     <td className="p-4">
-                      {/* Afișăm ambele prețuri */}
-                      <div className="space-y-1">
-                        <div>
-                          <span className="text-xs text-gray-500">Reparație:</span>
-                          <span className="ml-2 font-bold text-red-600">
-                            {service.repairPrice} {service.currency}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-xs text-gray-500">Testare:</span>
-                          <span className="ml-2 font-bold text-blue-600">
-                            {service.testPrice} {service.currency}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {service.duration}
-                        </p>
-                      </div>
+                      <span className="font-bold text-red-600">
+                        {formatRepairPrice(service)}
+                      </span>
                     </td>
 
                     <td className="p-4">
-                      <div className="flex space-x-2">
+                      <span className="font-bold text-blue-600">
+                        {service.testPrice} {service.currency}
+                      </span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {service.duration}
+                      </p>
+                    </td>
+
+                    <td className="p-4">
+                      <div className="flex flex-col space-y-2">
                         <button
                           onClick={() => handleEdit(service)}
                           className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"

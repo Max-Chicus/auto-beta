@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import API from '../api/api';
-import { getFirstImageUrl, getAllImageUrls, getFullImageUrl } from '../utils/imageUtils'; // Importă getFullImageUrl
+import { getFirstImageUrl, getAllImageUrls, getFullImageUrl } from '../utils/imageUtils';
 
 function ServiceDetail() {
   const { id } = useParams();
@@ -19,12 +19,11 @@ function ServiceDetail() {
     try {
       const [serviceRes, relatedRes] = await Promise.all([
         API.get(`/services/${id}`),
-        API.get('/services?limit=4') // Pentru servicii similare
+        API.get('/services?limit=4')
       ]);
 
       setService(serviceRes.data);
 
-      // Filtrează servicii similare (același brand sau același tip)
       const filteredRelated = relatedRes.data
         .filter(s => s._id !== id)
         .slice(0, 3);
@@ -34,6 +33,25 @@ function ServiceDetail() {
       console.error('Eroare serviciu:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Funcție pentru formatarea prețului reparației
+  const formatRepairPrice = () => {
+    if (!service) return '';
+    if (service.repairPriceType === 'from') {
+      return `de la ${service.repairPriceFrom} ${service.currency}`;
+    } else {
+      return `${service.repairPrice} ${service.currency}`;
+    }
+  };
+
+  // Funcție pentru formatarea prețului reparației în cardurile de servicii similare
+  const formatRelatedRepairPrice = (relatedService) => {
+    if (relatedService.repairPriceType === 'from') {
+      return `de la ${relatedService.repairPriceFrom} ${relatedService.currency}`;
+    } else {
+      return `${relatedService.repairPrice} ${relatedService.currency}`;
     }
   };
 
@@ -84,11 +102,9 @@ function ServiceDetail() {
     );
   }
 
-  // Obține toate URL-urile imaginilor
   const imageUrls = getAllImageUrls(service.images);
   const firstImageUrl = getFirstImageUrl(service.images);
 
-  // Extrage datele brandului
   const brandName = service.brand?.name || 'Necunoscut';
   const brandLogo = service.brand?.logo;
   const serviceTypeName = service.serviceType?.name || 'Serviciu';
@@ -112,7 +128,7 @@ function ServiceDetail() {
           <div className="bg-white rounded-xl border p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
                   <span className="text-2xl">{serviceTypeIcon}</span>
                   <h1 className="text-3xl font-bold text-gray-900">{service.name}</h1>
                   {service.featured && (
@@ -125,7 +141,6 @@ function ServiceDetail() {
                 {/* BRAND INFO CU LOGO */}
                 <div className="flex items-center gap-4 text-gray-600 mb-4 flex-wrap">
                   <div className="flex items-center gap-2">
-                    {/* LOGO BRAND */}
                     {brandLogo ? (
                       <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
                         <img
@@ -164,21 +179,18 @@ function ServiceDetail() {
               </div>
             </div>
 
-            {/* SECȚIUNE IMAGINI - MODIFICAT: mai mare și cu decor */}
+            {/* SECȚIUNE IMAGINI */}
             {imageUrls.length > 0 && (
               <div className="mt-4 pt-4 border-t">
                 <h3 className="text-xl font-bold mb-4">Imagini serviciu</h3>
 
-                {/* Container cu decor și umbră */}
                 <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-2xl shadow-lg">
-                  {/* Decor - elemente decorative în jurul imaginii */}
                   <div className="absolute -top-3 -left-3 w-12 h-12 bg-red-100 rounded-full opacity-50 blur-sm"></div>
                   <div className="absolute -bottom-3 -right-3 w-16 h-16 bg-blue-100 rounded-full opacity-50 blur-sm"></div>
                   
-                  {/* Imagine principală - MAI MARE */}
                   <div className="relative mb-4 flex justify-center">
                     <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-md overflow-hidden">
-                      <div className="relative pt-[75%]"> {/* Raport 4:3 pentru imagine mai mare */}
+                      <div className="relative pt-[75%]">
                         <img
                           src={imageUrls[selectedImageIndex]}
                           alt={`${service.name} - Imagine ${selectedImageIndex + 1}`}
@@ -190,7 +202,6 @@ function ServiceDetail() {
                         />
                       </div>
 
-                      {/* Navigare între imagini (dacă sunt mai multe) */}
                       {imageUrls.length > 1 && (
                         <>
                           <button
@@ -210,14 +221,12 @@ function ServiceDetail() {
                     </div>
                   </div>
 
-                  {/* Contor imagini */}
                   {imageUrls.length > 1 && (
                     <div className="text-center mt-2 text-sm text-gray-600 font-medium">
                       Imagine {selectedImageIndex + 1} din {imageUrls.length}
                     </div>
                   )}
 
-                  {/* Thumbnail gallery */}
                   {imageUrls.length > 1 && (
                     <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-4">
                       {imageUrls.map((url, index) => (
@@ -289,7 +298,7 @@ function ServiceDetail() {
             </div>
           </div>
 
-          {/* COMMON FAULTS - MUTAT PRICE BOX LÂNGĂ DEFECȚIUNI */}
+          {/* COMMON FAULTS SI PRICE BOX */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Defecțiuni frecvente */}
             {service.commonFaults && service.commonFaults.length > 0 && (
@@ -306,10 +315,10 @@ function ServiceDetail() {
               </div>
             )}
 
-            {/* PRICE BOX - MUTAT LÂNGĂ DEFECȚIUNI */}
+            {/* PRICE BOX - MODIFICAT */}
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 border rounded-xl p-6 shadow-md">
               <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-red-600">{service.repairPrice} {service.currency}</div>
+                <div className="text-3xl font-bold text-red-600">{formatRepairPrice()}</div>
                 <p className="text-sm text-gray-600">preț reparație</p>
                 <div className="mt-3 text-2xl font-bold text-blue-600">{service.testPrice} {service.currency}</div>
                 <p className="text-sm text-gray-600">preț testare</p>
@@ -335,7 +344,7 @@ function ServiceDetail() {
             </div>
           </div>
 
-          {/* DIAGRAM IMAGE (dacă există) */}
+          {/* DIAGRAM IMAGE */}
           {service.diagramImage && (
             <div className="bg-white rounded-xl border p-6">
               <h2 className="text-xl font-bold mb-4">Diagramă / Schematică</h2>
@@ -372,7 +381,6 @@ function ServiceDetail() {
                       className="block border rounded-lg p-4 hover:border-red-300 hover:bg-red-50 transition"
                     >
                       <div className="flex items-start gap-3">
-                        {/* Imagine mică pentru serviciu related */}
                         <div className="w-16 h-16 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
                           {related.images && related.images.length > 0 ? (
                             <img
@@ -394,7 +402,6 @@ function ServiceDetail() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900 line-clamp-2">{related.name}</h4>
 
-                          {/* BRAND INFO CU LOGO ÎN RELATED SERVICES */}
                           <div className="flex items-center gap-2 mt-1">
                             {relatedBrandLogo ? (
                               <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -422,7 +429,9 @@ function ServiceDetail() {
                             <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                               {related.serviceType?.name}
                             </span>
-                            <span className="text-red-600 font-bold">{related.repairPrice} {related.currency}</span>
+                            <span className="text-red-600 font-bold text-sm">
+                              {formatRelatedRepairPrice(related)}
+                            </span>
                           </div>
                         </div>
                       </div>

@@ -87,18 +87,34 @@ const ServiceSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  
+  // Tip preț pentru reparație: 'fixed' sau 'from'
+  repairPriceType: {
+    type: String,
+    enum: ['fixed', 'from'],
+    default: 'fixed'
+  },
+  // Preț reparație fix
   repairPrice: {
     type: Number,
-    required: true,
-    min: 0
+    min: 0,
+    default: null
   },
-  // NOU: Preț testare
+  // Preț reparație "de la" (minim)
+  repairPriceFrom: {
+    type: Number,
+    min: 0,
+    default: null
+  },
+  
+  // Preț testare - mereu fix
   testPrice: {
     type: Number,
     required: true,
     min: 0,
     default: 0
   },
+  
   currency: {
     type: String,
     default: 'EUR',

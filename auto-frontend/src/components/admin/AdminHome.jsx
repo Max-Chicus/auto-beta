@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import API from '../../api/api';
 
@@ -28,8 +29,8 @@ function AdminHome() {
     try {
       // Pornim toate request-urile în paralel
       const [
-        servicesRes, 
-        requestsRes, 
+        servicesRes,
+        requestsRes,
         shippingStatsRes,
         shippingRecentRes
       ] = await Promise.all([
@@ -79,7 +80,7 @@ function AdminHome() {
       completed: { color: 'bg-green-100 text-green-800', label: 'Finalizat' },
       cancelled: { color: 'bg-red-100 text-red-800', label: 'Anulat' }
     };
-    
+
     const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', label: status };
     return (
       <span className={`px-2 py-1 text-xs rounded-full ${config.color}`}>
@@ -96,7 +97,7 @@ function AdminHome() {
       returned: { color: 'bg-green-100 text-green-800', label: 'Returnat' },
       cancelled: { color: 'bg-red-100 text-red-800', label: 'Anulat' }
     };
-    
+
     const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', label: status };
     return (
       <span className={`px-2 py-1 text-xs rounded-full ${config.color}`}>
@@ -115,11 +116,13 @@ function AdminHome() {
     });
   };
 
+  const navigate = useNavigate();
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Bine ai venit în Panou Admin</h1>
       <p className="text-gray-600 mb-6">Gestionare servicii de reparație auto</p>
-      
+
       {/* Alert pentru cereri noi */}
       {stats.newRequests > 0 && (
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -163,13 +166,13 @@ function AdminHome() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         {/* Servicii Recente */}
         <div className="bg-white border rounded-lg shadow">
           <div className="p-6 border-b">
             <h2 className="text-lg font-semibold text-gray-900">🔧 Servicii Recente</h2>
           </div>
-          
+
           {loading ? (
             <div className="p-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"></div>
@@ -216,21 +219,19 @@ function AdminHome() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <div className="flex space-x-2">
-                          <Link
-                            to={`/admin/services?edit=${service._id}`}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
-                          >
-                            Edit
-                          </Link>
-                          <Link
-                            to={`/service/${service._id}`}
-                            target="_blank"
-                            className="text-gray-600 hover:text-gray-800 text-sm"
-                          >
-                            Vezi
-                          </Link>
-                        </div>
+                        <Link
+                          to={`/admin/services?edit=${service._id}`}
+                          className="block text-blue-600 hover:text-blue-800 text-sm mb-3"
+                        >
+                          Edit
+                        </Link>
+                        <Link
+                          to={`/service/${service._id}`}
+                          target="_blank"
+                          className="block text-gray-600 hover:text-gray-800 text-sm"
+                        >
+                          Vezi
+                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -238,7 +239,7 @@ function AdminHome() {
               </table>
             </div>
           )}
-          
+
           <div className="p-4 border-t bg-gray-50">
             <Link
               to="/admin/services"
@@ -254,7 +255,7 @@ function AdminHome() {
           <div className="p-6 border-b">
             <h2 className="text-lg font-semibold text-gray-900">📋 Cereri Recente</h2>
           </div>
-          
+
           {loading ? (
             <div className="p-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"></div>
@@ -300,7 +301,7 @@ function AdminHome() {
               </table>
             </div>
           )}
-          
+
           <div className="p-4 border-t bg-gray-50">
             <Link
               to="/admin/service-requests"
@@ -324,7 +325,7 @@ function AdminHome() {
               <span className="text-green-600">↩️ {shippingStats.returned} returnate</span>
             </div>
           </div>
-          
+
           {loading ? (
             <div className="p-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"></div>
@@ -374,7 +375,7 @@ function AdminHome() {
               </table>
             </div>
           )}
-          
+
           <div className="p-4 border-t bg-gray-50">
             <Link
               to="/admin/shipping-requests"
@@ -395,7 +396,7 @@ function AdminHome() {
           <span className="block text-2xl mb-2">➕</span>
           <span className="font-medium">Adaugă serviciu nou</span>
         </Link>
-        
+
         <Link
           to="/admin/shipping-requests"
           className="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 text-center"
@@ -403,7 +404,7 @@ function AdminHome() {
           <span className="block text-2xl mb-2">📦</span>
           <span className="font-medium">Vezi toate expedierile</span>
         </Link>
-        
+
         <Link
           to="/admin/service-requests"
           className="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 text-center"

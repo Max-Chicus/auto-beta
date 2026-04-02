@@ -13,6 +13,15 @@ function ServiceCard({ service }) {
   const serviceTypeName = service.serviceType?.name || 'Serviciu';
   const serviceTypeIcon = service.serviceType?.icon || '⚙️';
 
+  // Funcție pentru formatarea prețului reparației
+  const formatRepairPrice = () => {
+    if (service.repairPriceType === 'from') {
+      return `de la ${service.repairPriceFrom} ${service.currency}`;
+    } else {
+      return `${service.repairPrice} ${service.currency}`;
+    }
+  };
+
   // Funcție pentru navigare la shipping cu datele serviciului
   const handleShippingClick = (e) => {
     e.preventDefault();
@@ -58,9 +67,13 @@ function ServiceCard({ service }) {
           <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg shadow p-2">
             <div className="text-right">
               <div className="text-xs text-gray-500">Reparație:</div>
-              <div className="font-bold text-red-600 text-sm">{service.repairPrice} {service.currency}</div>
+              <div className="font-bold text-red-600 text-sm">
+                {formatRepairPrice()}
+              </div>
               <div className="text-xs text-gray-500 mt-1">Testare:</div>
-              <div className="font-bold text-blue-600 text-sm">{service.testPrice} {service.currency}</div>
+              <div className="font-bold text-blue-600 text-sm">
+                {service.testPrice} {service.currency}
+              </div>
             </div>
           </div>
         </div>
