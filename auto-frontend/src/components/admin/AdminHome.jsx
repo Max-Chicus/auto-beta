@@ -20,14 +20,25 @@ function AdminHome() {
     total: 0
   });
   const [recentShipping, setRecentShipping] = useState([]);
+  
+  // State pentru anunț
+  const [announcement, setAnnouncement] = useState({
+    isActive: false,
+    title: '',
+    message: '',
+    type: 'info',
+    expiresAt: ''
+  });
+  const [savingAnnouncement, setSavingAnnouncement] = useState(false);
+  const [announcementSaved, setAnnouncementSaved] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchAnnouncement();
   }, []);
 
   const fetchDashboardData = async () => {
     try {
-      // Pornim toate request-urile în paralel
       const [
         servicesRes,
         requestsRes,
@@ -40,26 +51,21 @@ function AdminHome() {
         API.get('/admin/shipping-requests?limit=5')
       ]);
 
-      // Servicii recente
       const services = servicesRes.data?.services || servicesRes.data || [];
       setRecentServices(Array.isArray(services) ? services.slice(0, 5) : []);
 
-      // Cereri recente
       const requests = requestsRes.data?.requests || requestsRes.data || [];
       setRecentRequests(Array.isArray(requests) ? requests.slice(0, 5) : []);
 
-      // Statistici cereri
       setStats({
         newRequests: Array.isArray(requests) ? requests.length : 0,
-        inProgress: 0 // Poți calcula din alte request-uri
+        inProgress: 0
       });
 
-      // Statistici expedieri
       if (shippingStatsRes.data) {
         setShippingStats(shippingStatsRes.data);
       }
 
-      // Expediții recente
       if (shippingRecentRes.data?.requests) {
         setRecentShipping(shippingRecentRes.data.requests.slice(0, 5));
       }
@@ -68,6 +74,52 @@ function AdminHome() {
       console.error('Eroare dashboard:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch current announcement
+  const fetchAnnouncement = async () => {
+    try {
+      const res = await API.get('/admin/announcement');
+      if (res.data) {
+        setAnnouncement(res.data);
+      }
+    } catch (err) {
+      console.error('Eroare la încărcarea anunțului:', err);
+    }
+  };
+
+  // Save announcement
+  const saveAnnouncement = async () => {
+    setSavingAnnouncement(true);
+    try {
+      await API.post('/admin/announcement', announcement);
+      setAnnouncementSaved(true);
+      setTimeout(() => setAnnouncementSaved(false), 3000);
+    } catch (err) {
+      console.error('Eroare la salvarea anunțului:', err);
+      alert('Eroare la salvarea anunțului');
+    } finally {
+      setSavingAnnouncement(false);
+    }
+  };
+
+  // Delete/deactivate announcement
+  const deleteAnnouncement = async () => {
+    if (window.confirm('Sigur dorești să ștergi acest anunț?')) {
+      try {
+        await API.delete('/admin/announcement');
+        setAnnouncement({
+          isActive: false,
+          title: '',
+          message: '',
+          type: 'info',
+          expiresAt: ''
+        });
+      } catch (err) {
+        console.error('Eroare la ștergerea anunțului:', err);
+        alert('Eroare la ștergerea anunțului');
+      }
     }
   };
 
@@ -118,10 +170,177 @@ function AdminHome() {
 
   const navigate = useNavigate();
 
+  // Opțiuni pentru tipul de anunț
+  const announcementTypes = [
+    { value: 'info', label: 'ℹ️ Informație', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    { value: 'warning', label: '⚠️ Atenție', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
+    { value: 'success', label: '✅ Succes', color: 'bg-green-100 text-green-800 border-green-200' },
+    { value: 'danger', label: '🔴 Urgent', color: 'bg-red-100 text-red-800 border-red-200' },
+    { value: 'vacation', label: '🏖️ Vacanță', color: 'bg-purple-100 text-purple-800 border-purple-200' }
+  ];
+
+  const getTypeColor = (type) => {
+    const found = announcementTypes.find(t => t.value === type);
+    return found ? found.color : announcementTypes[0].color;
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">Bine ai venit în Panou Admin</h1>
       <p className="text-gray-600 mb-6">Gestionare servicii de reparație auto</p>
+
+      {/* SECȚIUNE ANUNȚ IMPORTANT */}
+      <div className="mb-6 bg-white border rounded-lg shadow overflow-hidden">
+        <div className="p-6 border-b bg-gradient-to-r from-gray-50 to-white">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">📢</span>
+            <h2 className="text-lg font-semibold text-gray-900">Anunț important pentru clienți</h2>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">
+            Activează un anunț care va apărea în partea de sus a paginii Home pentru toți vizitatorii.
+          </p>
+        </div>
+
+        <div className="p-6">
+          {/* Status curent */}
+          {announcement.isActive && (
+            <div className={`mb-4 p-3 rounded-lg border ${getTypeColor(announcement.type)}`}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-semibold">Anunț activ:</p>
+                  <p className="font-medium">{announcement.title}</p>
+                  <p className="text-sm mt-1">{announcement.message}</p>
+                  {announcement.expiresAt && (
+                    <p className="text-xs mt-2 opacity-75">
+                      Expiră: {new Date(announcement.expiresAt).toLocaleDateString('ro-RO')}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={deleteAnnouncement}
+                  className="text-red-600 hover:text-red-800 text-sm"
+                >
+                  🗑️ Șterge
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Formular anunț */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Activează anunțul
+              </label>
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={announcement.isActive}
+                  onChange={(e) => setAnnouncement({ ...announcement, isActive: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                <span className="ms-3 text-sm text-gray-600">
+                  {announcement.isActive ? 'Anunț ACTIV' : 'Anunț INACTIV'}
+                </span>
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Titlu anunț
+              </label>
+              <input
+                type="text"
+                value={announcement.title}
+                onChange={(e) => setAnnouncement({ ...announcement, title: e.target.value })}
+                placeholder="Ex: În vacanță! sau Promoție specială"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Mesaj anunț
+              </label>
+              <textarea
+                value={announcement.message}
+                onChange={(e) => setAnnouncement({ ...announcement, message: e.target.value })}
+                placeholder="Scrie mesajul anunțului aici..."
+                rows="3"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tip anunț
+                </label>
+                <select
+                  value={announcement.type}
+                  onChange={(e) => setAnnouncement({ ...announcement, type: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                >
+                  {announcementTypes.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Dată expirare (opțional)
+                </label>
+                <input
+                  type="datetime-local"
+                  value={announcement.expiresAt ? announcement.expiresAt.slice(0, 16) : ''}
+                  onChange={(e) => setAnnouncement({ ...announcement, expiresAt: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={saveAnnouncement}
+                disabled={savingAnnouncement}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition disabled:opacity-50"
+              >
+                {savingAnnouncement ? 'Se salvează...' : '📢 Salvează anunțul'}
+              </button>
+              
+              {announcementSaved && (
+                <span className="text-green-600 text-sm self-center animate-pulse">
+                  ✓ Anunț salvat cu succes!
+                </span>
+              )}
+            </div>
+
+            {/* Previzualizare */}
+            {announcement.isActive && announcement.title && (
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-sm text-gray-500 mb-2">Previzualizare:</p>
+                <div className={`p-3 rounded-lg border ${getTypeColor(announcement.type)} flex items-start gap-3`}>
+                  <span className="text-xl">
+                    {announcement.type === 'vacation' && '🏖️'}
+                    {announcement.type === 'warning' && '⚠️'}
+                    {announcement.type === 'danger' && '🔴'}
+                    {announcement.type === 'success' && '✅'}
+                    {announcement.type === 'info' && 'ℹ️'}
+                  </span>
+                  <div>
+                    <p className="font-semibold">{announcement.title}</p>
+                    <p className="text-sm">{announcement.message}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Alert pentru cereri noi */}
       {stats.newRequests > 0 && (
@@ -144,7 +363,7 @@ function AdminHome() {
         </div>
       )}
 
-      {/* Statistici expedieri - carduri quick info */}
+      {/* Statistici expedieri */}
       {shippingStats.total > 0 && (
         <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -166,6 +385,7 @@ function AdminHome() {
         </div>
       )}
 
+      {/* Restul codului rămâne la fel */}
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         {/* Servicii Recente */}
         <div className="bg-white border rounded-lg shadow">
@@ -313,7 +533,7 @@ function AdminHome() {
         </div>
       </div>
 
-      {/* Expediții Recente - Rând nou, lățime completă */}
+      {/* Expediții Recente */}
       <div className="mt-8">
         <div className="bg-white border rounded-lg shadow">
           <div className="p-6 border-b flex justify-between items-center">

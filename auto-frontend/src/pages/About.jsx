@@ -27,7 +27,7 @@ function About() {
               Testarea și repararea profesională a echipamentului auto electronic
             </p>
             <div className="inline-block bg-red-600 px-6 py-2 rounded-full">
-              <span className="text-lg">✓ Atelier autorizat ✓ Garanție 12 luni ✓ Experiență 10+ ani</span>
+              <span className="text-lg">✓ Atelier autorizat ✓ Garanție 12 luni ✓ Experiență</span>
             </div>
           </div>
         </div>
@@ -73,10 +73,10 @@ function About() {
               alt="Echipamente de testare electronică auto"
               className="rounded-2xl shadow-2xl"
             />
-            <div className="absolute -bottom-6 -right-6 bg-red-600 text-white p-6 rounded-2xl shadow-xl max-w-xs">
+            {/* <div className="absolute -bottom-6 -right-6 bg-red-600 text-white p-6 rounded-2xl shadow-xl max-w-xs">
               <div className="text-4xl font-bold mb-2">10+</div>
               <div className="text-lg">Ani de experiență în electronică auto</div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

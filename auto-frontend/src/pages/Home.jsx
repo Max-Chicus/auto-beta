@@ -18,11 +18,18 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [dbServiceTypes, setDbServiceTypes] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [announcement, setAnnouncement] = useState(null);
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false);
 
   useEffect(() => {
     fetchHomeData();
     fetchServiceTypes();
     fetchGallery();
+    fetchAnnouncement();
+    const dismissed = localStorage.getItem('announcement_dismissed');
+    if (dismissed === 'true') {
+      setAnnouncementDismissed(true);
+    }
   }, []);
 
   const fetchServiceTypes = async () => {
@@ -53,7 +60,7 @@ function Home() {
         setNewServices(sortedByNewest);
       }
 
-      setPopularBrands((filtersRes.data?.brands || []).slice(0, 8));
+      setPopularBrands((filtersRes.data?.brands || []).slice(0, 1000));
 
     } finally {
       setLoading(false);
@@ -92,6 +99,21 @@ function Home() {
         { _id: 1, url: "/gallery-1.webp", alt: "Chei auto" },
         // ... restul imaginilor statice
       ]);
+    }
+  };
+
+  const fetchAnnouncement = async () => {
+    try {
+      const res = await API.get('/public/announcement');
+      if (res.data && res.data.isActive) {
+        // Verifică dacă a expirat
+        if (res.data.expiresAt && new Date(res.data.expiresAt) < new Date()) {
+          return; // Anunț expirat
+        }
+        setAnnouncement(res.data);
+      }
+    } catch (err) {
+      console.error('Eroare la încărcarea anunțului:', err);
     }
   };
 
@@ -283,7 +305,7 @@ function Home() {
         "Alte/diferite funcții nefuncționale"
       ]
     },
-        {
+    {
       id: 12,
       title: "Programare Unități Electronice Motor (ECU)",
       description: "",
@@ -295,7 +317,7 @@ function Home() {
         "Dezactivare imobilizator (IMMO OFF)",
         "Restabilire software original (reprogramare ECU)",
       ]
-    },    {
+    }, {
       id: 13,
       title: "Reparații baterii Lithium-Ion",
       description: "Erori în panoul de bord sau modulul BMS",
@@ -317,10 +339,73 @@ function Home() {
     return match?._id || null;
   };
 
+  const dismissAnnouncement = () => {
+    setAnnouncementDismissed(true);
+    localStorage.setItem('announcement_dismissed', 'true');
+    // Opțional: setează un timeout pentru re-apariție (ex: 24h)
+    setTimeout(() => {
+      localStorage.removeItem('announcement_dismissed');
+    }, 24 * 60 * 60 * 1000);
+  };
+
+  const getAnnouncementStyle = (type) => {
+    switch (type) {
+      case 'warning':
+        return 'bg-yellow-50 border-yellow-300 text-yellow-800';
+      case 'danger':
+        return 'bg-red-50 border-red-300 text-red-800';
+      case 'success':
+        return 'bg-green-50 border-green-300 text-green-800';
+      case 'vacation':
+        return 'bg-purple-50 border-purple-300 text-purple-800';
+      default:
+        return 'bg-blue-50 border-blue-300 text-blue-800';
+    }
+  };
+
   return (
     <div>
+      {/* ANUNȚ IMPORTANT - apare doar dacă există și nu a fost închis */}
+      {announcement && announcement.isActive && !announcementDismissed && (
+        <div className={`relative overflow-hidden ${getAnnouncementStyle(announcement.type)} border-l-8`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3 flex-1">
+                <span className="text-2xl flex-shrink-0">
+                  {announcement.type === 'vacation' && '🏖️'}
+                  {announcement.type === 'warning' && '⚠️'}
+                  {announcement.type === 'danger' && '🔴'}
+                  {announcement.type === 'success' && '✅'}
+                  {announcement.type === 'info' && 'ℹ️'}
+                </span>
+                <div>
+                  <h3 className="font-bold text-lg">{announcement.title}</h3>
+                  <p className="text-sm opacity-90">{announcement.message}</p>
+                  {announcement.expiresAt && (
+                    <p className="text-xs mt-1 opacity-75">
+                      Valabil până la: {new Date(announcement.expiresAt).toLocaleDateString('ro-RO')}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={dismissAnnouncement}
+                className="flex-shrink-0 text-gray-500 hover:text-gray-700 transition-colors"
+                aria-label="Închide anunțul"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Bară de progres animată (opțională) */}
+          <div className="absolute bottom-0 left-0 h-1 bg-current opacity-30 animate-progress"></div>
+        </div>
+      )}
       {/* HERO SECTION CU SWIPER */}
-      <div className="relative bg-gradient-to-r from-gray-900 to-red-900 text-white overflow-hidden h-[600px] md:h-[550px]">
+      <div className="relative bg-gradient-to-r from-gray-900 to-red-900 text-white overflow-hidden h-[600px] md:h-[600px]">
         <Swiper
           modules={[Autoplay, Pagination, Navigation]}
           spaceBetween={0}

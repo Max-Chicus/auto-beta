@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import API from '../api/api';
 import { getFirstImageUrl, getAllImageUrls, getFullImageUrl } from '../utils/imageUtils';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
 function ServiceDetail() {
   const { id } = useParams();
@@ -9,7 +14,6 @@ function ServiceDetail() {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedServices, setRelatedServices] = useState([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     fetchService();
@@ -64,22 +68,6 @@ function ServiceDetail() {
     });
   };
 
-  const handlePrevImage = () => {
-    if (service.images && service.images.length > 0) {
-      setSelectedImageIndex(prev =>
-        prev === 0 ? service.images.length - 1 : prev - 1
-      );
-    }
-  };
-
-  const handleNextImage = () => {
-    if (service.images && service.images.length > 0) {
-      setSelectedImageIndex(prev =>
-        prev === service.images.length - 1 ? 0 : prev + 1
-      );
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -124,7 +112,7 @@ function ServiceDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* MAIN CONTENT */}
         <div className="lg:col-span-2">
-          {/* SERVICE HEADER CU IMAGINI */}
+          {/* SERVICE HEADER CU IMAGINI - SWIPER */}
           <div className="bg-white rounded-xl border p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
               <div className="flex-1">
@@ -151,7 +139,7 @@ function ServiceDetail() {
                             e.target.onerror = null;
                             e.target.style.display = 'none';
                             e.target.parentElement.innerHTML =
-                              `<span class="text-xs font-bold text-gray-600">${brandName.charAt(0)}</span>`;
+                              `<span className="text-xs font-bold text-gray-600">${brandName.charAt(0)}</span>`;
                           }}
                         />
                       </div>
@@ -179,82 +167,127 @@ function ServiceDetail() {
               </div>
             </div>
 
-            {/* SECȚIUNE IMAGINI */}
+            {/* SECȚIUNE IMAGINI CU SWIPER - ca la Hero */}
             {imageUrls.length > 0 && (
               <div className="mt-4 pt-4 border-t">
                 <h3 className="text-xl font-bold mb-4">Imagini serviciu</h3>
 
-                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-2xl shadow-lg">
+                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-2xl shadow-lg overflow-hidden">
                   <div className="absolute -top-3 -left-3 w-12 h-12 bg-red-100 rounded-full opacity-50 blur-sm"></div>
                   <div className="absolute -bottom-3 -right-3 w-16 h-16 bg-blue-100 rounded-full opacity-50 blur-sm"></div>
                   
-                  <div className="relative mb-4 flex justify-center">
-                    <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-md overflow-hidden">
-                      <div className="relative pt-[75%]">
-                        <img
-                          src={imageUrls[selectedImageIndex]}
-                          alt={`${service.name} - Imagine ${selectedImageIndex + 1}`}
-                          className="absolute top-0 left-0 w-full h-full object-contain bg-gray-100"
-                          onError={(e) => { 
-                            e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/800x600?text=Imagine+indisponibila';
-                          }}
-                        />
-                      </div>
-
-                      {imageUrls.length > 1 && (
-                        <>
-                          <button
-                            onClick={handlePrevImage}
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-lg"
-                          >
-                            ←
-                          </button>
-                          <button
-                            onClick={handleNextImage}
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-lg"
-                          >
-                            →
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {imageUrls.length > 1 && (
-                    <div className="text-center mt-2 text-sm text-gray-600 font-medium">
-                      Imagine {selectedImageIndex + 1} din {imageUrls.length}
-                    </div>
-                  )}
-
-                  {imageUrls.length > 1 && (
-                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-4">
+                  <div className="relative">
+                    <Swiper
+                      modules={[Autoplay, Pagination, Navigation]}
+                      spaceBetween={0}
+                      slidesPerView={1}
+                      autoplay={{
+                        delay: 4000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                      }}
+                      pagination={{ 
+                        clickable: true,
+                        dynamicBullets: true,
+                      }}
+                      navigation
+                      loop={imageUrls.length > 1}
+                      className="service-detail-swiper rounded-xl overflow-hidden"
+                    >
                       {imageUrls.map((url, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedImageIndex(index)}
-                          className={`relative pt-[100%] rounded-lg overflow-hidden border-2 transition-transform hover:scale-105 ${selectedImageIndex === index
-                            ? 'border-red-500 shadow-lg'
-                            : 'border-transparent opacity-70 hover:opacity-100'
-                            }`}
-                        >
-                          <img
-                            src={url}
-                            alt={`Thumbnail ${index + 1}`}
-                            className="absolute top-0 left-0 w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = 'https://via.placeholder.com/100x100?text=Thumb';
-                            }}
-                          />
-                        </button>
+                        <SwiperSlide key={index}>
+                          <div className="relative w-full">
+                            <div className="relative pt-[75%] bg-gray-100">
+                              <img
+                                src={url}
+                                alt={`${service.name} - Imagine ${index + 1}`}
+                                className="absolute top-0 left-0 w-full h-full object-contain bg-white"
+                                onError={(e) => { 
+                                  e.target.onerror = null;
+                                  e.target.src = 'https://via.placeholder.com/800x600?text=Imagine+indisponibila';
+                                }}
+                              />
+                            </div>
+                            {/* Badge cu numărul imaginii */}
+                            {imageUrls.length > 1 && (
+                              <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                                {index + 1} / {imageUrls.length}
+                              </div>
+                            )}
+                          </div>
+                        </SwiperSlide>
                       ))}
-                    </div>
-                  )}
+                    </Swiper>
+
+                    {/* Thumbnail-uri sub slider */}
+                    {imageUrls.length > 1 && (
+                      <div className="grid grid-cols-4 md:grid-cols-6 gap-2 mt-4">
+                        {imageUrls.map((url, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              const swiper = document.querySelector('.service-detail-swiper')?.swiper;
+                              if (swiper) swiper.slideTo(index);
+                            }}
+                            className="relative pt-[100%] rounded-lg overflow-hidden border-2 transition-transform hover:scale-105 border-transparent hover:border-red-400"
+                          >
+                            <img
+                              src={url}
+                              alt={`Thumbnail ${index + 1}`}
+                              className="absolute top-0 left-0 w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://via.placeholder.com/100x100?text=Thumb';
+                              }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
           </div>
+
+          {/* Stiluri personalizate pentru Swiper */}
+          <style>{`
+            .service-detail-swiper {
+              box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            }
+            .service-detail-swiper .swiper-button-prev,
+            .service-detail-swiper .swiper-button-next {
+              background-color: rgba(0, 0, 0, 0.5);
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              color: white;
+              transition: all 0.3s ease;
+            }
+            .service-detail-swiper .swiper-button-prev:hover,
+            .service-detail-swiper .swiper-button-next:hover {
+              background-color: rgba(220, 38, 38, 0.8);
+              transform: scale(1.1);
+            }
+            .service-detail-swiper .swiper-button-prev:after,
+            .service-detail-swiper .swiper-button-next:after {
+              font-size: 18px;
+              font-weight: bold;
+            }
+            .service-detail-swiper .swiper-pagination-bullet {
+              background: white;
+              opacity: 0.7;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+            .service-detail-swiper .swiper-pagination-bullet-active {
+              background: #ef4444;
+              opacity: 1;
+              transform: scale(1.2);
+            }
+            .service-detail-swiper .swiper-pagination {
+              bottom: 15px;
+            }
+          `}</style>
 
           {/* COMPATIBLE MODELS */}
           <div className="bg-white rounded-xl border p-6 mb-6">
@@ -315,7 +348,7 @@ function ServiceDetail() {
               </div>
             )}
 
-            {/* PRICE BOX - MODIFICAT */}
+            {/* PRICE BOX */}
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 border rounded-xl p-6 shadow-md">
               <div className="text-center mb-4">
                 <div className="text-3xl font-bold text-red-600">{formatRepairPrice()}</div>
@@ -363,7 +396,7 @@ function ServiceDetail() {
           )}
         </div>
 
-        {/* SIDEBAR */}
+        {/* SIDEBAR - rămâne la fel */}
         <div className="space-y-6">
           {/* RELATED SERVICES */}
           {relatedServices.length > 0 && (

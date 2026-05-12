@@ -7,6 +7,7 @@ const ServiceRequest = require('../models/ServiceRequest');
 const path = require('path');
 const fs = require('fs');
 const mongoose = require('mongoose');
+const Announcement = require('../models/Announcement');
 
 console.log('✅ Admin routes loaded');
 
@@ -1114,5 +1115,68 @@ router.get('/shipping-requests/stats/summary', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ========== ANUNȚURI ==========
+
+// GET - Obține anunțul pentru admin (fără autentificare, doar pentru admin panel)
+router.get('/announcement', async (req, res) => {
+  try {
+    const announcement = await Announcement.findOne();
+    res.json(announcement || { isActive: false, title: '', message: '', type: 'info', expiresAt: null });
+  } catch (err) {
+    console.error('Eroare la obținerea anunțului:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST - Salvează anunțul (fără autentificare)
+router.post('/announcement', async (req, res) => {
+  console.log('📢 Salvare anunț:', req.body);
+
+  try {
+    const { isActive, title, message, type, expiresAt } = req.body;
+
+    let announcement = await Announcement.findOne();
+
+    if (announcement) {
+      announcement.isActive = isActive || false;
+      announcement.title = title || '';
+      announcement.message = message || '';
+      announcement.type = type || 'info';
+      announcement.expiresAt = expiresAt || null;
+      await announcement.save();
+      console.log('✅ Anunț actualizat');
+    } else {
+      announcement = await Announcement.create({
+        isActive: isActive || false,
+        title: title || '',
+        message: message || '',
+        type: type || 'info',
+        expiresAt: expiresAt || null
+      });
+      console.log('✅ Anunț creat');
+    }
+
+    res.json({ message: 'Anunț salvat cu succes', announcement });
+  } catch (err) {
+    console.error('❌ Eroare la salvarea anunțului:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE - Șterge anunțul (fără autentificare)
+router.delete('/announcement', async (req, res) => {
+  console.log('🗑️ Ștergere anunț');
+
+  try {
+    await Announcement.deleteMany({});
+    res.json({ message: 'Anunț șters cu succes' });
+  } catch (err) {
+    console.error('❌ Eroare la ștergerea anunțului:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
 
 module.exports = router;
