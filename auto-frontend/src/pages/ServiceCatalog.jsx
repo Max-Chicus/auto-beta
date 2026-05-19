@@ -16,7 +16,7 @@ function ServiceCatalog() {
     search: '',
     model: ''
   });
-  
+
   // Stări pentru paginăție
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -30,9 +30,9 @@ function ServiceCatalog() {
     const search = searchParams.get('search') || '';
     const serviceType = searchParams.get('serviceType') || '';
     const serviceTypeName = searchParams.get('serviceTypeName') || '';
-    
+
     console.log('📥 Parametri URL primiți:', { brand, model, search, serviceType });
-    
+
     setFilters({
       brand,
       model,
@@ -40,7 +40,7 @@ function ServiceCatalog() {
       serviceType,
       serviceTypeName
     });
-    
+
     // Resetează pagina la 1 când se schimbă parametrii URL
     setCurrentPage(1);
   }, [searchParams]);
@@ -72,32 +72,45 @@ function ServiceCatalog() {
       if (filters.serviceTypeName) params.append('serviceTypeName', filters.serviceTypeName);
       if (filters.search) params.append('search', filters.search);
       if (filters.model) params.append('model', filters.model);
-      
+
       // Adaugă parametrii de paginăție
       params.append('page', currentPage);
       params.append('limit', itemsPerPage);
 
-      console.log('🔍 Cerere către API cu parametrii:', params.toString());
+      console.log('🔍 Cerere către API:', `/services?${params.toString()}`);
 
       const res = await API.get(`/services?${params.toString()}`);
-      
-      // Verifică dacă răspunsul are structura nouă cu paginăție
-      if (res.data.services && res.data.pagination) {
-        console.log('📦 Servicii primite:', res.data.services.length);
-        console.log('📄 Paginație:', res.data.pagination);
+
+      console.log('📦 Răspuns primit:', res.data);
+
+      // ✅ FORMATUL NOU (CU PAGINAȚIE)
+      if (res.data && res.data.services && Array.isArray(res.data.services)) {
+        console.log('✅ Format cu paginăție - servicii:', res.data.services.length);
         setServices(res.data.services);
-        setCurrentPage(res.data.pagination.currentPage);
-        setTotalPages(res.data.pagination.totalPages);
-        setTotalItems(res.data.pagination.totalItems);
-      } else {
-        // Fallback pentru compatibilitate (dacă backend-ul nu e încă actualizat)
-        console.log('⚠️ Backend-ul nu returnează paginăție, folosește varianta veche');
+
+        if (res.data.pagination) {
+          setCurrentPage(res.data.pagination.currentPage);
+          setTotalPages(res.data.pagination.totalPages);
+          setTotalItems(res.data.pagination.totalItems);
+        }
+      }
+      // ✅ FALLBACK pentru format vechi (array direct) - compatibilitate
+      else if (Array.isArray(res.data)) {
+        console.log('⚠️ Format vechi (array) - servicii:', res.data.length);
         setServices(res.data);
-        setTotalPages(1);
         setTotalItems(res.data.length);
+        setTotalPages(1);
+      }
+      else {
+        console.error('❌ Format necunoscut:', res.data);
+        setServices([]);
+        setTotalItems(0);
+        setTotalPages(1);
       }
     } catch (err) {
-      console.error('Eroare servicii:', err);
+      console.error('❌ Eroare servicii:', err);
+      setServices([]);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
@@ -123,11 +136,11 @@ function ServiceCatalog() {
     const maxPagesToShow = 5; // Arată maxim 5 numere de pagină
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-    
+
     if (endPage - startPage + 1 < maxPagesToShow) {
       startPage = Math.max(1, endPage - maxPagesToShow + 1);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
@@ -139,7 +152,7 @@ function ServiceCatalog() {
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Servicii de reparație auto</h1>
-        
+
         {/* Afișează mesajul pentru tipul de serviciu selectat */}
         {filters.serviceType && selectedServiceType && (
           <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -148,7 +161,7 @@ function ServiceCatalog() {
               <span className="font-bold">
                 Servicii pentru: {selectedServiceType.name}
               </span>
-              <button 
+              <button
                 onClick={resetAllFilters}
                 className="ml-auto text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
               >
@@ -157,13 +170,13 @@ function ServiceCatalog() {
             </p>
           </div>
         )}
-        
+
         {/* Afișează mesajul pentru model selectat */}
         {filters.model && selectedBrand && !filters.serviceType && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800">
               🔍 Căutare pentru: <span className="font-bold">{selectedBrand.name} {filters.model}</span>
-              <button 
+              <button
                 onClick={resetAllFilters}
                 className="ml-4 text-sm text-blue-600 hover:text-blue-800 underline"
               >
@@ -172,7 +185,7 @@ function ServiceCatalog() {
             </p>
           </div>
         )}
-        
+
         <p className="text-gray-600 mt-2">
           Servicii profesionale pentru toate mărcile și modelele
         </p>
@@ -238,9 +251,9 @@ function ServiceCatalog() {
         <div className="text-center py-12 bg-white rounded-xl border">
           <h3 className="text-xl font-semibold text-gray-700">Nu s-au găsit servicii</h3>
           <p className="text-gray-600 mt-2 mb-6">
-            {filters.serviceType 
+            {filters.serviceType
               ? `Nu există servicii pentru tipul: ${selectedServiceType?.name || ''}`
-              : filters.model 
+              : filters.model
                 ? `Nu există servicii pentru ${selectedBrand?.name || ''} ${filters.model}`
                 : 'Încearcă alte filtre'}
           </p>
@@ -283,11 +296,10 @@ function ServiceCatalog() {
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  currentPage === 1
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === 1
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                  }`}
               >
                 ← Anterior
               </button>
@@ -310,11 +322,10 @@ function ServiceCatalog() {
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    currentPage === pageNum
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === pageNum
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {pageNum}
                 </button>
@@ -339,11 +350,10 @@ function ServiceCatalog() {
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  currentPage === totalPages
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === totalPages
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                  }`}
               >
                 Următoarea →
               </button>

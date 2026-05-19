@@ -90,7 +90,23 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
 
       const res = await API.get(`/services?${params.toString()}`);
 
-      setServices(res.data || []);
+      // 🔥 VERIFICĂ FORMATUL RĂSPUNSULUI
+      let servicesData = [];
+
+      if (res.data && res.data.services && Array.isArray(res.data.services)) {
+        // Format nou (cu paginăție)
+        servicesData = res.data.services;
+        console.log('✅ ServiceFinder: format cu paginăție, servicii:', servicesData.length);
+      } else if (Array.isArray(res.data)) {
+        // Format vechi (array direct)
+        servicesData = res.data;
+        console.log('✅ ServiceFinder: format array direct, servicii:', servicesData.length);
+      } else {
+        console.error('❌ ServiceFinder: format necunoscut', res.data);
+        servicesData = [];
+      }
+
+      setServices(servicesData);
       setShowResults(true);
       setStep(3);
 
@@ -299,13 +315,13 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                           </span>
                         </div>
                       )}
-                      
+
                       {/* BADGE PREȚ - ca în ServiceCard */}
                       <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-red-600 font-bold px-3 py-1 rounded-lg shadow">
                         {service.repairPrice} {service.currency || 'LEI'}
                       </div>
                     </div>
-                    
+
                     {/* DETALII SERVICIU */}
                     <div className="flex-1 p-5">
                       <div className="flex justify-between items-start">
@@ -314,7 +330,7 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                           <h4 className="font-bold text-lg text-gray-900 mb-1">
                             {service.name}
                           </h4>
-                          
+
                           {/* TIP SERVICIU */}
                           <div className="flex items-center gap-2 mb-3">
                             <span className="text-sm text-gray-600 bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-full flex items-center gap-2">
@@ -322,14 +338,14 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                               <span>{service.serviceType?.name || 'Serviciu'}</span>
                             </span>
                           </div>
-                          
+
                           {/* DESCRIERE SCURTĂ */}
                           {service.description && (
                             <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                               {service.description}
                             </p>
                           )}
-                          
+
                           {/* DETALII SERVICIU - durată și garanție */}
                           <div className="border-t border-gray-100 pt-3 flex justify-between text-sm text-gray-500">
                             <div className="flex items-center gap-2">
@@ -342,7 +358,7 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                             </div>
                           </div>
                         </div>
-                        
+
                         {/* BUTON DETALII */}
                         <div className="ml-4 flex-shrink-0">
                           <button className="bg-gray-50 hover:bg-red-50 text-red-600 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-200 hover:border-red-200 text-sm whitespace-nowrap">
