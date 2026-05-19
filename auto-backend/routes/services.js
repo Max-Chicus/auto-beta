@@ -13,13 +13,14 @@ router.get('/', async (req, res) => {
       model,
       year,
       serviceType,
-      serviceTypeName, // ← NOU: adaugă asta
+      serviceTypeName,
       search,
       featured,
-      limit = 50
+      page = 1,
+      limit = 21
     } = req.query;
 
-    console.log('🔍 PRIMIT PARAMETRII:', { brand, model, year, serviceType, serviceTypeName, search, featured });
+    console.log('🔍 PRIMIT PARAMETRII:', { brand, model, year, serviceType, serviceTypeName, search, featured, page, limit });
 
     // Construim query-ul de bază
     let query = { isActive: true };
@@ -41,7 +42,6 @@ router.get('/', async (req, res) => {
       if (mongoose.Types.ObjectId.isValid(serviceType)) {
         query.serviceType = serviceType;
       } else {
-        // Dacă nu e ID valid, caută după nume
         const typeDoc = await ServiceType.findOne({ name: new RegExp(serviceType, 'i') });
         if (typeDoc) {
           query.serviceType = typeDoc._id;
@@ -49,15 +49,14 @@ router.get('/', async (req, res) => {
       }
     }
 
-    // ← NOU: Filtrare după numele tipului de serviciu
+    // Filtrare după numele tipului de serviciu
     if (serviceTypeName && serviceTypeName.trim() !== '') {
       console.log('🎯 CAUT DUPA SERVICE TYPE NAME:', serviceTypeName);
-      
-      // Caută tipul de serviciu după nume (case insensitive)
-      const typeDoc = await ServiceType.findOne({ 
-        name: { $regex: serviceTypeName, $options: 'i' } 
+
+      const typeDoc = await ServiceType.findOne({
+        name: { $regex: serviceTypeName, $options: 'i' }
       });
-      
+
       if (typeDoc) {
         console.log('✅ GĂSIT TIP SERVICIU:', typeDoc.name, 'cu ID:', typeDoc._id);
         query.serviceType = typeDoc._id;
@@ -78,43 +77,38 @@ router.get('/', async (req, res) => {
 
     console.log('📦 Query MongoDB:', JSON.stringify(query));
 
-    // Execută query-ul
+    // CALCULEAZĂ PAGINAȚIA
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Execută query-ul CU PAGINAȚIE
     let services = await Service.find(query)
       .populate('brand', 'name logo')
       .populate('serviceType', 'name icon')
-      .sort({ featured: -1, popularity: -1, name: 1 });
+      .sort({ featured: -1, popularity: -1, name: 1 })
+      .skip(skip)
+      .limit(limitNum);
 
-    console.log('📊 Total servicii din DB înainte de filtrarea model:', services.length);
+    console.log('📊 Total servicii înainte de filtrare model:', services.length);
 
-    // FILTRU MANUAL pentru model - ASTA E PARTEA IMPORTANTĂ
+    // FILTRU MANUAL pentru model
     if (model && model.trim() !== '') {
       console.log('🎯 FILTREZ DUPA MODEL:', model);
 
       const modelSearch = model.toLowerCase().trim();
 
-      // Filtrează serviciile care au modelul compatibil
       services = services.filter(service => {
-        // Verifică dacă are modele compatibile
         if (!service.compatibleModels || service.compatibleModels.length === 0) {
           return false;
         }
 
-        // Caută modelul în lista de modele compatibile
         const hasMatch = service.compatibleModels.some(cm => {
           if (!cm.modelName) return false;
-
           const dbModel = cm.modelName.toLowerCase().trim();
-
-          // Verifică dacă se potrivește
-          const isMatch = dbModel === modelSearch ||
+          return dbModel === modelSearch ||
             dbModel.includes(modelSearch) ||
             modelSearch.includes(dbModel);
-
-          if (isMatch) {
-            console.log(`✅ ${service.name} -> ${cm.modelName} (match cu ${model})`);
-          }
-
-          return isMatch;
         });
 
         return hasMatch;
@@ -123,7 +117,7 @@ router.get('/', async (req, res) => {
       console.log('📊 Servicii după filtrare model:', services.length);
     }
 
-    // FILTRU pentru model + an (opțional)
+    // FILTRU pentru model + an
     if (model && year) {
       console.log('🎯 FILTREZ DUPA MODEL + AN:', model, year);
 
@@ -135,14 +129,11 @@ router.get('/', async (req, res) => {
 
         return service.compatibleModels.some(cm => {
           if (!cm.modelName) return false;
-
           const dbModel = cm.modelName.toLowerCase().trim();
           const matchesModel = dbModel === modelSearch ||
             dbModel.includes(modelSearch) ||
             modelSearch.includes(dbModel);
-
           const matchesYear = yearNum >= cm.yearFrom && yearNum <= cm.yearTo;
-
           return matchesModel && matchesYear;
         });
       });
@@ -150,7 +141,47 @@ router.get('/', async (req, res) => {
       console.log('📊 Servicii după filtrare model+an:', services.length);
     }
 
-    res.json(services);
+    // CALCULEAZĂ TOTALUL PENTRU PAGINAȚIE (fără skip și limit)
+    const total = await Service.countDocuments(query);
+
+    // Aplică aceleași filtre de model pentru total (dacă există)
+    let totalAfterModelFilter = total;
+    if (model && model.trim() !== '') {
+      // Pentru simplitate, folosim aceeași logică ca mai sus
+      const allServicesForCount = await Service.find(query)
+        .populate('brand', 'name logo')
+        .populate('serviceType', 'name icon');
+
+      const filteredCount = allServicesForCount.filter(service => {
+        if (!service.compatibleModels || service.compatibleModels.length === 0) return false;
+        return service.compatibleModels.some(cm => {
+          if (!cm.modelName) return false;
+          const dbModel = cm.modelName.toLowerCase().trim();
+          const modelSearch = model.toLowerCase().trim();
+          return dbModel === modelSearch || dbModel.includes(modelSearch) || modelSearch.includes(dbModel);
+        });
+      }).length;
+
+      totalAfterModelFilter = filteredCount;
+    }
+
+    const totalPages = Math.ceil(totalAfterModelFilter / limitNum);
+
+    console.log(`📄 Pagina ${pageNum} din ${totalPages} (${totalAfterModelFilter} total servicii)`);
+
+    // Răspuns cu metadata de paginăție
+    res.json({
+      services,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: totalPages,
+        totalItems: totalAfterModelFilter,
+        itemsPerPage: limitNum,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1
+      }
+    });
+
   } catch (err) {
     console.error('❌ EROARE:', err);
     res.status(500).json({ error: err.message });

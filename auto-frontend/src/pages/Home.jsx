@@ -328,6 +328,19 @@ function Home() {
         "Baterie descărcată profund sau fără funcționare",
         "Descărcare profundă după utilizare necorespunzătoare sau accident",
       ]
+    }, {
+      id: 14,
+      title: "Programare chei pentru camioane",
+      description: "Programare chei, recuperare chei pierdute, service imobilizator (IMMO)",
+      icon: "🔑",
+      image: "/gama-14.webp",
+      features: [
+        "Programare chei noi pentru camioane",
+        "Recuperare chei pierdute sau deteriorate",
+        "Programare/dezactivare imobilizator (IMMO)",
+        "Reparație unități imobilizator",
+        "Diagnoză sistem imobilizator camion",
+      ]
     }
   ];
 
@@ -544,7 +557,7 @@ function Home() {
             {/* Card decorativ CTA */}
             <Link
               to="/services"
-              className="relative h-48 rounded-2xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex items-center justify-center group bg-cover bg-center"
+              className="relative h-full rounded-2xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex items-center justify-center group bg-cover bg-center"
               style={{ backgroundImage: "url('/gama-all.webp')" }}
             >
               {/* Overlay pentru contrast text */}

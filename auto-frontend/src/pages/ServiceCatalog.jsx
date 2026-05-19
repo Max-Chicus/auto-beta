@@ -16,6 +16,12 @@ function ServiceCatalog() {
     search: '',
     model: ''
   });
+  
+  // Stări pentru paginăție
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage] = useState(21); // 20 servicii pe pagină
 
   // Citește parametrii din URL la încărcare
   useEffect(() => {
@@ -34,6 +40,9 @@ function ServiceCatalog() {
       serviceType,
       serviceTypeName
     });
+    
+    // Resetează pagina la 1 când se schimbă parametrii URL
+    setCurrentPage(1);
   }, [searchParams]);
 
   useEffect(() => {
@@ -41,13 +50,8 @@ function ServiceCatalog() {
   }, []);
 
   useEffect(() => {
-    if (filters.brand || filters.serviceType || filters.search || filters.model) {
-      fetchServices();
-    } else {
-      // Dacă nu sunt filtre, încarcă toate serviciile
-      fetchServices();
-    }
-  }, [filters]);
+    fetchServices();
+  }, [filters, currentPage]); // Reîncarcă la schimbarea paginii sau filtrelor
 
   const fetchFilters = async () => {
     try {
@@ -68,12 +72,30 @@ function ServiceCatalog() {
       if (filters.serviceTypeName) params.append('serviceTypeName', filters.serviceTypeName);
       if (filters.search) params.append('search', filters.search);
       if (filters.model) params.append('model', filters.model);
+      
+      // Adaugă parametrii de paginăție
+      params.append('page', currentPage);
+      params.append('limit', itemsPerPage);
 
       console.log('🔍 Cerere către API cu parametrii:', params.toString());
 
       const res = await API.get(`/services?${params.toString()}`);
-      console.log('📦 Servicii primite:', res.data.length);
-      setServices(res.data);
+      
+      // Verifică dacă răspunsul are structura nouă cu paginăție
+      if (res.data.services && res.data.pagination) {
+        console.log('📦 Servicii primite:', res.data.services.length);
+        console.log('📄 Paginație:', res.data.pagination);
+        setServices(res.data.services);
+        setCurrentPage(res.data.pagination.currentPage);
+        setTotalPages(res.data.pagination.totalPages);
+        setTotalItems(res.data.pagination.totalItems);
+      } else {
+        // Fallback pentru compatibilitate (dacă backend-ul nu e încă actualizat)
+        console.log('⚠️ Backend-ul nu returnează paginăție, folosește varianta veche');
+        setServices(res.data);
+        setTotalPages(1);
+        setTotalItems(res.data.length);
+      }
     } catch (err) {
       console.error('Eroare servicii:', err);
     } finally {
@@ -83,10 +105,34 @@ function ServiceCatalog() {
 
   const handleFilterChange = (name, value) => {
     setFilters(prev => ({ ...prev, [name]: value }));
+    setCurrentPage(1); // Resetează la prima pagină când se schimbă filtrul
+  };
+
+  const resetAllFilters = () => {
+    setFilters({ brand: '', model: '', search: '', serviceType: '', serviceTypeName: '' });
+    setCurrentPage(1);
+    window.location.href = '/services';
   };
 
   const selectedBrand = brands.find(b => b._id === filters.brand);
   const selectedServiceType = serviceTypes.find(st => st._id === filters.serviceType);
+
+  // Generează numerele paginilor pentru afișare
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5; // Arată maxim 5 numere de pagină
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
+  };
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
@@ -103,10 +149,7 @@ function ServiceCatalog() {
                 Servicii pentru: {selectedServiceType.name}
               </span>
               <button 
-                onClick={() => {
-                  setFilters({ brand: '', model: '', search: '', serviceType: '' });
-                  window.location.href = '/services';
-                }}
+                onClick={resetAllFilters}
                 className="ml-auto text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
               >
                 Șterge filtrul
@@ -121,10 +164,7 @@ function ServiceCatalog() {
             <p className="text-blue-800">
               🔍 Căutare pentru: <span className="font-bold">{selectedBrand.name} {filters.model}</span>
               <button 
-                onClick={() => {
-                  setFilters({ brand: '', model: '', search: '', serviceType: '' });
-                  window.location.href = '/services';
-                }}
+                onClick={resetAllFilters}
                 className="ml-4 text-sm text-blue-600 hover:text-blue-800 underline"
               >
                 Șterge filtrele
@@ -213,17 +253,17 @@ function ServiceCatalog() {
         </div>
       ) : (
         <>
-          <div className="mb-6 flex justify-between items-center">
+          <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
             <p className="text-gray-600">
-              {services.length} servicii găsite
+              <strong>{totalItems}</strong> servicii găsite
               {filters.serviceType && ` pentru ${selectedServiceType?.name}`}
               {filters.model && !filters.serviceType && ` pentru ${selectedBrand?.name || ''} ${filters.model}`}
+              <span className="text-sm text-gray-500 ml-2">
+                (Pagina {currentPage} din {totalPages})
+              </span>
             </p>
             <button
-              onClick={() => {
-                setFilters({ brand: '', serviceType: '', search: '', model: '' });
-                window.location.href = '/services';
-              }}
+              onClick={resetAllFilters}
               className="text-sm text-red-600 hover:text-red-800"
             >
               Resetează filtrele
@@ -234,6 +274,85 @@ function ServiceCatalog() {
             {services.map(service => (
               <ServiceCard key={service._id} service={service} />
             ))}
+          </div>
+
+          {/* PAGINAȚIE */}
+          {totalPages > 1 && (
+            <div className="mt-12 flex justify-center items-center gap-2 flex-wrap">
+              {/* Buton Previous */}
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                ← Anterior
+              </button>
+
+              {/* Prima pagină dacă nu e în range */}
+              {getPageNumbers()[0] > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    1
+                  </button>
+                  {getPageNumbers()[0] > 2 && <span className="px-2">...</span>}
+                </>
+              )}
+
+              {/* Numerele paginilor */}
+              {getPageNumbers().map(pageNum => (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    currentPage === pageNum
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              ))}
+
+              {/* Ultima pagină dacă nu e în range */}
+              {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+                <>
+                  {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                    <span className="px-2">...</span>
+                  )}
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
+
+              {/* Buton Next */}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage === totalPages
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Următoarea →
+              </button>
+            </div>
+          )}
+
+          {/* Informație suplimentară */}
+          <div className="mt-6 text-center text-sm text-gray-500">
+            Afișate {services.length} din {totalItems} servicii
           </div>
         </>
       )}
