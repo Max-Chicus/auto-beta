@@ -75,26 +75,21 @@ router.get('/', async (req, res) => {
 
     console.log('📦 Query MongoDB:', JSON.stringify(query));
 
-    // CALCULEAZĂ PAGINAȚIA
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-    const skip = (pageNum - 1) * limitNum;
-
-    // Execută query-ul CU PAGINAȚIE
-    let services = await Service.find(query)
+    // 🔥 CHEIE: Ia TOATE serviciile care îndeplinesc condițiile
+    let allServices = await Service.find(query)
       .populate('brand', 'name logo')
       .populate('serviceType', 'name icon')
       .sort({ featured: -1, popularity: -1, name: 1 })
-      .skip(skip)
-      .limit(limitNum);
+      .lean();
 
-    console.log('📊 Total servicii înainte de filtrare model:', services.length);
+    console.log('📊 Total servicii înainte de filtrare model:', allServices.length);
 
-    // FILTRU MANUAL pentru model
+    // 🔥 FILTRARE MODEL (pe TOATE serviciile)
     if (model && model.trim() !== '') {
       console.log('🎯 FILTREZ DUPA MODEL:', model);
       const modelSearch = model.toLowerCase().trim();
-      services = services.filter(service => {
+      
+      allServices = allServices.filter(service => {
         if (!service.compatibleModels || service.compatibleModels.length === 0) {
           return false;
         }
@@ -107,7 +102,7 @@ router.get('/', async (req, res) => {
         });
         return hasMatch;
       });
-      console.log('📊 Servicii după filtrare model:', services.length);
+      console.log('📊 Servicii după filtrare model:', allServices.length);
     }
 
     // FILTRU pentru model + an
@@ -115,7 +110,8 @@ router.get('/', async (req, res) => {
       console.log('🎯 FILTREZ DUPA MODEL + AN:', model, year);
       const modelSearch = model.toLowerCase().trim();
       const yearNum = parseInt(year);
-      services = services.filter(service => {
+      
+      allServices = allServices.filter(service => {
         if (!service.compatibleModels) return false;
         return service.compatibleModels.some(cm => {
           if (!cm.modelName) return false;
@@ -127,35 +123,25 @@ router.get('/', async (req, res) => {
           return matchesModel && matchesYear;
         });
       });
-      console.log('📊 Servicii după filtrare model+an:', services.length);
+      console.log('📊 Servicii după filtrare model+an:', allServices.length);
     }
 
-    // CALCULEAZĂ TOTALUL PENTRU PAGINAȚIE
-    const total = await Service.countDocuments(query);
-    let totalAfterModelFilter = total;
+    // 🔥 ACUM aplică paginăția pe rezultatele deja filtrate
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
     
-    if (model && model.trim() !== '') {
-      const allServicesForCount = await Service.find(query)
-        .populate('brand', 'name logo')
-        .populate('serviceType', 'name icon');
-      const filteredCount = allServicesForCount.filter(service => {
-        if (!service.compatibleModels || service.compatibleModels.length === 0) return false;
-        return service.compatibleModels.some(cm => {
-          if (!cm.modelName) return false;
-          const dbModel = cm.modelName.toLowerCase().trim();
-          const modelSearch = model.toLowerCase().trim();
-          return dbModel === modelSearch || dbModel.includes(modelSearch) || modelSearch.includes(dbModel);
-        });
-      }).length;
-      totalAfterModelFilter = filteredCount;
-    }
-
+    const totalAfterModelFilter = allServices.length;
     const totalPages = Math.ceil(totalAfterModelFilter / limitNum);
-    console.log(`📄 Pagina ${pageNum} din ${totalPages} (${totalAfterModelFilter} total servicii)`);
+    
+    // Aplică paginăția
+    const paginatedServices = allServices.slice(skip, skip + limitNum);
+    
+    console.log(`📄 Pagina ${pageNum} din ${totalPages} (${totalAfterModelFilter} total servicii, afișate ${paginatedServices.length})`);
 
-    // ✅ RETURNEAZĂ FORMATUL CORECT CU PAGINAȚIE
+    // Răspuns cu paginăție
     res.json({
-      services: services,
+      services: paginatedServices,
       pagination: {
         currentPage: pageNum,
         totalPages: totalPages,

@@ -296,7 +296,7 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                 >
                   <div className="flex flex-col sm:flex-row">
                     {/* IMAGINEA SERVICIULUI - ACUM FOLOSEȘTE getFirstImageUrl() */}
-                    <div className="sm:w-48 h-32 sm:h-auto bg-gray-100 overflow-hidden">
+                    <div className="relative sm:w-48 h-32 sm:h-auto bg-gray-100 overflow-hidden">
                       {getServiceImage(service) ? (
                         <img
                           src={getServiceImage(service)}
@@ -317,9 +317,9 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                       )}
 
                       {/* BADGE PREȚ - ca în ServiceCard */}
-                      <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-red-600 font-bold px-3 py-1 rounded-lg shadow">
+                      {/* <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm text-red-600 font-bold px-3 py-1 rounded-lg shadow">
                         {service.repairPrice} {service.currency || 'LEI'}
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* DETALII SERVICIU */}
