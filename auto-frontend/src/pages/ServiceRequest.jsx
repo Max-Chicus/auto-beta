@@ -55,7 +55,7 @@ function ServiceRequest() {
       ]);
 
       setBrands(brandsRes.data.brands || []);
-      setServices(servicesRes.data || []);
+      setServices(servicesRes.data.services || servicesRes.data.data || []);
     } catch (err) {
       console.error('Eroare date:', err);
     }

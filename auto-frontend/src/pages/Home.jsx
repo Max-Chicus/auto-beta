@@ -667,7 +667,7 @@ function Home() {
                   <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                     <div className="aspect-w-4 aspect-h-3">
                       <img
-                        src={image.url.startsWith('http') ? image.url : image.url}
+                        src={getFullImageUrl(image.url)}
                         alt={image.alt}
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                         onError={(e) => {

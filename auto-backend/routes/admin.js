@@ -90,14 +90,37 @@ router.post('/brands', async (req, res) => {
       return res.status(400).json({ error: 'Brandul există deja' });
     }
 
-    // 🔥 IMPORTANT: Folosește direct URL-ul primit de la Vercel Blob
+    // 🔥 NOU: Transformă URL-ul complet în cale relativă
+    let logoPath = null;
+    if (logo) {
+      // Dacă e URL complet de la Vercel sau localhost, extrage doar calea
+      if (logo.includes('vercel-storage.com') || logo.includes('localhost') || logo.includes('127.0.0.1')) {
+        // Extrage partea după /uploads/
+        const match = logo.match(/\/uploads\/(.+)$/);
+        if (match) {
+          logoPath = `/uploads/${match[1]}`;
+        } else {
+          // Dacă nu găsește pattern-ul, folosește ca atare
+          logoPath = logo;
+        }
+      } else if (logo.startsWith('/uploads/')) {
+        // Deja e cale relativă corectă
+        logoPath = logo;
+      } else {
+        // Alt caz - păstrează originalul
+        logoPath = logo;
+      }
+    }
+
     const brandData = {
       name,
-      logo: logo || null  // logo este deja URL-ul complet de la Vercel
+      logo: logoPath  // ← Acum salvează calea relativă: /uploads/...
     };
 
     // Creează brandul
     const brand = await Brand.create(brandData);
+
+    console.log(`✅ Brand creat: ${name} cu logo: ${logoPath}`);
 
     res.status(201).json({
       message: 'Brand creat cu succes',
@@ -695,6 +718,7 @@ router.get('/gallery', async (req, res) => {
 });
 
 // POST imagine nouă în galerie
+// POST imagine nouă în galerie
 router.post('/gallery', async (req, res) => {
   console.log('🚀 CREATE GALLERY IMAGE REQUEST');
 
@@ -721,9 +745,37 @@ router.post('/gallery', async (req, res) => {
         return res.status(400).json({ error: 'URL-ul imaginii este obligatoriu' });
       }
 
+      // 🔥 NOU: Convertește URL-ul complet în cale relativă
+      let cleanUrl = img.url;
+      
+      // Dacă e URL de pe Vercel
+      if (cleanUrl.includes('vercel-storage.com')) {
+        const filename = cleanUrl.split('/').pop();
+        cleanUrl = `/uploads/${filename}`;
+        console.log(`   🔄 Convertit URL Vercel: ${cleanUrl}`);
+      }
+      // Dacă e URL cu localhost
+      else if (cleanUrl.includes('localhost:5000') || cleanUrl.includes('127.0.0.1:5000')) {
+        const match = cleanUrl.match(/\/uploads\/(.+)$/);
+        if (match) {
+          cleanUrl = `/uploads/${match[1]}`;
+          console.log(`   🔄 Convertit URL localhost: ${cleanUrl}`);
+        }
+      }
+      // Dacă e deja cale relativă, păstreaz-o
+      else if (cleanUrl.startsWith('/uploads/')) {
+        // Deja e corect
+        console.log(`   ✅ URL deja corect: ${cleanUrl}`);
+      }
+      // Altfel, încearcă să adauge /uploads/ dacă e doar nume de fișier
+      else if (!cleanUrl.startsWith('http')) {
+        cleanUrl = `/uploads/${cleanUrl}`;
+        console.log(`   🔄 Adăugat prefix /uploads/: ${cleanUrl}`);
+      }
+
       // Creează intrarea în galerie
       const galleryImage = new Gallery({
-        url: img.url,
+        url: cleanUrl,  // ← Acum salvează calea curată
         alt: img.alt || 'Galerie imagine',
         order: img.order || 0
       });
