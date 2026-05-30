@@ -205,6 +205,7 @@ router.get('/services/:id', async (req, res) => {
 });
 
 // CREATE service - CU SUPPORT PENTRU PREȚ FIX SAU PREȚ DE LA
+// CREATE service - CU CONVERSIE URL-URI IMAGINI
 router.post('/services', async (req, res) => {
   console.log('🚀 CREATE SERVICE REQUEST');
   console.log('📦 Date primite:', req.body);
@@ -227,11 +228,10 @@ router.post('/services', async (req, res) => {
         return res.status(400).json({ error: 'Pentru preț "de la", prețul minim al reparației este obligatoriu' });
       }
     } else {
-      // Dacă nu e specificat, setăm default la 'fixed'
       serviceData.repairPriceType = 'fixed';
     }
 
-    // Validare preț testare (mereu obligatoriu)
+    // Validare preț testare
     if (!serviceData.testPrice && serviceData.testPrice !== 0) {
       return res.status(400).json({ error: 'Prețul testării este obligatoriu' });
     }
@@ -280,13 +280,13 @@ router.post('/services', async (req, res) => {
       if (isNaN(serviceData.repairPrice)) {
         return res.status(400).json({ error: 'Prețul reparației trebuie să fie un număr' });
       }
-      serviceData.repairPriceFrom = null; // Curăță câmpul nefolosit
+      serviceData.repairPriceFrom = null;
     } else {
       serviceData.repairPriceFrom = Number(serviceData.repairPriceFrom);
       if (isNaN(serviceData.repairPriceFrom)) {
         return res.status(400).json({ error: 'Prețul minim al reparației trebuie să fie un număr' });
       }
-      serviceData.repairPrice = null; // Curăță câmpul nefolosit
+      serviceData.repairPrice = null;
     }
 
     // PROCESEAZĂ COMMONFAULTS
@@ -318,11 +318,16 @@ router.post('/services', async (req, res) => {
     if (!serviceData.duration) serviceData.duration = '2-3 zile lucrătoare';
     if (!serviceData.warranty) serviceData.warranty = '12 luni';
 
-    // VALIDARE IMAGINI
+    // ========== CONVERSIE URL-URI IMAGINI (SOLUȚIA PENTRU PROBLEMĂ) ==========
     if (serviceData.images && Array.isArray(serviceData.images)) {
       for (let i = 0; i < serviceData.images.length; i++) {
-        if (!serviceData.images[i].url) {
-          return res.status(400).json({ error: `Imaginea ${i + 1} nu are URL` });
+        if (serviceData.images[i].url) {
+          // Extrage doar numele fișierului din URL
+          let url = serviceData.images[i].url;
+          const filename = url.split('/').pop();
+          // Salvează doar calea relativă
+          serviceData.images[i].url = `/uploads/${filename}`;
+          console.log(`✅ Imagine serviciu salvată: /uploads/${filename}`);
         }
       }
     }
@@ -365,7 +370,7 @@ router.post('/services', async (req, res) => {
   }
 });
 
-// UPDATE service - CU SUPPORT PENTRU PREȚ FIX SAU PREȚ DE LA
+// UPDATE service - CU CONVERSIE URL-URI IMAGINI
 router.put('/services/:id', async (req, res) => {
   console.log('🔄 UPDATE SERVICE REQUEST');
   console.log('📦 Date primite:', req.body);
@@ -379,7 +384,7 @@ router.put('/services/:id', async (req, res) => {
     if (!serviceData.brand) return res.status(400).json({ error: 'Brandul este obligatoriu' });
     if (!serviceData.serviceType) return res.status(400).json({ error: 'Tipul serviciului este obligatoriu' });
 
-    // VALIDARE PREȚURI în funcție de tip
+    // VALIDARE PREȚURI
     if (serviceData.repairPriceType === 'fixed') {
       if (!serviceData.repairPrice && serviceData.repairPrice !== 0) {
         return res.status(400).json({ error: 'Pentru preț fix, prețul reparației este obligatoriu' });
@@ -390,17 +395,14 @@ router.put('/services/:id', async (req, res) => {
       }
     }
 
-    // Validare preț testare (mereu obligatoriu)
     if (!serviceData.testPrice && serviceData.testPrice !== 0) {
       return res.status(400).json({ error: 'Prețul testării este obligatoriu' });
     }
 
-    // Validare modele compatibile
     if (!serviceData.compatibleModels || serviceData.compatibleModels.length === 0) {
       return res.status(400).json({ error: 'Adaugă cel puțin un model compatibil' });
     }
 
-    // VALIDARE MODELE
     for (const [index, model] of serviceData.compatibleModels.entries()) {
       if (!model.modelName) return res.status(400).json({ error: `Modelul #${index + 1} nu are nume` });
       if (!model.yearFrom) return res.status(400).json({ error: `Modelul "${model.modelName}" nu are anul "de la"` });
@@ -420,7 +422,6 @@ router.put('/services/:id', async (req, res) => {
       }
     }
 
-    // CONVERTEȘTE PREȚURILE
     serviceData.testPrice = Number(serviceData.testPrice);
     if (isNaN(serviceData.testPrice)) {
       return res.status(400).json({ error: 'Prețul testării trebuie să fie un număr' });
@@ -431,16 +432,15 @@ router.put('/services/:id', async (req, res) => {
       if (isNaN(serviceData.repairPrice)) {
         return res.status(400).json({ error: 'Prețul reparației trebuie să fie un număr' });
       }
-      serviceData.repairPriceFrom = null; // Curăță câmpul nefolosit
+      serviceData.repairPriceFrom = null;
     } else if (serviceData.repairPriceType === 'from') {
       serviceData.repairPriceFrom = Number(serviceData.repairPriceFrom);
       if (isNaN(serviceData.repairPriceFrom)) {
         return res.status(400).json({ error: 'Prețul minim al reparației trebuie să fie un număr' });
       }
-      serviceData.repairPrice = null; // Curăță câmpul nefolosit
+      serviceData.repairPrice = null;
     }
 
-    // PROCESEAZĂ ENGINE CODES
     if (serviceData.compatibleModels) {
       serviceData.compatibleModels = serviceData.compatibleModels.map(model => ({
         modelName: model.modelName,
@@ -454,7 +454,17 @@ router.put('/services/:id', async (req, res) => {
       }));
     }
 
-    // Actualizează serviciul
+    // ========== CONVERSIE URL-URI IMAGINI LA UPDATE ==========
+    if (serviceData.images && Array.isArray(serviceData.images)) {
+      for (let i = 0; i < serviceData.images.length; i++) {
+        if (serviceData.images[i].url) {
+          const filename = serviceData.images[i].url.split('/').pop();
+          serviceData.images[i].url = `/uploads/${filename}`;
+          console.log(`✅ Imagine serviciu actualizată: /uploads/${filename}`);
+        }
+      }
+    }
+
     const service = await Service.findByIdAndUpdate(
       serviceId,
       serviceData,
@@ -481,19 +491,17 @@ router.put('/services/:id', async (req, res) => {
   }
 });
 
-// DELETE service - Șterge un serviciu
+// DELETE service
 router.delete('/services/:id', async (req, res) => {
   console.log('🗑️ DELETE service:', req.params.id);
 
   try {
     const { id } = req.params;
 
-    // Verifică dacă ID-ul este valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'ID invalid' });
     }
 
-    // Găsește și șterge serviciul
     const service = await Service.findByIdAndDelete(id);
 
     if (!service) {
