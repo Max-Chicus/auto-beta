@@ -178,144 +178,90 @@ function ServiceRequest() {
 
       const savedRequestId = res.data.requestNumber || res.data._id;
       console.log('✅ Cerere salvată în DB cu ID:', savedRequestId);
-
       // ============================================
       // PAS 2: TRIMITE EMAIL CU WEB3FORMS
       // ============================================
 
-      // ============================================
-      // 🚨 ATENȚIE: ÎNLOCUIEȘTE URMĂTOAREA CHEIE CU ACCESS KEY-UL TĂU REAL DE LA WEB3FORMS.COM
-      // Obține cheia de la: https://web3forms.com > Dashboard > Access Keys
-      // ============================================
-      const WEB3FORMS_ACCESS_KEY = 'ecbd0ae9-c840-4c34-a062-9be43ec689f5'; // <-- ÎNLOCUIEȚTE ACEASTĂ CHEIE!
-      // Exemplu: '12345678-1234-1234-1234-123456789012'
-      // ============================================
+      const WEB3FORMS_ACCESS_KEY = 'ecbd0ae9-c840-4c34-a062-9be43ec689f5';
 
       const emailData = {
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🔔 CERERE SERVICIU NOUĂ: ${cleanData.customer.name} - ${brandName} ${cleanData.vehicle.model}`,
         from_name: 'Derstronik Electronic',
-        botcheck: '', // Lăsat gol pentru protecție anti-spam
+        botcheck: '',
 
-        // Conținut HTML pentru email
-        html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-    .content { background: #f9f9f9; padding: 25px; border: 1px solid #ddd; border-radius: 0 0 10px 10px; }
-    .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-    .label { font-weight: bold; color: #555; min-width: 150px; display: inline-block; }
-    .status-new { 
-      background: #fef3c7; 
-      color: #92400e; 
-      padding: 8px 15px; 
-      border-radius: 20px; 
-      font-weight: bold; 
-      display: inline-block; 
-      margin: 10px 0; 
-      font-size: 14px;
-    }
-    .highlight { background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; }
-    .footer { margin-top: 25px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center; }
-    h2 { color: #dc2626; margin-top: 0; font-size: 18px; }
-    .info-box { background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 10px 15px; margin: 10px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1 style="margin: 0; font-size: 24px;">🚨 CERERE SERVICIU NOUĂ</h1>
-    </div>
-    
-    <div class="content">
-      <div class="highlight">
-        <div class="status-new">📋 STATUS: NOUĂ - NECESITĂ ACȚIUNE</div>
-        <p><strong>🔢 Nr. cerere:</strong> ${savedRequestId}</p>
-        <p><strong>📅 Data primirii:</strong> ${new Date().toLocaleString('ro-RO')}</p>
-      </div>
-      
-      <div class="section">
-        <h2>👤 DATE CLIENT</h2>
-        <p><span class="label">Nume:</span> ${cleanData.customer.name}</p>
-        <p><span class="label">Telefon:</span> <a href="tel:${cleanData.customer.phone}" style="color: #dc2626; text-decoration: none;">${cleanData.customer.phone}</a></p>
-        ${cleanData.customer.email ? `<p><span class="label">Email:</span> <a href="mailto:${cleanData.customer.email}" style="color: #2563eb;">${cleanData.customer.email}</a></p>` : ''}
-        ${cleanData.customer.city ? `<p><span class="label">Oraș:</span> ${cleanData.customer.city}</p>` : ''}
-      </div>
-      
-      <div class="section">
-        <h2>🚗 DATE VEHICUL</h2>
-        <p><span class="label">Marcă:</span> ${brandName}</p>
-        <p><span class="label">Model:</span> ${cleanData.vehicle.model}</p>
-        <p><span class="label">An fabricație:</span> ${cleanData.vehicle.year}</p>
-        ${cleanData.vehicle.vin ? `<p><span class="label">Serie șasiu (VIN):</span> ${cleanData.vehicle.vin}</p>` : ''}
-        ${cleanData.vehicle.registration ? `<p><span class="label">Înmatriculare:</span> ${cleanData.vehicle.registration}</p>` : ''}
-        ${cleanData.vehicle.notes ? `<div class="info-box"><strong>Observații client:</strong><br>${cleanData.vehicle.notes}</div>` : ''}
-      </div>
-      
-      ${serviceName || cleanData.serviceId ? `
-      <div class="section">
-        <h2>🔧 SERVICIU SOLICITAT</h2>
-        <p><span class="label">Serviciu:</span> ${serviceName || 'Serviciu selectat din listă'}</p>
-        ${selectedService ? `<p><span class="label">Preț estimativ:</span> ${selectedService.repairPrice} ${selectedService.currency}</p>` : ''}
-        ${selectedService?.duration ? `<p><span class="label">Durată estimată:</span> ${selectedService.duration}</p>` : ''}
-      </div>
-      ` : ''}
-      
-      ${cleanData.issueDescription ? `
-      <div class="section">
-        <h2>📝 DESCRIEREA PROBLEMEI</h2>
-        <div class="info-box">${cleanData.issueDescription}</div>
-      </div>
-      ` : ''}
-      
-      ${cleanData.symptoms && cleanData.symptoms.length > 0 ? `
-      <div class="section">
-        <h2>⚠️ SIMPTOME MENȚIONATE</h2>
-        <ul style="margin-left: 20px;">
-          ${cleanData.symptoms.map(s => `<li>${s}</li>`).join('')}
-        </ul>
-      </div>
-      ` : ''}
-      
-      ${cleanData.errorCodes && cleanData.errorCodes.length > 0 ? `
-      <div class="section">
-        <h2>🔢 CODURI EROARE</h2>
-        <p><strong>Coduri:</strong> ${cleanData.errorCodes.join(', ')}</p>
-      </div>
-      ` : ''}
-      
-      <div class="section">
-        <h2>⏰ PREFERINȚE CONTACT</h2>
-        <p><span class="label">Interval orar preferat:</span> ${cleanData.preferredContactTime || 'Orice oră'}</p>
-      </div>
-      
-      <div class="info-box">
-        <p><strong>💡 ACȚIUNE NECESARĂ:</strong> Contactează clientul în cel mult 30 de minute!</p>
-        <p><strong>📞 Sună la:</strong> <a href="tel:${cleanData.customer.phone}" style="color: #dc2626; font-weight: bold; text-decoration: none;">${cleanData.customer.phone}</a></p>
-      </div>
-    </div>
-    
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} Atelier Auto - Acest email a fost generat automat de pe website</p>
-      <p><small>ID cerere: ${savedRequestId} • Sursă: Website • Timestamp: ${new Date().toISOString()}</small></p>
-    </div>
-  </div>
-</body>
-</html>
-        `,
+        // Folosește 'message' în loc de 'html'
+        message: `
+🚨 CERERE SERVICIU NOUĂ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        // Date suplimentare pentru dashboard-ul Web3Forms
-        customer_name: cleanData.customer.name,
-        customer_phone: cleanData.customer.phone,
-        customer_email: cleanData.customer.email || 'Nespecificat',
-        vehicle_info: `${brandName} ${cleanData.vehicle.model} (${cleanData.vehicle.year})`,
-        request_id: savedRequestId,
-        request_status: 'new'
+📋 STATUS: NOUĂ - NECESITĂ ACȚIUNE
+🔢 Nr. cerere: ${savedRequestId}
+📅 Data primirii: ${new Date().toLocaleString('ro-RO')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👤 DATE CLIENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Nume: ${cleanData.customer.name}
+Telefon: ${cleanData.customer.phone}
+${cleanData.customer.email ? `Email: ${cleanData.customer.email}` : ''}
+${cleanData.customer.city ? `Oraș: ${cleanData.customer.city}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚗 DATE VEHICUL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Marcă: ${brandName}
+Model: ${cleanData.vehicle.model}
+An fabricație: ${cleanData.vehicle.year}
+${cleanData.vehicle.vin ? `Serie șasiu (VIN): ${cleanData.vehicle.vin}` : ''}
+${cleanData.vehicle.registration ? `Înmatriculare: ${cleanData.vehicle.registration}` : ''}
+${cleanData.vehicle.notes ? `Observații vehicul: ${cleanData.vehicle.notes}` : ''}
+
+${serviceName || cleanData.serviceId ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 SERVICIU SOLICITAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Serviciu: ${serviceName || 'Serviciu selectat din listă'}
+${selectedService ? `Preț estimativ: ${selectedService.repairPrice} ${selectedService.currency}` : ''}
+${selectedService?.duration ? `Durată estimată: ${selectedService.duration}` : ''}
+` : ''}
+
+${cleanData.issueDescription ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 DESCRIEREA PROBLEMEI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${cleanData.issueDescription}
+` : ''}
+
+${cleanData.symptoms && cleanData.symptoms.length > 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ SIMPTOME MENȚIONATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${cleanData.symptoms.map(s => `• ${s}`).join('\n')}
+` : ''}
+
+${cleanData.errorCodes && cleanData.errorCodes.length > 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔢 CODURI EROARE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${cleanData.errorCodes.join(', ')}
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏰ PREFERINȚE CONTACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Interval orar preferat: ${cleanData.preferredContactTime || 'Orice oră'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 ACȚIUNE NECESARĂ:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Contactează clientul în cel mult 30 de minute!
+📞 Sună la: ${cleanData.customer.phone}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+© ${new Date().getFullYear()} Atelier Auto
+ID cerere: ${savedRequestId} • Sursă: Website
+  `
       };
 
       console.log('📧 Se trimite email via Web3Forms...');
@@ -336,7 +282,6 @@ function ServiceRequest() {
         console.log('✅ Email trimis cu succes via Web3Forms!');
       } else {
         console.warn('⚠️ Email-ul nu a putut fi trimis, dar cererea este salvată în DB:', emailResult.message);
-        // Nu aruncăm eroare, continuăm pentru că cererea e salvată în DB
       }
 
       // ============================================
