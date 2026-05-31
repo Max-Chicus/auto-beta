@@ -8,16 +8,41 @@ require('dotenv').config();
 const app = express();
 connectDB();
 
-// CORS configurat pentru production + development
+// ========== CORS CONFIGURAT COMPLET ==========
+const allowedOrigins = [
+  'http://localhost:5173',                    // Frontend local (Vite)
+  'http://localhost:3000',                    // Frontend local (alternativ)
+  'https://auto-beta-front.vercel.app',       // Frontend pe Vercel (vechi)
+  'https://auto-beta.vercel.app',             // Frontend pe Vercel (alternativ)
+  'https://derstronik.md',                    // Noul tău domeniu (fără www)
+  'https://www.derstronik.md',                // Noul tău domeniu (cu www)
+  'https://auto-beta.onrender.com'            // Backend-ul însuși (pentru teste)
+];
+
 const corsOptions = {
-  origin: ['https://auto-beta-front.vercel.app', 'http://localhost:5173'],
+  origin: function(origin, callback) {
+    // Permite cereri fără origin (ex: Postman, aplicații mobile, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('❌ CORS blocat pentru originea:', origin);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
 
-// Middleware pentru body parsing (MARE IMPORTANȚĂ să fie înainte de rute!)
+// Middleware pentru body parsing
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({
   limit: '50mb',
@@ -25,13 +50,14 @@ app.use(express.urlencoded({
   parameterLimit: 100000
 }));
 
-// Debug middleware - DOAR O DATĂ
+// Debug middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log(`  Origin: ${req.headers.origin || 'No origin'}`);
   next();
 });
 
-// ✅ SERVESTE FIȘIERELE STATICE CORECT
+// Servește fișierele statice
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsPath, {
   maxAge: '30d',
@@ -41,7 +67,7 @@ app.use('/uploads', express.static(uploadsPath, {
   }
 }));
 
-// RUTA DE BAZĂ - pentru a evita "Not Found"
+// Rutele de bază
 app.get('/', (req, res) => {
   res.json({
     message: 'Auto Beta Backend API',
@@ -59,7 +85,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// RUTA API DE BAZĂ
 app.get('/api', (req, res) => {
   res.json({
     message: 'Auto Beta API v1.0',
@@ -69,7 +94,6 @@ app.get('/api', (req, res) => {
   });
 });
 
-// RUTA DE TEST pentru CORS
 app.get('/test-cors', (req, res) => {
   res.json({
     message: 'CORS is working!',
