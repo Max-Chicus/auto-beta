@@ -2,11 +2,30 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const uploadRouter = require('./routes/upload');
 require('dotenv').config();
 
 const app = express();
 connectDB();
+
+// ========== DETERMINĂ CALEA CORECTĂ PENTRU UPLOADS ==========
+let uploadsDir;
+if (process.env.RENDER) {
+  // Pe Render: folosește calea persistentă a discului
+  uploadsDir = '/opt/render/project/data/uploads';
+  console.log('📡 Rulează pe Render, folosește disk persistent:', uploadsDir);
+} else {
+  // Pe Windows (local): folosește calea relativă
+  uploadsDir = path.join(__dirname, 'uploads');
+  console.log('💻 Rulează local, folosește folderul:', uploadsDir);
+}
+
+// Asigură-te că directorul uploads există
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('✅ Director uploads creat:', uploadsDir);
+}
 
 // ========== CORS CONFIGURAT COMPLET ==========
 const allowedOrigins = [
@@ -57,9 +76,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Servește fișierele statice
-const uploadsPath = path.join(__dirname, 'uploads');
-app.use('/uploads', express.static(uploadsPath, {
+// ========== SERVEȘTE FIȘIERELE STATICE DIN CALEA CORECTĂ ==========
+app.use('/uploads', express.static(uploadsDir, {
   maxAge: '30d',
   setHeaders: (res, filePath) => {
     res.set('Cache-Control', 'public, max-age=2592000');

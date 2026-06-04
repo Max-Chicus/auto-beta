@@ -6,8 +6,19 @@ const fs = require('fs');
 
 console.log('✅ Upload router loaded - using LOCAL storage');
 
+// ========== DETERMINĂ CALEA CORECTĂ PENTRU UPLOADS ==========
+let uploadDir;
+if (process.env.RENDER) {
+  // Pe Render: folosește calea persistentă a discului
+  uploadDir = '/opt/render/project/data/uploads';
+  console.log('📡 Rulează pe Render, folosește disk persistent:', uploadDir);
+} else {
+  // Pe Windows (local): folosește calea relativă
+  uploadDir = path.join(__dirname, '../uploads');
+  console.log('💻 Rulează local, folosește folderul:', uploadDir);
+}
+
 // Asigură-te că directorul uploads există
-const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   console.log('✅ Director uploads creat:', uploadDir);
