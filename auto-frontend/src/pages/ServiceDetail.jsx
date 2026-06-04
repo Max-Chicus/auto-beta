@@ -9,29 +9,27 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 function ServiceDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { brandSlug, serviceSlug } = useParams(); const navigate = useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedServices, setRelatedServices] = useState([]);
 
   useEffect(() => {
-    fetchService();
-  }, [id]);
+    if (brandSlug && serviceSlug) {
+      fetchServiceBySlug();
+    }
+  }, [brandSlug, serviceSlug]);
 
-  const fetchService = async () => {
+  const fetchServiceBySlug = async () => {
     try {
-      const [serviceRes, relatedRes] = await Promise.all([
-        API.get(`/services/${id}`),
-        API.get('/services?limit=4')
-      ]);
+      const res = await API.get(`/services/slug/${brandSlug}/${serviceSlug}`);
+      setService(res.data);
 
-      setService(serviceRes.data);
-
-      const filteredRelated = relatedRes.data
-        .filter(s => s._id !== id)
-        .slice(0, 3);
-
+      // Încarcă servicii similare
+      const relatedRes = await API.get('/services?limit=4');
+      const filteredRelated = relatedRes.data.services
+        ? relatedRes.data.services.filter(s => s._id !== res.data._id).slice(0, 3)
+        : relatedRes.data.filter(s => s._id !== res.data._id).slice(0, 3);
       setRelatedServices(filteredRelated);
     } catch (err) {
       console.error('Eroare serviciu:', err);
@@ -62,7 +60,7 @@ function ServiceDetail() {
   const handleRequestService = () => {
     navigate('/request-service', {
       state: {
-        serviceId: id,
+        serviceId: service._id,
         serviceName: service?.name
       }
     });
@@ -175,7 +173,7 @@ function ServiceDetail() {
                 <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-2xl shadow-lg overflow-hidden">
                   <div className="absolute -top-3 -left-3 w-12 h-12 bg-red-100 rounded-full opacity-50 blur-sm"></div>
                   <div className="absolute -bottom-3 -right-3 w-16 h-16 bg-blue-100 rounded-full opacity-50 blur-sm"></div>
-                  
+
                   <div className="relative">
                     <Swiper
                       modules={[Autoplay, Pagination, Navigation]}
@@ -186,7 +184,7 @@ function ServiceDetail() {
                         disableOnInteraction: false,
                         pauseOnMouseEnter: true,
                       }}
-                      pagination={{ 
+                      pagination={{
                         clickable: true,
                         dynamicBullets: true,
                       }}
@@ -202,7 +200,7 @@ function ServiceDetail() {
                                 src={url}
                                 alt={`${service.name} - Imagine ${index + 1}`}
                                 className="absolute top-0 left-0 w-full h-full object-contain bg-white"
-                                onError={(e) => { 
+                                onError={(e) => {
                                   e.target.onerror = null;
                                   e.target.src = 'https://via.placeholder.com/800x600?text=Imagine+indisponibila';
                                 }}

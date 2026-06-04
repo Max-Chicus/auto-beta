@@ -19,6 +19,12 @@ const brandSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true
   }
 }, {
   timestamps: true

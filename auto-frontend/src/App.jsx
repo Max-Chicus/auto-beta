@@ -32,7 +32,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<ServiceCatalog />} />
-          <Route path="/service/:id" element={<ServiceDetail />} />
+          <Route path="/servicii/:brandSlug/:serviceSlug" element={<ServiceDetail />} />
+          <Route path="/service/:id" element={<Navigate to="/services" />} />
           <Route path="/request-service" element={<ServiceRequest />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />

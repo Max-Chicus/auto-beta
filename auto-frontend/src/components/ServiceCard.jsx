@@ -37,7 +37,7 @@ function ServiceCard({ service }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-red-300 transition-all duration-300">
       {/* IMAGINE SERVICIU - click duce la detalii */}
-      <Link to={`/service/${service._id}`} className="block">
+      <Link to={`/servicii/${service.brandSlug}/${service.slug.split('/').pop()}`} className="block">
         <div className="h-48 bg-gray-100 relative overflow-hidden">
           {imageUrl ? (
             <img
@@ -111,10 +111,9 @@ function ServiceCard({ service }) {
 
               {/* NUME SERVICIU */}
               <div className="flex-1">
-                <Link to={`/service/${service._id}`}>
-                  <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-1 hover:text-red-600 transition-colors">
-                    {service.name}
-                  </h3>
+                <Link to={`/servicii/${service.brand?.slug || service.brand}/${service.slug?.split('/').pop() || service._id}`}>                  <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-1 hover:text-red-600 transition-colors">
+                  {service.name}
+                </h3>
                 </Link>
                 <p className="text-sm text-gray-600">
                   {brandName}
@@ -195,7 +194,7 @@ function ServiceCard({ service }) {
         {/* BUTOANE ACȚIUNE - VERSIUNE CU 2 BUTOANE FRUMOASE */}
         <div className="grid grid-cols-2 gap-3 mt-4">
           <Link
-            to={`/service/${service._id}`}
+            to={`/servicii/${service.brandSlug}/${service.slug.split('/').pop()}`}
             className="bg-gray-50 hover:bg-red-50 text-red-600 font-medium py-2.5 px-3 rounded-lg transition-colors border border-gray-200 hover:border-red-200 hover:shadow-sm text-sm text-center"
           >
             Vezi detalii

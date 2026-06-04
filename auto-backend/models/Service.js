@@ -34,6 +34,16 @@ const CompatibleModelSchema = new mongoose.Schema({
   notes: {
     type: String,
     trim: true
+  },
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true
+  },
+  brandSlug: {
+    type: String,
+    trim: true
   }
 }, { _id: false });
 
@@ -87,7 +97,7 @@ const ServiceSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  
+
   // Tip preț pentru reparație: 'fixed' sau 'from'
   repairPriceType: {
     type: String,
@@ -106,7 +116,7 @@ const ServiceSchema = new mongoose.Schema({
     min: 0,
     default: null
   },
-  
+
   // Preț testare - mereu fix
   testPrice: {
     type: Number,
@@ -114,7 +124,7 @@ const ServiceSchema = new mongoose.Schema({
     min: 0,
     default: 0
   },
-  
+
   currency: {
     type: String,
     default: 'EUR',

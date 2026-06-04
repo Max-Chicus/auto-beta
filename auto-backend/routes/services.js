@@ -77,7 +77,7 @@ router.get('/', async (req, res) => {
 
     // 🔥 CHEIE: Ia TOATE serviciile care îndeplinesc condițiile
     let allServices = await Service.find(query)
-      .populate('brand', 'name logo')
+      .populate('brand', 'name logo slug')
       .populate('serviceType', 'name icon')
       .sort({ featured: -1, popularity: -1, name: 1 })
       .lean();
@@ -88,7 +88,7 @@ router.get('/', async (req, res) => {
     if (model && model.trim() !== '') {
       console.log('🎯 FILTREZ DUPA MODEL:', model);
       const modelSearch = model.toLowerCase().trim();
-      
+
       allServices = allServices.filter(service => {
         if (!service.compatibleModels || service.compatibleModels.length === 0) {
           return false;
@@ -110,7 +110,7 @@ router.get('/', async (req, res) => {
       console.log('🎯 FILTREZ DUPA MODEL + AN:', model, year);
       const modelSearch = model.toLowerCase().trim();
       const yearNum = parseInt(year);
-      
+
       allServices = allServices.filter(service => {
         if (!service.compatibleModels) return false;
         return service.compatibleModels.some(cm => {
@@ -130,13 +130,13 @@ router.get('/', async (req, res) => {
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
-    
+
     const totalAfterModelFilter = allServices.length;
     const totalPages = Math.ceil(totalAfterModelFilter / limitNum);
-    
+
     // Aplică paginăția
     const paginatedServices = allServices.slice(skip, skip + limitNum);
-    
+
     console.log(`📄 Pagina ${pageNum} din ${totalPages} (${totalAfterModelFilter} total servicii, afișate ${paginatedServices.length})`);
 
     // Răspuns cu paginăție
@@ -164,9 +164,9 @@ router.get('/newest', async (req, res) => {
     const { limit = 6 } = req.query;
 
     const services = await Service.find({ isActive: true })
-      .populate('brand', 'name logo')
+      .populate('brand', 'name logo slug')
       .populate('serviceType', 'name icon')
-      .sort({ createdAt: -1 }) // Sortează după data creării (cele mai noi)
+      .sort({ createdAt: -1 })
       .limit(parseInt(limit));
 
     res.json(services);
@@ -191,11 +191,10 @@ router.get('/for-vehicle', async (req, res) => {
       brand: brandId,
       isActive: true
     })
-      .populate('brand', 'name logo')
+      .populate('brand', 'name logo slug')
       .populate('serviceType', 'name icon')
       .sort({ serviceType: 1, name: 1 });
 
-    // Filtrează serviciile compatibile
     const compatibleServices = services.filter(service =>
       service.compatibleModels.some(cm => {
         const matchesModel = cm.modelName.toLowerCase().includes(modelName.toLowerCase()) ||
@@ -216,14 +215,13 @@ router.get('/for-vehicle', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const service = await Service.findById(req.params.id)
-      .populate('brand', 'name logo')
+      .populate('brand', 'name logo slug')
       .populate('serviceType', 'name icon');
 
     if (!service) {
       return res.status(404).json({ error: 'Serviciul nu a fost găsit' });
     }
 
-    // Incrementează popularitatea
     service.popularity += 1;
     await service.save();
 
@@ -240,6 +238,51 @@ router.get('/types/all', async (req, res) => {
     const serviceTypes = await ServiceType.find({ isActive: true }).sort({ name: 1 });
     res.json(serviceTypes);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET service by slug (brand-slug/service-slug)
+router.get('/slug/:brandSlug/:serviceSlug', async (req, res) => {
+  try {
+    const { brandSlug, serviceSlug } = req.params;
+    const fullSlug = `${brandSlug}/${serviceSlug}`;
+
+    const service = await Service.findOne({ slug: fullSlug })
+      .populate('brand', 'name logo slug')
+      .populate('serviceType', 'name icon');
+
+    if (!service) {
+      return res.status(404).json({ error: 'Serviciul nu a fost găsit' });
+    }
+
+    service.popularity += 1;
+    await service.save();
+
+    res.json(service);
+  } catch (err) {
+    console.error('Eroare la căutarea serviciului după slug:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET all service slugs (pentru sitemap dinamic)
+router.get('/all-slugs', async (req, res) => {
+  try {
+    const services = await Service.find({ isActive: true }, 'slug updatedAt name')
+      .populate('brand', 'slug name');
+
+    const slugs = services.map(service => ({
+      slug: service.slug,
+      brandSlug: service.brand?.slug,
+      brandName: service.brand?.name,
+      serviceName: service.name,
+      updatedAt: service.updatedAt
+    }));
+
+    res.json(slugs);
+  } catch (err) {
+    console.error('Eroare la obținerea slug-urilor:', err);
     res.status(500).json({ error: err.message });
   }
 });
