@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import API from '../api/api';
 import ServiceCard from '../components/ServiceCard';
+import { Helmet } from 'react-helmet-async';
 
 function ServiceCatalog() {
   const [searchParams] = useSearchParams();
@@ -148,225 +149,254 @@ function ServiceCatalog() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Servicii de reparație auto</h1>
+    <>
+      <Helmet>
+        <title>Servicii | Derstronik - Reparații ECU, ABS, Airbag, Panou Bord</title>
+        <meta name="description" content="Catalog complet al serviciilor noastre: reparații unități motor (ECU), ABS, ESP, Airbag, panouri de bord, programare chei auto și camioane." />
+        <link rel="canonical" href="https://www.derstronik.md/services" />
+        {/* Breadcrumbs JSON-LD */}
+        <script type="application/ld+json">
+          {`{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Acasă",
+              "item": "https://www.derstronik.md/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Servicii",
+              "item": "https://www.derstronik.md/services"
+            }
+          ]
+          }`}
+        </script>
+      </Helmet>
+      <div className="max-w-7xl mx-auto py-8 px-4">
+        {/* HEADER */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Servicii de reparație auto</h1>
 
-        {/* Afișează mesajul pentru tipul de serviciu selectat */}
-        {filters.serviceType && selectedServiceType && (
-          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-800 flex items-center flex-wrap gap-2">
-              <span className="text-2xl">{selectedServiceType.icon}</span>
-              <span className="font-bold">
-                Servicii pentru: {selectedServiceType.name}
-              </span>
-              <button
-                onClick={resetAllFilters}
-                className="ml-auto text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-              >
-                Șterge filtrul
-              </button>
-            </p>
-          </div>
-        )}
-
-        {/* Afișează mesajul pentru model selectat */}
-        {filters.model && selectedBrand && !filters.serviceType && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-blue-800">
-              🔍 Căutare pentru: <span className="font-bold">{selectedBrand.name} {filters.model}</span>
-              <button
-                onClick={resetAllFilters}
-                className="ml-4 text-sm text-blue-600 hover:text-blue-800 underline"
-              >
-                Șterge filtrele
-              </button>
-            </p>
-          </div>
-        )}
-
-        <p className="text-gray-600 mt-2">
-          Servicii profesionale pentru toate mărcile și modelele
-        </p>
-      </div>
-
-      {/* FILTRE RAPIDE */}
-      <div className="flex flex-col md:flex-row gap-4 mb-8 p-6 bg-gray-50 rounded-xl">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Marcă
-          </label>
-          <select
-            value={filters.brand}
-            onChange={(e) => handleFilterChange('brand', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2"
-          >
-            <option value="">Toate mărcile</option>
-            {brands.map(b => (
-              <option key={b._id} value={b._id}>{b.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tip serviciu
-          </label>
-          <select
-            value={filters.serviceType}
-            onChange={(e) => handleFilterChange('serviceType', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2"
-          >
-            <option value="">Toate tipurile</option>
-            {serviceTypes.map(st => (
-              <option key={st._id} value={st._id}>
-                {st.icon} {st.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Căutare
-          </label>
-          <input
-            type="text"
-            value={filters.search}
-            onChange={(e) => handleFilterChange('search', e.target.value)}
-            placeholder="Nume serviciu..."
-            className="w-full border border-gray-300 rounded-lg px-4 py-2"
-          />
-        </div>
-      </div>
-
-      {/* REZULTATE */}
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-          <p className="mt-4 text-gray-600">Se încarcă serviciile...</p>
-        </div>
-      ) : services.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border">
-          <h3 className="text-xl font-semibold text-gray-700">Nu s-au găsit servicii</h3>
-          <p className="text-gray-600 mt-2 mb-6">
-            {filters.serviceType
-              ? `Nu există servicii pentru tipul: ${selectedServiceType?.name || ''}`
-              : filters.model
-                ? `Nu există servicii pentru ${selectedBrand?.name || ''} ${filters.model}`
-                : 'Încearcă alte filtre'}
-          </p>
-          <Link
-            to="/request-service"
-            className="inline-block bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700"
-          >
-            Solicită serviciu personalizat
-          </Link>
-        </div>
-      ) : (
-        <>
-          <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
-            <p className="text-gray-600">
-              <strong>{totalItems}</strong> servicii găsite
-              {filters.serviceType && ` pentru ${selectedServiceType?.name}`}
-              {filters.model && !filters.serviceType && ` pentru ${selectedBrand?.name || ''} ${filters.model}`}
-              <span className="text-sm text-gray-500 ml-2">
-                (Pagina {currentPage} din {totalPages})
-              </span>
-            </p>
-            <button
-              onClick={resetAllFilters}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
-              Resetează filtrele
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map(service => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
-
-          {/* PAGINAȚIE */}
-          {totalPages > 1 && (
-            <div className="mt-12 flex justify-center items-center gap-2 flex-wrap">
-              {/* Buton Previous */}
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-              >
-                ← Anterior
-              </button>
-
-              {/* Prima pagină dacă nu e în range */}
-              {getPageNumbers()[0] > 1 && (
-                <>
-                  <button
-                    onClick={() => setCurrentPage(1)}
-                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-                  >
-                    1
-                  </button>
-                  {getPageNumbers()[0] > 2 && <span className="px-2">...</span>}
-                </>
-              )}
-
-              {/* Numerele paginilor */}
-              {getPageNumbers().map(pageNum => (
+          {/* Afișează mesajul pentru tipul de serviciu selectat */}
+          {filters.serviceType && selectedServiceType && (
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-800 flex items-center flex-wrap gap-2">
+                <span className="text-2xl">{selectedServiceType.icon}</span>
+                <span className="font-bold">
+                  Servicii pentru: {selectedServiceType.name}
+                </span>
                 <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === pageNum
-                      ? 'bg-red-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                  onClick={resetAllFilters}
+                  className="ml-auto text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
                 >
-                  {pageNum}
+                  Șterge filtrul
                 </button>
-              ))}
-
-              {/* Ultima pagină dacă nu e în range */}
-              {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
-                <>
-                  {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
-                    <span className="px-2">...</span>
-                  )}
-                  <button
-                    onClick={() => setCurrentPage(totalPages)}
-                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-                  >
-                    {totalPages}
-                  </button>
-                </>
-              )}
-
-              {/* Buton Next */}
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-              >
-                Următoarea →
-              </button>
+              </p>
             </div>
           )}
 
-          {/* Informație suplimentară */}
-          <div className="mt-6 text-center text-sm text-gray-500">
-            Afișate {services.length} din {totalItems} servicii
+          {/* Afișează mesajul pentru model selectat */}
+          {filters.model && selectedBrand && !filters.serviceType && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-800">
+                🔍 Căutare pentru: <span className="font-bold">{selectedBrand.name} {filters.model}</span>
+                <button
+                  onClick={resetAllFilters}
+                  className="ml-4 text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  Șterge filtrele
+                </button>
+              </p>
+            </div>
+          )}
+
+          <p className="text-gray-600 mt-2">
+            Servicii profesionale pentru toate mărcile și modelele
+          </p>
+        </div>
+
+        {/* FILTRE RAPIDE */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8 p-6 bg-gray-50 rounded-xl">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Marcă
+            </label>
+            <select
+              value={filters.brand}
+              onChange={(e) => handleFilterChange('brand', e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            >
+              <option value="">Toate mărcile</option>
+              {brands.map(b => (
+                <option key={b._id} value={b._id}>{b.name}</option>
+              ))}
+            </select>
           </div>
-        </>
-      )}
-    </div>
+
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tip serviciu
+            </label>
+            <select
+              value={filters.serviceType}
+              onChange={(e) => handleFilterChange('serviceType', e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            >
+              <option value="">Toate tipurile</option>
+              {serviceTypes.map(st => (
+                <option key={st._id} value={st._id}>
+                  {st.icon} {st.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Căutare
+            </label>
+            <input
+              type="text"
+              value={filters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              placeholder="Nume serviciu..."
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            />
+          </div>
+        </div>
+
+        {/* REZULTATE */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+            <p className="mt-4 text-gray-600">Se încarcă serviciile...</p>
+          </div>
+        ) : services.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border">
+            <h3 className="text-xl font-semibold text-gray-700">Nu s-au găsit servicii</h3>
+            <p className="text-gray-600 mt-2 mb-6">
+              {filters.serviceType
+                ? `Nu există servicii pentru tipul: ${selectedServiceType?.name || ''}`
+                : filters.model
+                  ? `Nu există servicii pentru ${selectedBrand?.name || ''} ${filters.model}`
+                  : 'Încearcă alte filtre'}
+            </p>
+            <Link
+              to="/request-service"
+              className="inline-block bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700"
+            >
+              Solicită serviciu personalizat
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
+              <p className="text-gray-600">
+                <strong>{totalItems}</strong> servicii găsite
+                {filters.serviceType && ` pentru ${selectedServiceType?.name}`}
+                {filters.model && !filters.serviceType && ` pentru ${selectedBrand?.name || ''} ${filters.model}`}
+                <span className="text-sm text-gray-500 ml-2">
+                  (Pagina {currentPage} din {totalPages})
+                </span>
+              </p>
+              <button
+                onClick={resetAllFilters}
+                className="text-sm text-red-600 hover:text-red-800"
+              >
+                Resetează filtrele
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map(service => (
+                <ServiceCard key={service._id} service={service} />
+              ))}
+            </div>
+
+            {/* PAGINAȚIE */}
+            {totalPages > 1 && (
+              <div className="mt-12 flex justify-center items-center gap-2 flex-wrap">
+                {/* Buton Previous */}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                >
+                  ← Anterior
+                </button>
+
+                {/* Prima pagină dacă nu e în range */}
+                {getPageNumbers()[0] > 1 && (
+                  <>
+                    <button
+                      onClick={() => setCurrentPage(1)}
+                      className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                    >
+                      1
+                    </button>
+                    {getPageNumbers()[0] > 2 && <span className="px-2">...</span>}
+                  </>
+                )}
+
+                {/* Numerele paginilor */}
+                {getPageNumbers().map(pageNum => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === pageNum
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+
+                {/* Ultima pagină dacă nu e în range */}
+                {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+                  <>
+                    {getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1 && (
+                      <span className="px-2">...</span>
+                    )}
+                    <button
+                      onClick={() => setCurrentPage(totalPages)}
+                      className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                    >
+                      {totalPages}
+                    </button>
+                  </>
+                )}
+
+                {/* Buton Next */}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === totalPages
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                >
+                  Următoarea →
+                </button>
+              </div>
+            )}
+
+            {/* Informație suplimentară */}
+            <div className="mt-6 text-center text-sm text-gray-500">
+              Afișate {services.length} din {totalItems} servicii
+            </div>
+          </>
+        )}
+      </div>
+
+    </>
   );
 }
 
