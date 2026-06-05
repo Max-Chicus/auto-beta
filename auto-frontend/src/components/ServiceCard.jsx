@@ -39,7 +39,6 @@ function ServiceCard({ service }) {
       {/* IMAGINE SERVICIU - click duce la detalii */}
       <Link to={`/servicii/${service.brandSlug}/${service.slug.split('/').pop()}`}
         className="block"
-        aria-label={`Vezi detalii pentru serviciul ${service.name} - ${brandName}`}
       >
         <div className="h-48 bg-gray-100 relative overflow-hidden">
           {imageUrl ? (
@@ -77,6 +76,8 @@ function ServiceCard({ service }) {
               <div className="font-bold text-blue-600 text-sm">
                 {service.testPrice} {service.currency}
               </div>
+              {/* Text ascuns doar pentru Google - face link-ul unic */}
+              <span className="sr-only">pentru {service.name} {brandName}</span>
             </div>
           </div>
         </div>

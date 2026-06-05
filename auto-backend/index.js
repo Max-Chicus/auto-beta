@@ -10,17 +10,18 @@ const helmet = require('helmet');
 
 const app = express();
 
-// ========== HELMET - SECURITATE ==========
+// ========== HELMET - SECURITATE COMPLETĂ ==========
+// 1. Helmet de bază (setează mai multe headere de securitate)
 app.use(helmet());
 
-// Configurare HSTS (forțează HTTPS)
+// 2. Configurare HSTS (forțează HTTPS)
 app.use(helmet.hsts({
   maxAge: 15552000, // 180 de zile
   includeSubDomains: true,
   preload: true
 }));
 
-// Configurare CSP (Content Security Policy)
+// 3. Configurare CSP (Content Security Policy)
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -30,9 +31,22 @@ app.use(
       imgSrc: ["'self'", "data:", "https://via.placeholder.com", "https://ui-avatars.com", "https://images.unsplash.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       connectSrc: ["'self'", "https://auto-beta.onrender.com"],
+      frameAncestors: ["'none'"], // Previne clickjacking (echivalent XFO)
     },
   })
 );
+
+// 4. Configurare COOP (Cross-Origin-Opener-Policy)
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  next();
+});
+
+// 5. Configurare XFO (X-Frame-Options) - fallback
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
 
 connectDB();
 
