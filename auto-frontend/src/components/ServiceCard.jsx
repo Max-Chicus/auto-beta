@@ -37,7 +37,10 @@ function ServiceCard({ service }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-red-300 transition-all duration-300">
       {/* IMAGINE SERVICIU - click duce la detalii */}
-      <Link to={`/servicii/${service.brandSlug}/${service.slug.split('/').pop()}`} className="block">
+      <Link to={`/servicii/${service.brandSlug}/${service.slug.split('/').pop()}`}
+        className="block"
+        aria-label={`Vezi detalii pentru serviciul ${service.name} - ${brandName}`}
+      >
         <div className="h-48 bg-gray-100 relative overflow-hidden">
           {imageUrl ? (
             <img

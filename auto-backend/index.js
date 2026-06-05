@@ -6,7 +6,34 @@ const fs = require('fs');
 const uploadRouter = require('./routes/upload');
 require('dotenv').config();
 
+const helmet = require('helmet');
+
 const app = express();
+
+// ========== HELMET - SECURITATE ==========
+app.use(helmet());
+
+// Configurare HSTS (forțează HTTPS)
+app.use(helmet.hsts({
+  maxAge: 15552000, // 180 de zile
+  includeSubDomains: true,
+  preload: true
+}));
+
+// Configurare CSP (Content Security Policy)
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://via.placeholder.com", "https://ui-avatars.com", "https://images.unsplash.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      connectSrc: ["'self'", "https://auto-beta.onrender.com"],
+    },
+  })
+);
+
 connectDB();
 
 // ========== DETERMINĂ CALEA CORECTĂ PENTRU UPLOADS ==========
@@ -39,12 +66,12 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     // Permite cereri fără origin (ex: Postman, aplicații mobile, server-to-server)
     if (!origin) {
       return callback(null, true);
     }
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
