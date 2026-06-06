@@ -1,18 +1,28 @@
 // scripts/generateSitemap.js
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function generateSitemap() {
+  console.log('🚀 Starting sitemap generation...');
   try {
-    // Ia toate serviciile de la backend
-    const response = await fetch('https://auto-beta.onrender.com/services/all-slugs');
+    const backendUrl = 'https://auto-beta.onrender.com/services/all-slugs';
+    console.log(`📡 Fetching services from: ${backendUrl}`);
+    
+    const response = await fetch(backendUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const services = await response.json();
+    console.log(`📊 Successfully fetched ${services.length} services.`);
     
-    console.log(`📊 Am găsit ${services.length} servicii pentru sitemap`);
-    
+    if (!Array.isArray(services)) {
+      throw new Error('Invalid data format received from backend.');
+    }
+
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -26,6 +36,18 @@ async function generateSitemap() {
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.derstronik.md/request-service</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.derstronik.md/about</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>`;
     
     for (const service of services) {
@@ -44,14 +66,19 @@ async function generateSitemap() {
     sitemap += `
 </urlset>`;
     
-    // Scrie fișierul în folderul public
-    const publicDir = resolve(__dirname, '../public');
-    mkdirSync(publicDir, { recursive: true });
-    writeFileSync(resolve(publicDir, 'sitemap.xml'), sitemap);
+    // Vite scrie în folderul 'dist' la build
+    const outputDir = resolve(__dirname, '../dist');
+    if (!existsSync(outputDir)) {
+        mkdirSync(outputDir, { recursive: true });
+    }
+    const outputPath = resolve(outputDir, 'sitemap.xml');
+    writeFileSync(outputPath, sitemap);
     
-    console.log(`✅ Sitemap generat cu succes! ${services.length + 3} URL-uri totale`);
+    console.log(`✅ Sitemap successfully generated at ${outputPath}`);
+    console.log(`📊 Total URLs in sitemap: ${services.length + 3}`);
   } catch (err) {
-    console.error('❌ Eroare generare sitemap:', err);
+    console.error('❌ FATAL ERROR generating sitemap:', err);
+    throw err;
   }
 }
 
