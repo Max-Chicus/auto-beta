@@ -211,26 +211,6 @@ router.get('/for-vehicle', async (req, res) => {
   }
 });
 
-// GET service by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const service = await Service.findById(req.params.id)
-      .populate('brand', 'name logo slug')
-      .populate('serviceType', 'name icon');
-
-    if (!service) {
-      return res.status(404).json({ error: 'Serviciul nu a fost găsit' });
-    }
-
-    service.popularity += 1;
-    await service.save();
-
-    res.json(service);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // GET service types (categorii)
 router.get('/types/all', async (req, res) => {
   try {
@@ -266,23 +246,43 @@ router.get('/slug/:brandSlug/:serviceSlug', async (req, res) => {
   }
 });
 
-// GET all service slugs (pentru sitemap dinamic)
+// GET all service slugs (pentru sitemap dinamic) - MUTAT AICI ÎNAINTE DE /:id
 router.get('/all-slugs', async (req, res) => {
   try {
-    const services = await Service.find({ isActive: true }, 'slug updatedAt name')
-      .populate('brand', 'slug name');
+    const services = await Service.find({ isActive: true }, 'slug updatedAt name brandSlug')
+      .lean();
 
     const slugs = services.map(service => ({
       slug: service.slug,
-      brandSlug: service.brand?.slug,
-      brandName: service.brand?.name,
+      brandSlug: service.brandSlug,
       serviceName: service.name,
       updatedAt: service.updatedAt
     }));
 
+    console.log(`✅ Sitemap endpoint: ${slugs.length} services found`);
     res.json(slugs);
   } catch (err) {
     console.error('Eroare la obținerea slug-urilor:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET service by ID - TREBUIE SĂ FIE ULTIMA RUTĂ
+router.get('/:id', async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id)
+      .populate('brand', 'name logo slug')
+      .populate('serviceType', 'name icon');
+
+    if (!service) {
+      return res.status(404).json({ error: 'Serviciul nu a fost găsit' });
+    }
+
+    service.popularity += 1;
+    await service.save();
+
+    res.json(service);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
