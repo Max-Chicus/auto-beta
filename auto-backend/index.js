@@ -12,6 +12,24 @@ const app = express();
 
 connectDB();
 
+// ========== DETERMINĂ CALEA CORECTĂ PENTRU UPLOADS (înainte de a fi folosită) ==========
+let uploadsDir;
+if (process.env.RENDER) {
+  // Pe Render: folosește calea persistentă a discului
+  uploadsDir = '/opt/render/project/data/uploads';
+  console.log('📡 Rulează pe Render, folosește disk persistent:', uploadsDir);
+} else {
+  // Pe Windows (local): folosește calea relativă
+  uploadsDir = path.join(__dirname, 'uploads');
+  console.log('💻 Rulează local, folosește folderul:', uploadsDir);
+}
+
+// Asigură-te că directorul uploads există
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('✅ Director uploads creat:', uploadsDir);
+}
+
 // ========== CORS - TREBUIE SĂ FIE PRIMUL ==========
 const allowedOrigins = [
   'http://localhost:5173',
