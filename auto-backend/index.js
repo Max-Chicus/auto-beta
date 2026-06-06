@@ -28,10 +28,10 @@ app.use(
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://via.placeholder.com", "https://ui-avatars.com", "https://images.unsplash.com"],
+      imgSrc: ["'self'", "data:", "https://via.placeholder.com", "https://ui-avatars.com", "https://images.unsplash.com", "https://auto-beta.onrender.com", "https://derstronik.md", "https://www.derstronik.md"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      connectSrc: ["'self'", "https://auto-beta.onrender.com"],
-      frameAncestors: ["'none'"], // Previne clickjacking (echivalent XFO)
+      connectSrc: ["'self'", "https://auto-beta.onrender.com", "https://derstronik.md", "https://www.derstronik.md"],
+      frameAncestors: ["'none'"],
     },
   })
 );
