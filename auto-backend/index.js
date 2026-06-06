@@ -10,82 +10,22 @@ const helmet = require('helmet');
 
 const app = express();
 
-// ========== HELMET - SECURITATE COMPLETĂ ==========
-// 1. Helmet de bază (setează mai multe headere de securitate)
-app.use(helmet());
-
-// 2. Configurare HSTS (forțează HTTPS)
-app.use(helmet.hsts({
-  maxAge: 15552000, // 180 de zile
-  includeSubDomains: true,
-  preload: true
-}));
-
-// 3. Configurare CSP (Content Security Policy)
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://via.placeholder.com", "https://ui-avatars.com", "https://images.unsplash.com", "https://auto-beta.onrender.com", "https://derstronik.md", "https://www.derstronik.md"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      connectSrc: ["'self'", "https://auto-beta.onrender.com", "https://derstronik.md", "https://www.derstronik.md"],
-      frameAncestors: ["'none'"],
-    },
-  })
-);
-
-// 4. Configurare COOP (Cross-Origin-Opener-Policy)
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  next();
-});
-
-// 5. Configurare XFO (X-Frame-Options) - fallback
-app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'DENY');
-  next();
-});
-
 connectDB();
 
-// ========== DETERMINĂ CALEA CORECTĂ PENTRU UPLOADS ==========
-let uploadsDir;
-if (process.env.RENDER) {
-  // Pe Render: folosește calea persistentă a discului
-  uploadsDir = '/opt/render/project/data/uploads';
-  console.log('📡 Rulează pe Render, folosește disk persistent:', uploadsDir);
-} else {
-  // Pe Windows (local): folosește calea relativă
-  uploadsDir = path.join(__dirname, 'uploads');
-  console.log('💻 Rulează local, folosește folderul:', uploadsDir);
-}
-
-// Asigură-te că directorul uploads există
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log('✅ Director uploads creat:', uploadsDir);
-}
-
-// ========== CORS CONFIGURAT COMPLET ==========
+// ========== CORS - TREBUIE SĂ FIE PRIMUL ==========
 const allowedOrigins = [
-  'http://localhost:5173',                    // Frontend local (Vite)
-  'http://localhost:3000',                    // Frontend local (alternativ)
-  'https://auto-beta-front.vercel.app',       // Frontend pe Vercel (vechi)
-  'https://auto-beta.vercel.app',             // Frontend pe Vercel (alternativ)
-  'https://derstronik.md',                    // Noul tău domeniu (fără www)
-  'https://www.derstronik.md',                // Noul tău domeniu (cu www)
-  'https://auto-beta.onrender.com'            // Backend-ul însuși (pentru teste)
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://auto-beta-front.vercel.app',
+  'https://auto-beta.vercel.app',
+  'https://derstronik.md',
+  'https://www.derstronik.md',
+  'https://auto-beta.onrender.com'
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permite cereri fără origin (ex: Postman, aplicații mobile, server-to-server)
-    if (!origin) {
-      return callback(null, true);
-    }
-
+    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -100,7 +40,35 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
+// CORS trebuie să fie înainte de helmet
 app.use(cors(corsOptions));
+
+// ========== HELMET - DOAR DUPĂ CORS ==========
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Configurare HSTS
+app.use(helmet.hsts({
+  maxAge: 15552000,
+  includeSubDomains: true,
+  preload: true
+}));
+
+// Configurare CSP (mai permisivă)
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://via.placeholder.com", "https://ui-avatars.com", "https://images.unsplash.com", "https://auto-beta.onrender.com", "https://derstronik.md", "https://www.derstronik.md"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      connectSrc: ["'self'", "https://auto-beta.onrender.com", "https://derstronik.md", "https://www.derstronik.md"],
+      frameAncestors: ["'none'"],
+    },
+  })
+);
 
 // Middleware pentru body parsing
 app.use(express.json({ limit: '50mb' }));
