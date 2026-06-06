@@ -81,51 +81,43 @@ router.get('/gallery/:id', async (req, res) => {
   }
 });
 
-// GET sitemap.xml dinamic
+// GET sitemap.xml dinamic - se generează automat
 router.get('/sitemap.xml', async (req, res) => {
   try {
+    // Ia TOATE serviciile active
     const services = await Service.find(
       { isActive: true },
-      'slug updatedAt brandSlug name'
+      'slug brandSlug updatedAt'
     ).lean();
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-
-    // Pagina principală
-    sitemap += `
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.derstronik.md/</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-  </url>`;
-
-    // Pagina de servicii
-    sitemap += `
+  </url>
   <url>
     <loc>https://www.derstronik.md/services</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-  </url>`;
-
-    // Pagina de request service
-    sitemap += `
+  </url>
   <url>
     <loc>https://www.derstronik.md/request-service</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`;
-
-    // Pagina despre noi
-    sitemap += `
+  </url>
   <url>
     <loc>https://www.derstronik.md/about</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;
 
-    // Fiecare serviciu activ
+    // Adaugă automat TOATE serviciile
     for (const service of services) {
       if (service.slug && service.brandSlug) {
         const slugPart = service.slug.split('/').pop();
@@ -134,7 +126,7 @@ router.get('/sitemap.xml', async (req, res) => {
     <loc>https://www.derstronik.md/servicii/${service.brandSlug}/${slugPart}</loc>
     <lastmod>${service.updatedAt ? service.updatedAt.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>`;
       }
     }
@@ -145,7 +137,7 @@ router.get('/sitemap.xml', async (req, res) => {
     res.header('Content-Type', 'application/xml');
     res.send(sitemap);
   } catch (err) {
-    console.error('❌ Eroare sitemap:', err);
+    console.error('❌ Eroare generare sitemap:', err);
     res.status(500).json({ error: err.message });
   }
 });
