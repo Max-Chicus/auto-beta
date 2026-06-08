@@ -302,6 +302,20 @@ router.get('/all-slugs/sitemap', async (req, res) => {
   }
 });
 
+// GET all service slugs (pentru sitemap dinamic)
+router.get('/all-slugs', async (req, res) => {
+  try {
+    const services = await Service.find({ isActive: true }, 'slug brandSlug updatedAt name')
+      .lean();
+
+    console.log(`✅ Sitemap endpoint: ${services.length} services found`);
+    res.json(services);
+  } catch (err) {
+    console.error('❌ Eroare la obținerea slug-urilor:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET service by ID - TREBUIE SĂ FIE ULTIMA RUTĂ
 router.get('/:id', async (req, res) => {
   try {

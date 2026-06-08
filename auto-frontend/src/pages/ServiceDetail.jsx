@@ -223,7 +223,7 @@ function ServiceDetail() {
                           dynamicBullets: true,
                         }}
                         navigation
-                        loop={imageUrls.length > 1}
+                        loop={false}  // ← SCHIMBĂ DIN true ÎN false
                         className="service-detail-swiper rounded-xl overflow-hidden"
                       >
                         {imageUrls.map((url, index) => (
