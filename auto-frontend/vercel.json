@@ -6,7 +6,7 @@
     },
     {
       "source": "/sitemap.xml",
-      "destination": "/sitemap.xml"
+      "destination": "https://auto-beta.onrender.com/services/all-slugs/sitemap"
     },
     {
       "source": "/admin",
