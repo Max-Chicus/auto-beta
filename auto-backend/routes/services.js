@@ -246,58 +246,16 @@ router.get('/slug/:brandSlug/:serviceSlug', async (req, res) => {
   }
 });
 
-// GET sitemap.xml (generate XML)
-router.get('/all-slugs/sitemap', async (req, res) => {
+// GET all service slugs (pentru sitemap dinamic)
+router.get('/all-slugs', async (req, res) => {
   try {
-    const services = await Service.find({ isActive: true }, 'slug brandSlug updatedAt').lean();
-
-    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://www.derstronik.md/</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://www.derstronik.md/services</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.derstronik.md/request-service</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.derstronik.md/about</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>`;
-
-    for (const service of services) {
-      if (service.slug && service.brandSlug) {
-        const slugPart = service.slug.split('/').pop();
-        sitemap += `
-  <url>
-    <loc>https://www.derstronik.md/servicii/${service.brandSlug}/${slugPart}</loc>
-    <lastmod>${service.updatedAt ? service.updatedAt.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`;
-      }
-    }
-
-    sitemap += `
-</urlset>`;
-
-    res.header('Content-Type', 'application/xml');
-    res.send(sitemap);
+    const services = await Service.find({ isActive: true }, 'slug brandSlug updatedAt name')
+      .lean();
+    
+    console.log(`✅ Sitemap endpoint: ${services.length} services found`);
+    res.json(services);
   } catch (err) {
-    console.error('❌ Error generating sitemap:', err);
+    console.error('❌ Eroare la obținerea slug-urilor:', err);
     res.status(500).json({ error: err.message });
   }
 });
