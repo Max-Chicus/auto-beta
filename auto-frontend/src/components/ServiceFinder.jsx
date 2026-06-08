@@ -292,7 +292,7 @@ function ServiceFinder({ onSearch, dbServiceTypes }) {
                 <div
                   key={service._id}
                   className="border border-blue-200 rounded-lg overflow-hidden hover:shadow-2xl transition cursor-pointer hover:bg-blue-50"
-                  onClick={() => navigate(`/service/${service._id}`)}
+                  onClick={() => navigate(`/servicii/${service.brandSlug}/${service.slug.split('/').pop()}`)}
                 >
                   <div className="flex flex-col sm:flex-row">
                     {/* IMAGINEA SERVICIULUI - ACUM FOLOSEȘTE getFirstImageUrl() */}
