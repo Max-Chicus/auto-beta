@@ -234,8 +234,18 @@ function ServiceDetail() {
                                   src={url}
                                   alt={`${service.name} - Imagine ${index + 1}`}
                                   className="absolute top-0 left-0 w-full h-full object-contain bg-white"
+                                  crossOrigin="anonymous"
                                   onError={(e) => {
-                                    e.target.style.display = 'none';
+                                    // Prima încercare: încearcă să reîncarci imaginea
+                                    if (!e.target.dataset.retried) {
+                                      e.target.dataset.retried = 'true';
+                                      e.target.src = url;
+                                    } else {
+                                      // A doua încercare: ascunde imaginea și arată placeholder-ul
+                                      e.target.style.display = 'none';
+                                      const placeholder = e.target.nextElementSibling;
+                                      if (placeholder) placeholder.classList.remove('hidden');
+                                    }
                                   }}
                                 />
                                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
