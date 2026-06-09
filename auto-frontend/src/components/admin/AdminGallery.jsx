@@ -33,16 +33,26 @@ function AdminGallery() {
 
     setUploading(true);
     try {
-      // Trimitem direct URL-urile de la Vercel Blob
-      const imagesToSave = newImages.map(img => ({
-        url: img.url,
-        alt: img.alt || 'Galerie imagine',
-        order: 0
-      }));
+      // Convertește URL-urile complete în căi relative
+      const imagesToSave = newImages.map(img => {
+        let cleanUrl = img.url;
+        
+        // Extrage doar calea /uploads/... din orice URL complet
+        const match = cleanUrl.match(/\/uploads\/(.+)$/);
+        if (match) {
+          cleanUrl = `/uploads/${match[1]}`;
+        }
+        
+        return {
+          url: cleanUrl,
+          alt: img.alt || 'Galerie imagine',
+          order: 0
+        };
+      });
 
       const res = await API.post('/admin/gallery', { images: imagesToSave });
       
-      // ✅ Păstrăm imaginile existente și adăugăm pe cele noi la început
+      // Păstrăm imaginile existente și adăugăm pe cele noi la început
       setImages(prevImages => [...res.data, ...prevImages]);
       
       setShowUploader(false);
@@ -169,7 +179,7 @@ function AdminGallery() {
         <div className="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow">
           <h2 className="text-xl font-bold mb-4">Încarcă imagini noi</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Poți încărca mai multe imagini simultan. Imaginea va fi încărcată pe Vercel Blob, iar URL-ul va fi salvat în galerie.
+            Poți încărca mai multe imagini simultan.
           </p>
           <ImageUpload
             images={[]}

@@ -552,7 +552,7 @@ function ServiceDetail() {
                     return (
                       <Link
                         key={related._id}
-                        to={`/service/${related._id}`}
+                        to={`/servicii/${related.brandSlug}/${related.slug?.split('/').pop()}`}
                         className="block border rounded-lg p-4 hover:border-red-300 hover:bg-red-50 transition"
                       >
                         <div className="flex items-start gap-3">
