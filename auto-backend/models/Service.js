@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Subschema pentru modele compatibile (FĂRĂ slug aici)
+// Subschema pentru modele compatibile
 const CompatibleModelSchema = new mongoose.Schema({
   modelName: {
     type: String,
@@ -63,7 +63,7 @@ const ServiceSchema = new mongoose.Schema({
     trim: true
   },
 
-  // 🔥 SLUG-URI - MUTATE AICI (în schema principală) 🔥
+  // 🔥 SLUG-URI - doar unique: true, fără index separat 🔥
   slug: {
     type: String,
     unique: true,
@@ -106,20 +106,17 @@ const ServiceSchema = new mongoose.Schema({
     enum: ['fixed', 'from'],
     default: 'fixed'
   },
-  // Preț reparație fix
   repairPrice: {
     type: Number,
     min: 0,
     default: null
   },
-  // Preț reparație "de la" (minim)
   repairPriceFrom: {
     type: Number,
     min: 0,
     default: null
   },
 
-  // Preț testare - mereu fix
   testPrice: {
     type: Number,
     required: true,
@@ -170,14 +167,14 @@ const ServiceSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Index pentru căutare rapidă
+// Indexuri (NU mai include indexul pentru slug - deja are unique: true)
 ServiceSchema.index({ name: 'text', 'compatibleModels.modelName': 'text' });
 ServiceSchema.index({ brand: 1 });
 ServiceSchema.index({ serviceType: 1 });
 ServiceSchema.index({ isActive: 1 });
-ServiceSchema.index({ slug: 1 });
+// ServiceSchema.index({ slug: 1 }); ← ȘTERGE ACEASTĂ LINIE (comentat)
 
-// Virtual pentru numele brandului
+// Virtuale
 ServiceSchema.virtual('brandName', {
   ref: 'Brand',
   localField: 'brand',
@@ -186,7 +183,6 @@ ServiceSchema.virtual('brandName', {
   options: { select: 'name' }
 });
 
-// Virtual pentru numele tipului serviciului
 ServiceSchema.virtual('serviceTypeName', {
   ref: 'ServiceType',
   localField: 'serviceType',
