@@ -4,6 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
   const [uploading, setUploading] = useState(false);
+  const [localPreviews, setLocalPreviews] = useState([]); // 🔥 NOU: stochează preview-urile locale
   const fileInputRef = useRef(null);
 
   const handleFileSelect = async (e) => {
@@ -22,12 +23,15 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
           continue;
         }
 
-        if (file.size > 5 * 1024 * 1024) { // 5MB max
+        if (file.size > 5 * 1024 * 1024) {
           alert(`Imaginea ${file.name} este prea mare (max 5MB)`);
           continue;
         }
 
-        // 🔥 NOU: Trimitem fișierul la backend
+        // 🔥 CREEZĂ PREVIEW LOCAL IMEDIAT
+        const localPreviewUrl = URL.createObjectURL(file);
+        
+        // Trimitem fișierul la backend
         const formData = new FormData();
         formData.append('image', file);
 
@@ -42,12 +46,18 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
 
         const data = await res.json();
 
-        // Adăugăm imaginea primită de la server
-        onImagesChange([...images, {
-          url: data.url,  // URL de la Vercel Blob
+        // Adăugăm imaginea cu URL-ul real de la server
+        const newImage = {
+          url: data.url,
           name: data.name,
-          size: data.size
-        }]);
+          size: data.size,
+          localPreview: localPreviewUrl // 🔥 PĂSTRĂM PREVIEW-UL LOCAL
+        };
+
+        onImagesChange([...images, newImage]);
+        
+        // Adaugă și în localPreviews pentru a menține referința
+        setLocalPreviews(prev => [...prev, localPreviewUrl]);
       }
 
     } catch (err) {
@@ -62,6 +72,10 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
   };
 
   const removeImage = (index) => {
+    // Curăță URL-ul local pentru a evita memory leak
+    if (images[index]?.localPreview) {
+      URL.revokeObjectURL(images[index].localPreview);
+    }
     const newImages = [...images];
     newImages.splice(index, 1);
     onImagesChange(newImages);
@@ -69,6 +83,11 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
+  };
+
+  // Obține URL-ul pentru preview (folosește localPreview dacă există, altfel url-ul real)
+  const getPreviewUrl = (img) => {
+    return img.localPreview || img.url;
   };
 
   return (
@@ -112,9 +131,13 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
             {images.map((img, index) => (
               <div key={index} className="relative group">
                 <img
-                  src={img.url}
+                  src={getPreviewUrl(img)}
                   alt={`Preview ${index + 1}`}
                   className="w-full h-32 object-cover rounded-lg border"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/128?text=Eroare';
+                  }}
                 />
                 <button
                   type="button"
