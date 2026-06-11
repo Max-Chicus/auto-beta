@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Subschema pentru modele compatibile
+// Subschema pentru modele compatibile (FĂRĂ slug aici)
 const CompatibleModelSchema = new mongoose.Schema({
   modelName: {
     type: String,
@@ -34,16 +34,6 @@ const CompatibleModelSchema = new mongoose.Schema({
   notes: {
     type: String,
     trim: true
-  },
-  slug: {
-    type: String,
-    unique: true,
-    sparse: true,
-    trim: true
-  },
-  brandSlug: {
-    type: String,
-    trim: true
   }
 }, { _id: false });
 
@@ -70,6 +60,18 @@ const ServiceSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true
+  },
+
+  // 🔥 SLUG-URI - MUTATE AICI (în schema principală) 🔥
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true
+  },
+  brandSlug: {
+    type: String,
     trim: true
   },
 
@@ -173,6 +175,7 @@ ServiceSchema.index({ name: 'text', 'compatibleModels.modelName': 'text' });
 ServiceSchema.index({ brand: 1 });
 ServiceSchema.index({ serviceType: 1 });
 ServiceSchema.index({ isActive: 1 });
+ServiceSchema.index({ slug: 1 });
 
 // Virtual pentru numele brandului
 ServiceSchema.virtual('brandName', {
