@@ -185,6 +185,23 @@ function AdminServices() {
     }
 
     try {
+      // 🔥 CONVERSEAZĂ URL-URILE IMAGINILOR
+      const cleanedImages = formData.images.map(img => {
+        let cleanUrl = img.url;
+
+        // Extrage doar calea /uploads/...
+        const match = cleanUrl.match(/\/uploads\/(.+)$/);
+        if (match) {
+          cleanUrl = `/uploads/${match[1]}`;
+        }
+
+        return {
+          url: cleanUrl,
+          name: img.name,
+          size: img.size
+        };
+      });
+
       // Pregătește datele - trimite DOAR câmpurile necesare
       const serviceData = {
         name: formData.name,
@@ -207,7 +224,7 @@ function AdminServices() {
         description: formData.description || '',
         duration: formData.duration,
         warranty: formData.warranty,
-        images: formData.images,
+        images: cleanedImages,  // ← FOLOSEȘTE VERSIUNEA CURATĂ
         diagramImage: formData.diagramImage || '',
         featured: Boolean(formData.featured)
       };
