@@ -351,7 +351,7 @@ router.post('/services', async (req, res) => {
         .replace(/-+$/, '');
     }
 
-    if (!serviceData.slug) {
+    if (!serviceData.slug || serviceData.slug === '') {
       const brand = await Brand.findById(serviceData.brand);
       const brandSlug = brand?.slug || slugify(brand?.name || 'general');
       const serviceSlug = slugify(serviceData.name);
