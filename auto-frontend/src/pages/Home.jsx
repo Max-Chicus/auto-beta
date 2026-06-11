@@ -832,7 +832,7 @@ function Home() {
                 </div>
 
                 {/* Badge curier parteneri */}
-                <div className="absolute -bottom-4 -right-4 bg-white rounded-full shadow-xl p-4">
+                <div className="absolute -bottom-7 -right-4 bg-white rounded-full shadow-xl p-4">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">🚚</span>
                     <span className="font-bold text-sm">DHL • FanCurier • Cargus • NovaPost • Poșta Moldovei</span>

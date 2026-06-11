@@ -47,7 +47,7 @@ function About() {
 
           <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h1 className="text-5xl md:text-6xl font-bold mb-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
                 D E R S T R O N I K
               </h1>
               <p className="text-2xl md:text-3xl mb-8 text-gray-200 font-light">
