@@ -332,7 +332,7 @@ router.post('/services', async (req, res) => {
       }
     }
 
-    // ========== GENEREAZĂ SLUG AUTOMAT DACA NU EXISTĂ ==========
+    // ========== GENEREAZĂ SLUG AUTOMAT ==========
     function slugify(text) {
       if (!text) return '';
       return text
@@ -351,21 +351,28 @@ router.post('/services', async (req, res) => {
         .replace(/-+$/, '');
     }
 
+    // Verifică dacă slug-ul lipsește sau e gol
     if (!serviceData.slug || serviceData.slug === '') {
-      const brand = await Brand.findById(serviceData.brand);
-      const brandSlug = brand?.slug || slugify(brand?.name || 'general');
-      const serviceSlug = slugify(serviceData.name);
+      // Convertește brand-ul la ObjectId dacă e string
+      const brandId = mongoose.Types.ObjectId.isValid(serviceData.brand)
+        ? serviceData.brand
+        : serviceData.brand;
 
-      serviceData.slug = `${brandSlug}/${serviceSlug}`;
-      serviceData.brandSlug = brandSlug;
+      const brand = await Brand.findById(brandId);
 
-      // Verifică unicitatea (în caz de conflict rar)
-      const existing = await Service.findOne({ slug: serviceData.slug });
-      if (existing) {
-        serviceData.slug = `${brandSlug}/${serviceSlug}-${Date.now().toString().slice(-4)}`;
+      if (brand) {
+        const brandSlug = brand.slug || slugify(brand.name);
+        const serviceSlug = slugify(serviceData.name);
+        serviceData.slug = `${brandSlug}/${serviceSlug}`;
+        serviceData.brandSlug = brandSlug;
+        console.log(`✅ Slug generat: ${serviceData.slug}`);
+      } else {
+        console.log(`❌ Brand negăsit pentru ID: ${serviceData.brand}`);
+        // Fallback
+        const serviceSlug = slugify(serviceData.name);
+        serviceData.slug = `general/${serviceSlug}`;
+        serviceData.brandSlug = 'general';
       }
-
-      console.log(`✅ Slug generat automat: ${serviceData.slug}`);
     }
 
     // CREEAZĂ SERVICIUL
@@ -1272,7 +1279,5 @@ router.delete('/announcement', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-module.exports = router;
 
 module.exports = router;
