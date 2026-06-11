@@ -332,6 +332,42 @@ router.post('/services', async (req, res) => {
       }
     }
 
+    // ========== GENEREAZĂ SLUG AUTOMAT DACA NU EXISTĂ ==========
+    function slugify(text) {
+      if (!text) return '';
+      return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[șȘ]/g, 's')
+        .replace(/[țȚ]/g, 't')
+        .replace(/[ăĂ]/g, 'a')
+        .replace(/[îÎ]/g, 'i')
+        .replace(/[âÂ]/g, 'a')
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    }
+
+    if (!serviceData.slug) {
+      const brand = await Brand.findById(serviceData.brand);
+      const brandSlug = brand?.slug || slugify(brand?.name || 'general');
+      const serviceSlug = slugify(serviceData.name);
+
+      serviceData.slug = `${brandSlug}/${serviceSlug}`;
+      serviceData.brandSlug = brandSlug;
+
+      // Verifică unicitatea (în caz de conflict rar)
+      const existing = await Service.findOne({ slug: serviceData.slug });
+      if (existing) {
+        serviceData.slug = `${brandSlug}/${serviceSlug}-${Date.now().toString().slice(-4)}`;
+      }
+
+      console.log(`✅ Slug generat automat: ${serviceData.slug}`);
+    }
+
     // CREEAZĂ SERVICIUL
     console.log('💾 Salvez în MongoDB...');
     const service = await Service.create(serviceData);
@@ -755,7 +791,7 @@ router.post('/gallery', async (req, res) => {
 
       // 🔥 NOU: Convertește URL-ul complet în cale relativă
       let cleanUrl = img.url;
-      
+
       // Dacă e URL de pe Vercel
       if (cleanUrl.includes('vercel-storage.com')) {
         const filename = cleanUrl.split('/').pop();
