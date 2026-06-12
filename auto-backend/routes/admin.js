@@ -332,7 +332,7 @@ router.post('/services', async (req, res) => {
       }
     }
 
-    // ========== GENEREAZĂ SLUG AUTOMAT ==========
+    // ========== GENEREAZĂ SLUG AUTOMAT CU VERIFICARE UNICITATE ==========
     function slugify(text) {
       if (!text) return '';
       return text
@@ -353,7 +353,6 @@ router.post('/services', async (req, res) => {
 
     // Verifică dacă slug-ul lipsește sau e gol
     if (!serviceData.slug || serviceData.slug === '') {
-      // Convertește brand-ul la ObjectId dacă e string
       const brandId = mongoose.Types.ObjectId.isValid(serviceData.brand)
         ? serviceData.brand
         : serviceData.brand;
@@ -362,15 +361,38 @@ router.post('/services', async (req, res) => {
 
       if (brand) {
         const brandSlug = brand.slug || slugify(brand.name);
-        const serviceSlug = slugify(serviceData.name);
-        serviceData.slug = `${brandSlug}/${serviceSlug}`;
+        const baseServiceSlug = slugify(serviceData.name);
+
+        // Slug de bază
+        let finalSlug = `${brandSlug}/${baseServiceSlug}`;
+
+        // 🔥 VERIFICĂ UNICITATEA ȘI ADAUGĂ SUFIX NUMERIC Dacă este necesar
+        let counter = 1;
+        let existing = await Service.findOne({ slug: finalSlug });
+        while (existing) {
+          finalSlug = `${brandSlug}/${baseServiceSlug}-${counter}`;
+          existing = await Service.findOne({ slug: finalSlug });
+          counter++;
+        }
+
+        serviceData.slug = finalSlug;
         serviceData.brandSlug = brandSlug;
-        console.log(`✅ Slug generat: ${serviceData.slug}`);
+        console.log(`✅ Slug generat unic: ${serviceData.slug}`);
       } else {
         console.log(`❌ Brand negăsit pentru ID: ${serviceData.brand}`);
-        // Fallback
         const serviceSlug = slugify(serviceData.name);
-        serviceData.slug = `general/${serviceSlug}`;
+        let finalSlug = `general/${serviceSlug}`;
+
+        // Verifică și pentru fallback
+        let counter = 1;
+        let existing = await Service.findOne({ slug: finalSlug });
+        while (existing) {
+          finalSlug = `general/${serviceSlug}-${counter}`;
+          existing = await Service.findOne({ slug: finalSlug });
+          counter++;
+        }
+
+        serviceData.slug = finalSlug;
         serviceData.brandSlug = 'general';
       }
     }
