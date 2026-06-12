@@ -84,7 +84,7 @@ router.get('/', async (req, res) => {
 
     console.log('📊 Total servicii înainte de filtrare model:', allServices.length);
 
-    // 🔥 FILTRARE MODEL (pe TOATE serviciile)
+    // 🔥 FILTRARE MODEL (pe TOATE serviciile) - EXACT MATCH PRIORITATE
     if (model && model.trim() !== '') {
       console.log('🎯 FILTREZ DUPA MODEL:', model);
       const modelSearch = model.toLowerCase().trim();
@@ -93,14 +93,26 @@ router.get('/', async (req, res) => {
         if (!service.compatibleModels || service.compatibleModels.length === 0) {
           return false;
         }
-        const hasMatch = service.compatibleModels.some(cm => {
-          if (!cm.modelName) return false;
+
+        // Verifică dacă există un match exact
+        let hasExactMatch = false;
+        let hasPartialMatch = false;
+
+        for (const cm of service.compatibleModels) {
+          if (!cm.modelName) continue;
           const dbModel = cm.modelName.toLowerCase().trim();
-          return dbModel === modelSearch ||
-            dbModel.includes(modelSearch) ||
-            modelSearch.includes(dbModel);
-        });
-        return hasMatch;
+
+          if (dbModel === modelSearch) {
+            hasExactMatch = true;
+            break;
+          }
+          if (dbModel.includes(modelSearch) || modelSearch.includes(dbModel)) {
+            hasPartialMatch = true;
+          }
+        }
+
+        // Priority: exact match > partial match
+        return hasExactMatch || hasPartialMatch;
       });
       console.log('📊 Servicii după filtrare model:', allServices.length);
     }
@@ -113,15 +125,27 @@ router.get('/', async (req, res) => {
 
       allServices = allServices.filter(service => {
         if (!service.compatibleModels) return false;
-        return service.compatibleModels.some(cm => {
-          if (!cm.modelName) return false;
+
+        let hasExactMatch = false;
+        let hasPartialMatch = false;
+
+        for (const cm of service.compatibleModels) {
+          if (!cm.modelName) continue;
           const dbModel = cm.modelName.toLowerCase().trim();
-          const matchesModel = dbModel === modelSearch ||
-            dbModel.includes(modelSearch) ||
-            modelSearch.includes(dbModel);
           const matchesYear = yearNum >= cm.yearFrom && yearNum <= cm.yearTo;
-          return matchesModel && matchesYear;
-        });
+
+          if (!matchesYear) continue;
+
+          if (dbModel === modelSearch) {
+            hasExactMatch = true;
+            break;
+          }
+          if (dbModel.includes(modelSearch) || modelSearch.includes(dbModel)) {
+            hasPartialMatch = true;
+          }
+        }
+
+        return hasExactMatch || hasPartialMatch;
       });
       console.log('📊 Servicii după filtrare model+an:', allServices.length);
     }
