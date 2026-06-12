@@ -374,6 +374,7 @@ router.post('/services', async (req, res) => {
           existing = await Service.findOne({ slug: finalSlug });
           counter++;
         }
+        
 
         serviceData.slug = finalSlug;
         serviceData.brandSlug = brandSlug;

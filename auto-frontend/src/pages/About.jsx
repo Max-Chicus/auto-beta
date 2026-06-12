@@ -59,6 +59,7 @@ function About() {
             </div>
           </div>
         </div>
+        
 
         {/* DESPRE NOI */}
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
