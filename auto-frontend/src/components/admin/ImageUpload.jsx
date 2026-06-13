@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { getFullImageUrl } from '../../utils/imageUtils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -30,7 +31,7 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
 
         // 🔥 CREEZĂ PREVIEW LOCAL IMEDIAT
         const localPreviewUrl = URL.createObjectURL(file);
-        
+
         // Trimitem fișierul la backend
         const formData = new FormData();
         formData.append('image', file);
@@ -55,7 +56,7 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
         };
 
         onImagesChange([...images, newImage]);
-        
+
         // Adaugă și în localPreviews pentru a menține referința
         setLocalPreviews(prev => [...prev, localPreviewUrl]);
       }
@@ -85,9 +86,14 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
     fileInputRef.current?.click();
   };
 
-  // Obține URL-ul pentru preview (folosește localPreview dacă există, altfel url-ul real)
+  // Obține URL-ul pentru preview (folosește localPreview dacă există, altfel URL-ul complet)
   const getPreviewUrl = (img) => {
-    return img.localPreview || img.url;
+    // Dacă există localPreview (imagine proaspăt încărcată), folosește-l
+    if (img.localPreview) {
+      return img.localPreview;
+    }
+    // Altfel, folosește URL-ul complet din backend (pentru imaginile salvate)
+    return getFullImageUrl(img.url);
   };
 
   return (
@@ -136,7 +142,7 @@ function ImageUpload({ images = [], onImagesChange, maxImages = 5 }) {
                   className="w-full h-32 object-cover rounded-lg border"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/128?text=Eroare';
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="1"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"%3E%3C/rect%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"%3E%3C/circle%3E%3Cpolyline points="21 15 16 10 5 21"%3E%3C/polyline%3E%3C/svg%3E';
                   }}
                 />
                 <button
