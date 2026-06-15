@@ -123,6 +123,7 @@ router.get('/', async (req, res) => {
       });
       console.log('📊 Servicii după filtrare model+an:', allServices.length);
     }
+    
 
     // 🔥 ACUM aplică paginăția pe rezultatele deja filtrate
     const pageNum = parseInt(page);
