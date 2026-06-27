@@ -18,6 +18,7 @@ import AdminGallery from './components/admin/AdminGallery';
 import ShippingLabel from './pages/ShippingLabel';
 import AdminShippingRequests from './components/admin/AdminShippingRequests';
 import NotFound from './pages/NotFound';
+import ServiceTypePage from './pages/ServiceTypePage';
 import { HelmetProvider } from 'react-helmet-async';
 import "./App.css"
 
@@ -42,7 +43,8 @@ function App() {
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/shipping-label" element={<ShippingLabel />} />
             <Route path="/shipping-label/:serviceId" element={<ShippingLabel />} />
-
+            <Route path="/service-type/:serviceSlug" element={<ServiceTypePage />} />
+            
             {/* RUTE ADMIN */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route

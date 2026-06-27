@@ -162,7 +162,7 @@ function Home() {
   const serviceTypes = [
     {
       id: 1,
-      title: "Ceasuri/panoul de bord",
+      title: "Ceasuri, panou de bord",
       description: "Reparăm și reprogramăm toate tipurile de panouri de bord pentru afișare corectă a informațiilor vehiculului.",
       icon: "📊",
       image: "/gama-1.webp",
@@ -507,10 +507,21 @@ function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {serviceTypes.map((service) => {
                 const dbId = getDbServiceTypeId(service.title);
+                // Generează slug-ul pentru link
+                const slug = service.title
+                  .toLowerCase()
+                  .replace(/[șȘ]/g, 's')
+                  .replace(/[țȚ]/g, 't')
+                  .replace(/[ăĂ]/g, 'a')
+                  .replace(/[îÎ]/g, 'i')
+                  .replace(/[âÂ]/g, 'a')
+                  .replace(/\s+/g, '-')
+                  .replace(/[^\w\-]+/g, '');
                 return (
-                  <div
+                  <Link
                     key={service.id}
-                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
+                    to={`/service-type/${slug}`}
+                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group block"
                   >
                     {/* Imagine serviciu */}
                     <div className="relative h-48 overflow-hidden">
@@ -557,7 +568,7 @@ function Home() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
 
