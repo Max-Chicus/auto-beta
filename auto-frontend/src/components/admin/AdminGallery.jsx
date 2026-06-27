@@ -326,6 +326,7 @@ function AdminGallery() {
               >
                 Anulează
               </button>
+              
               <button
                 onClick={() => {
                   handleUpdate(editingImage._id, {
